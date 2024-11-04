@@ -33,7 +33,6 @@ import com.railwayteam.railways.multiloader.Loader;
 import com.railwayteam.railways.registry.CRCommands;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.util.MethodVarHandleUtils;
-import com.railwayteam.railways.util.RailwaysUpdateCheck;
 import com.railwayteam.railways.util.Utils;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.data.CreateRegistrate;
