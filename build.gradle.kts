@@ -136,9 +136,9 @@ subprojects {
             val maven = if (isRelease) "releases" else "snapshots"
             if (mavenToken != null && mavenToken.isNotEmpty()) {
                 maven {
-                    url = uri("https://maven.ithundxr.dev/${maven}")
+                    url = uri("https://mvn.devos.one/${maven}")
                     credentials {
-                        username = "railways-github"
+                        username = "ithundxr-github"
                         password = mavenToken
                     }
                 }
