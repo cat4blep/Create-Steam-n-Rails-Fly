@@ -46,3 +46,8 @@ Most of the code for spy conductors is from Security Craft, which is licensed un
 Most of the code for annotation based conditional mixins is from Neruina, which is licensed under the MIT license. See [Neruina's license](https://github.com/Bawnorton/Neruina/blob/multi-version/LICENSE.txt) for more information.
 
 Most of the code for the sloped/custom hitbox outlines is from FramedBlocks, which is licensed under the LGPL license. See [FramedBlock's license](https://github.com/XFactHD/FramedBlocks/blob/17c8274ca380c3a868763b1b05657d07860c364b/LICENSE) for more information.
+
+## Acknowledgements
+<img src="https://www.yourkit.com/images/yklogo.png"></img>
+
+We make use of [YourKit's Java profiler](https://www.yourkit.com/java/profiler/) when working our mods. Many thanks to them for providing a free license for this project.
