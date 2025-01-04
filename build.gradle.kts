@@ -72,7 +72,13 @@ allprojects {
     // example: 1.0.0+fabric-1.19.2-build.100 (or -local)
     val build = buildNumber?.let { "-build.${it}" } ?: "-local"
 
-    version = "${"mod_version"()}+${project.name}-mc${"minecraft_version"() + if (isRelease) "" else build}"
+    var gitBranchLabel = "";
+    if ("mod_version"().endsWith("-alpha")) {
+        // gitBranchLabel should be "-" + the current git branch (replacing any slashes with underscores)
+        gitBranchLabel = "-" + calculateGitBranch().replace("/", "_")
+    }
+
+    version = "${"mod_version"()}${gitBranchLabel}+${project.name}-mc${"minecraft_version"() + if (isRelease) "" else build}"
 
     tasks.withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
@@ -377,6 +383,19 @@ fun calculateGitHash(): String {
         val stdout = ByteArrayOutputStream()
         exec {
             commandLine("git", "rev-parse", "HEAD")
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    } catch(ignored: Throwable) {
+        return "unknown"
+    }
+}
+
+fun calculateGitBranch(): String {
+    try {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine("git", "rev-parse", "--abbrev-ref", "HEAD")
             standardOutput = stdout
         }
         return stdout.toString().trim()
