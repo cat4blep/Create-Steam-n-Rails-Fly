@@ -39,12 +39,9 @@ public final class EmptySchema extends FirstSchema {
     }
 
     // Ensure the schema stays empty.
-    @Override
     public void registerType(boolean recursive, DSL.TypeReference type, Supplier<TypeTemplate> template) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
     protected Map<String, Type<?>> buildTypes() {
         return Object2ObjectMaps.emptyMap();
     }

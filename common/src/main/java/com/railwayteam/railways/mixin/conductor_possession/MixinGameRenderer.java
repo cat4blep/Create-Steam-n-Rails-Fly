@@ -25,7 +25,7 @@ import com.railwayteam.railways.content.conductor.ClientHandler;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -44,7 +44,7 @@ public abstract class MixinGameRenderer {
 	Minecraft minecraft;
 
     @Shadow
-	abstract void loadEffect(ResourceLocation resourceLocation);
+	abstract void loadEffect(Identifier Identifier);
 
     @Inject(method = "bobView", at = @At("HEAD"), cancellable = true)
     private void railways$bobView(PoseStack matrixStack, float partialTicks, CallbackInfo ci) {
@@ -64,7 +64,7 @@ public abstract class MixinGameRenderer {
     @Inject(method = "checkEntityPostEffect", at = @At("RETURN"))
     private void railways$checkEntityPostEffect(Entity entity, CallbackInfo ci) {
         if (entity instanceof ConductorEntity && CRConfigs.client().useConductorSpyShader.get()) {
-            loadEffect(new ResourceLocation("shaders/post/scan_pincushion.json"));
+            loadEffect(new Identifier("shaders/post/scan_pincushion.json"));
         }
     }
 

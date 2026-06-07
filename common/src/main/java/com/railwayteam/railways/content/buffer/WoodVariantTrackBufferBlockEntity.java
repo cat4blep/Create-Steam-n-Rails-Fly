@@ -62,22 +62,19 @@ public class WoodVariantTrackBufferBlockEntity extends TrackBufferBlockEntity im
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
+        protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
         BlockState prevMaterial = material;
         if (!compound.contains("Material"))
             return;
 
-        material = NbtUtils.readBlockState(blockHolderGetter(), compound.getCompound("Material"));
+        material = NbtUtils.readBlockState(blockHolderGetter(), compound.getCompound("Material").orElse(new CompoundTag()));
         if (material.isAir())
             material = Blocks.SPRUCE_PLANKS.defaultBlockState();
 
         if (clientPacket && prevMaterial != material)
             redraw();
     }
-
-    @Override
     public void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
         compound.put("Material", NbtUtils.writeBlockState(material));

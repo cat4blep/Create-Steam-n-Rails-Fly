@@ -28,7 +28,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.Vanishable;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -42,13 +42,9 @@ public class PaintBrushItem extends Item implements Vanishable {
     public PaintBrushItem(Properties properties) {
         super(properties);
     }
-
-    @Override
     public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         return CRTags.AllItemTags.PAINT_BRUSH_REPAIR_ITEMS.matches(repairCandidate);
     }
-
-    @Override
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         Level level = context.getLevel();
@@ -69,19 +65,16 @@ public class PaintBrushItem extends Item implements Vanishable {
         if (target == null) return InteractionResult.PASS;
         if (target.getColor() == pitcherColor) return InteractionResult.PASS;
 
-        if (level.isClientSide) return InteractionResult.SUCCESS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
 
         if (!target.repaint(pitcherColor)) return InteractionResult.FAIL;
 
         PaintPitcherItem.usePaint(player, InteractionHand.OFF_HAND);
-        player.getMainHandItem().hurtAndBreak(1, player,
-            (playerEntity) -> playerEntity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
+        player.getMainHandItem().hurtAndBreak(1, player, InteractionHand.MAIN_HAND);
 
         return InteractionResult.SUCCESS;
     }
-
-    @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BRUSH;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.BRUSH;
     }
 }

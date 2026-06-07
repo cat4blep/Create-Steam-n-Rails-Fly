@@ -72,7 +72,12 @@ public record SmokeEmissionParams(
             case OLD -> {
                 ParticleOptions particleType;
                 if (color != null) {
-                    float[] c = color.getTextureDiffuseColors();
+                    int rgb = color.getTextureDiffuseColor();
+                    float[] c = new float[] {
+                        ((rgb >> 16) & 0xFF) / 255.0F,
+                        ((rgb >> 8) & 0xFF) / 255.0F,
+                        (rgb & 0xFF) / 255.0F
+                    };
                     particleType = new SmokeParticleData(stationary, c[0], c[1], c[2]);
                 } else {
                     particleType = new SmokeParticleData(stationary);

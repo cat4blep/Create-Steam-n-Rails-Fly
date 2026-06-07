@@ -42,8 +42,6 @@ public abstract class AxisToFacingFix extends DataFix {
     }
 
     protected abstract boolean applyToBlockState(String blockId);
-
-    @Override
     public TypeRewriteRule makeRule() {
         return this.fixTypeEverywhereTyped(this.name + " for block_state", this.getInputSchema().getType(References.BLOCK_STATE), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
             Optional<String> optional = dynamic.get("Name").asString().result();

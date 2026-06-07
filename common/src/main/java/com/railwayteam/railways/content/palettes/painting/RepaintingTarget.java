@@ -23,9 +23,9 @@ import com.railwayteam.railways.mixin_interfaces.CopycatDuck;
 import com.railwayteam.railways.registry.CRPalettes;
 import com.railwayteam.railways.registry.CRPalettes.Styles;
 import com.railwayteam.railways.registry.CRTags;
-import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import com.simibubi.create.content.decoration.copycat.CopycatBlockEntity;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
@@ -82,13 +82,9 @@ public abstract class RepaintingTarget {
             super(level, pos, state);
             this.style = style;
         }
-
-        @Override
         public PalettesColor getColor() {
             return style.getSecond();
         }
-
-        @Override
         public boolean repaint(PalettesColor color) {
             if (level.isClientSide()) return false;
 
@@ -145,13 +141,9 @@ public abstract class RepaintingTarget {
             this.materialStyle = materialStyle;
             this.copycat = copycat;
         }
-
-        @Override
         public PalettesColor getColor() {
             return materialStyle.getSecond();
         }
-
-        @Override
         public boolean repaint(PalettesColor color) {
             if (level.isClientSide()) return false;
 

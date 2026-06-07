@@ -21,39 +21,36 @@ package com.railwayteam.railways.content.animated_flywheel;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.mixin_interfaces.ICarriageFlywheel;
 import com.railwayteam.railways.mixin_interfaces.IDistanceTravelled;
-import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
-import com.simibubi.create.content.contraptions.behaviour.MovementContext;
-import com.simibubi.create.content.contraptions.render.ContraptionMatrices;
-import com.simibubi.create.content.kinetics.flywheel.FlywheelBlockEntity;
-import com.simibubi.create.content.trains.entity.CarriageContraption;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
-import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
-import net.createmod.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
+import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
+import com.zurrtum.create.content.contraptions.render.ContraptionMatrices;
+import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlockEntity;
+import com.zurrtum.create.content.trains.entity.CarriageContraption;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
+import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
-public class FlywheelMovementBehaviour implements MovementBehaviour {
-    @Override
+public class FlywheelMovementBehaviour extends MovementBehaviour {
     public boolean isActive(MovementContext context) {
-        return context.world.isClientSide;
+        return context.world.isClientSide();
     }
 
     private static class TemporaryData {
         float wheelAngle0 = Float.NaN;
         float wheelAngle1 = Float.NaN;
     }
-
-    @Override
     public void tick(MovementContext context) {
         Object temporaryDataBackup = context.temporaryData;
         context.temporaryData = null;
 
         // Early exit checks, don't mind them :)
         if (!CRConfigs.client().animatedFlywheels.get()) return;
-        if (!context.world.isClientSide || Minecraft.getInstance().isPaused()) return;
+        if (!context.world.isClientSide() || Minecraft.getInstance().isPaused()) return;
         if (!(context.contraption instanceof CarriageContraption carriageContraption)) return;
         if (!(carriageContraption.entity instanceof CarriageContraptionEntity carriageContraptionEntity)) return;
         if (!(context.contraption.getOrCreateClientContraptionLazy().getBlockEntity(context.localPos) instanceof FlywheelBlockEntity flywheelBlockEntity)) return;
@@ -86,7 +83,6 @@ public class FlywheelMovementBehaviour implements MovementBehaviour {
         td.wheelAngle1 = (float) (td.wheelAngle0 + angleDiff);
     }
 
-    @Override
     public void renderInContraption(MovementContext context, VirtualRenderWorld renderWorld, ContraptionMatrices matrices, MultiBufferSource buffer) {
         if (!(context.contraption.getOrCreateClientContraptionLazy().getBlockEntity(context.localPos) instanceof FlywheelBlockEntity flywheelBlockEntity)) return;
         if (!(context.temporaryData instanceof TemporaryData temporaryData)) return;

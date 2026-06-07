@@ -22,13 +22,13 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.mixin.AccessorIngredient$TagValue;
 import com.railwayteam.railways.registry.CRItems;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.AllTags;
-import com.simibubi.create.content.kinetics.deployer.DeployerApplicationRecipe;
-import com.simibubi.create.content.kinetics.press.PressingRecipe;
-import com.simibubi.create.content.kinetics.saw.CuttingRecipe;
-import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.foundation.data.recipe.CommonMetal;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
+import com.zurrtum.create.content.kinetics.press.PressingRecipe;
+import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.foundation.data.recipe.CommonMetal;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -69,15 +69,15 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
             ));
         }
 
-        List<TrackMaterial> trackMaterials = new ArrayList<>(TrackMaterial.allFromMod(Railways.MOD_ID));
+        List<TrackMaterial> trackMaterials = new ArrayList<>(CRTrackMaterials.allFromMod(Railways.MOD_ID));
 
         // Add all mod compat tracks
         for (String mod : TRACK_COMPAT_MODS)
-            trackMaterials.addAll(TrackMaterial.allFromMod(mod));
+            trackMaterials.addAll(CRTrackMaterials.allFromMod(mod));
 
         for (TrackMaterial material : trackMaterials) {
             if (material.railsIngredient.isEmpty() || material.sleeperIngredient.isEmpty()) {
-                if (material.trackType == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
+                if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
                     TrackMaterial baseMaterial = CRTrackMaterials.getBaseFromWide(material);
                     if (baseMaterial == null)
                         continue;
@@ -89,8 +89,8 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
                     }
                     if (sleeperIngredient.isEmpty()) continue;
                     TRACKS.put(material, create(
-                        "track_" + (material.id.getNamespace().equals(Railways.MOD_ID)
-                            ? "" : material.id.getNamespace()+"_") + material.resourceName(),
+                        "track_" + (CRTrackMaterials.id(material).getNamespace().equals(Railways.MOD_ID)
+                            ? "" : CRTrackMaterials.id(material).getNamespace()+"_") + material.getId().getPath(),
                         b -> b.conditionalMaterial(material).require(baseMaterial.getBlock())
                             .transitionTo(CRItems.ITEM_INCOMPLETE_TRACK.get(material).get())
                             .addOutput(material.getBlock(), 1)
@@ -99,7 +99,7 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
                             .addStep(DeployerApplicationRecipe::new, rb -> rb.require(sleeperIngredient))
                             .addStep(PressingRecipe::new, rb -> rb)
                     ));
-                } else if (material.trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
+                } else if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
                     TrackMaterial baseMaterial = CRTrackMaterials.getBaseFromNarrow(material);
                     if (baseMaterial == null)
                         continue;
@@ -125,8 +125,8 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
 
                     Ingredient finalRailsIngredient = railsIngredient;
                     TRACKS.put(material, create(
-                        "track_" + (material.id.getNamespace().equals(Railways.MOD_ID)
-                            ? "" : material.id.getNamespace()+"_") + material.resourceName(),
+                        "track_" + (CRTrackMaterials.id(material).getNamespace().equals(Railways.MOD_ID)
+                            ? "" : CRTrackMaterials.id(material).getNamespace()+"_") + material.getId().getPath(),
                         b -> b.conditionalMaterial(material).require(sleeperIngredient)
                             .transitionTo(CRItems.ITEM_INCOMPLETE_TRACK.get(material).get())
                             .addOutput(material.getBlock(), 1)
@@ -153,8 +153,8 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
             Ingredient finalRailsIngredient = railsIngredient;
 
             TRACKS.put(material, create(
-                "track_" + (material.id.getNamespace().equals(Railways.MOD_ID)
-                    ? "" : material.id.getNamespace()+"_") + material.resourceName(),
+                "track_" + (CRTrackMaterials.id(material).getNamespace().equals(Railways.MOD_ID)
+                    ? "" : CRTrackMaterials.id(material).getNamespace()+"_") + material.getId().getPath(),
                 b -> b.conditionalMaterial(material).require(material.sleeperIngredient)
                     .transitionTo(CRItems.ITEM_INCOMPLETE_TRACK.get(material).get())
                     .addOutput(material.getBlock(), 1)
@@ -183,8 +183,6 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
             .addStep(PressingRecipe::new, rb -> rb)
         ));
     }
-
-    @Override
     public @NotNull String getName() {
         return "Railways' Sequenced Assembly Recipes";
     }

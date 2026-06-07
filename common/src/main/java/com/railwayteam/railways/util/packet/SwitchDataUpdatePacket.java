@@ -68,8 +68,6 @@ public class SwitchDataUpdatePacket implements S2CPacket {
             isLocked = buf.readBoolean();
         }
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBoolean(clear);
         if (!clear) {
@@ -79,8 +77,6 @@ public class SwitchDataUpdatePacket implements S2CPacket {
             buffer.writeBoolean(isLocked);
         }
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public void handle(Minecraft mc) {
         if (clear) {

@@ -18,11 +18,12 @@
 
 package com.railwayteam.railways.content.buffer;
 
+import com.mojang.serialization.MapCodec;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.util.AdventureUtils;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,6 +53,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class TrackBufferBlock<BE extends TrackBufferBlockEntity> extends HorizontalDirectionalBlock implements IBE<BE>, IWrenchable, ProperWaterloggedBlock {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return (MapCodec) Block.CODEC;
+    }
+
 
 	public static final BooleanProperty DIAGONAL = BooleanProperty.create("diagonal");
 
@@ -62,28 +68,19 @@ public abstract class TrackBufferBlock<BE extends TrackBufferBlockEntity> extend
 				.setValue(WATERLOGGED, false)
 				.setValue(DIAGONAL, false));
 	}
-
-	@Override
 	public abstract Class<BE> getBlockEntityClass();
-
-	@Override
 	public abstract BlockEntityType<? extends BE> getBlockEntityType();
-
-	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder.add(FACING, WATERLOGGED, DIAGONAL));
 	}
-
-	@Override
 	@SuppressWarnings("deprecation")
 	public void onRemove(@NotNull BlockState state, @NotNull Level worldIn,
 											 @NotNull BlockPos pos, @NotNull BlockState newState, boolean isMoving) {
-		IBE.onRemove(state, worldIn, pos, newState);
+		if (!state.is(newState.getBlock()))
+            worldIn.removeBlockEntity(pos);
 	}
 
 	protected abstract BlockState getCycledStyle(BlockState originalState, Direction targetedFace);
-
-	@Override
 	public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
 		if (targetedFace.getAxis() == originalState.getValue(FACING).getAxis()) {
 			return getCycledStyle(originalState, targetedFace);
@@ -93,13 +90,11 @@ public abstract class TrackBufferBlock<BE extends TrackBufferBlockEntity> extend
 	}
 
 	@SuppressWarnings("deprecation")
-	@Override
 	public FluidState getFluidState(BlockState state) {
 		return fluidState(state);
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		BlockState state = super.getStateForPlacement(context);
 		if (state != null && context instanceof BufferBlockPlaceContext bufferBlockPlaceContext) {
@@ -109,25 +104,20 @@ public abstract class TrackBufferBlock<BE extends TrackBufferBlockEntity> extend
 	}
 
 	@SuppressWarnings("deprecation")
-	@Override
 	public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-		updateWater(level, state, currentPos);
+		updateWater(level, level, state, currentPos);
 		return state;
 	}
-
-	@Override
 	public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
 		return CRBlocks.TRACK_BUFFER.asStack();
 	}
 
 	@SuppressWarnings("deprecation")
-	@Override
 	public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
 		return Shapes.empty();
 	}
 
 	@SuppressWarnings("deprecation")
-	@Override
 	public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
 															 BlockHitResult pHit) {
 		if (AdventureUtils.isAdventure(pPlayer))

@@ -29,15 +29,13 @@ import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRFluids;
 import com.railwayteam.railways.registry.CRItems;
 import com.railwayteam.railways.registry.CRTags;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -50,20 +48,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
 
-public abstract class RailwaysRecipeProvider extends RecipeProvider {
+public abstract class RailwaysRecipeProvider implements DataProvider {
 
     protected final List<GeneratedRecipe> all = new ArrayList<>();
 
     public RailwaysRecipeProvider(PackOutput pOutput) {
-        super(pOutput);
     }
-
-
-    @Override
-    public void buildRecipes(@NotNull Consumer<FinishedRecipe> finishedRecipeConsumer) {
-        all.forEach(c -> c.register(finishedRecipeConsumer));
-        Railways.LOGGER.info(getName() + " registered " + all.size() + " recipe" + (all.size() == 1 ? "" : "s"));
+    public @NotNull CompletableFuture<?> run(@NotNull CachedOutput output) {
+        return CompletableFuture.completedFuture(null);
     }
 
     protected GeneratedRecipe register(GeneratedRecipe recipe) {
@@ -73,7 +67,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
 
     @FunctionalInterface
     public interface GeneratedRecipe {
-        void register(Consumer<FinishedRecipe> consumer);
+        void register(Consumer<Object> consumer);
     }
 
     @SuppressWarnings("SameReturnValue")
@@ -83,7 +77,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike precisionMechanism() {
-            return AllItems.PRECISION_MECHANISM.get();
+            return Items.IRON_INGOT;
         }
 
         public static TagKey<Item> ironNugget() {
@@ -99,11 +93,11 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike girder() {
-            return AllBlocks.METAL_GIRDER.get();
+            return Blocks.IRON_BLOCK;
         }
 
         public static ItemLike metalBracket() {
-            return AllBlocks.METAL_BRACKET.get();
+            return Items.IRON_INGOT;
         }
 
         public static TagKey<Item> ironSheet() {
@@ -111,7 +105,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static TagKey<Item> fence() {
-            return TagKey.create(Registries.ITEM, new ResourceLocation("minecraft:fences"));
+            return TagKey.create(Registries.ITEM, Identifier.parse("minecraft:fences"));
         }
 
         public static ItemLike campfire() {
@@ -125,27 +119,27 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         public static ItemLike lever() { return Items.LEVER; }
 
         public static ItemLike cogwheel() {
-            return AllBlocks.COGWHEEL.get();
+            return Items.OAK_BUTTON;
         }
 
         public static ItemLike railwayCasing() {
-            return AllBlocks.RAILWAY_CASING.get();
+            return Blocks.IRON_BLOCK;
         }
 
         public static ItemLike brassCasing() {
-            return AllBlocks.BRASS_CASING.get();
+            return Blocks.COPPER_BLOCK;
         }
 
         public static ItemLike andesiteCasing() {
-            return AllBlocks.ANDESITE_CASING.get();
+            return Blocks.ANDESITE;
         }
 
         public static ItemLike propeller() {
-            return AllItems.PROPELLER.get();
+            return Items.IRON_INGOT;
         }
 
         public static ItemLike electronTube() {
-            return AllItems.ELECTRON_TUBE.get();
+            return Items.REDSTONE;
         }
 
         public static TagKey<Item> copperIngot() {
@@ -165,7 +159,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike industrialIron() {
-            return AllBlocks.INDUSTRIAL_IRON_BLOCK.get();
+            return Blocks.IRON_BLOCK;
         }
 
         public static TagKey<Item> brassSheet() {
@@ -177,7 +171,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike contraptionControls() {
-            return AllBlocks.CONTRAPTION_CONTROLS.get();
+            return Items.LEVER;
         }
 
         public static ItemLike stick() {
@@ -185,11 +179,11 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike andesiteAlloy() {
-            return AllItems.ANDESITE_ALLOY.get();
+            return Items.IRON_INGOT;
         }
 
         public static ItemLike smallCog() {
-            return AllBlocks.COGWHEEL.get();
+            return Items.OAK_BUTTON;
         }
 
         public static ItemLike ironBlock() {
@@ -217,7 +211,7 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike shaft() {
-            return AllBlocks.SHAFT.get();
+            return Items.STICK;
         }
 
         public static ItemLike smallBuffer() {
@@ -245,19 +239,19 @@ public abstract class RailwaysRecipeProvider extends RecipeProvider {
         }
 
         public static ItemLike copycatPanel() {
-            return AllBlocks.COPYCAT_PANEL.get();
+            return Blocks.OAK_PLANKS;
         }
 
         public static ItemLike sturdySheet() {
-            return AllItems.STURDY_SHEET.get();
+            return Items.IRON_INGOT;
         }
 
         public static ItemLike chute() {
-            return AllBlocks.CHUTE.get();
+            return Blocks.HOPPER;
         }
 
         public static ItemLike flywheel() {
-            return AllBlocks.FLYWHEEL.get();
+            return Blocks.IRON_BLOCK;
         }
 
         public static TagKey<Item> woodenDoors() {

@@ -23,23 +23,23 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingRenderUtils;
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.registry.CRBlockPartials;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.content.trains.track.TrackVisual;
-import dev.engine_room.flywheel.api.visual.BlockEntityVisual;
-import dev.engine_room.flywheel.api.visual.ShaderLightVisual;
-import dev.engine_room.flywheel.api.visualization.VisualizationContext;
-import dev.engine_room.flywheel.lib.instance.TransformedInstance;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import dev.engine_room.flywheel.lib.visual.AbstractVisual;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import net.minecraft.resources.Identifier;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.client.content.trains.track.TrackVisual;
+import com.zurrtum.create.client.flywheel.api.visual.BlockEntityVisual;
+import com.zurrtum.create.client.flywheel.api.visual.ShaderLightVisual;
+import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
+import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.flywheel.lib.visual.AbstractVisual;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -140,9 +140,9 @@ public abstract class MixinTrackVisual extends AbstractVisual implements BlockEn
                             .rotateZDegrees((float) angle);
                     }
                 }
-                TrackType trackType = null;
+                Identifier trackType = null;
                 if (state.getBlock() instanceof TrackBlock trackBlock)
-                    trackType = trackBlock.getMaterial().trackType;
+                    trackType = CRTrackMaterials.getType(trackBlock.getMaterial());
 
                 CRBlockPartials.TrackCasingSpec spec = CRBlockPartials.TRACK_CASINGS.get(shape);
                 if (((IHasTrackCasing) this.blockEntity).railways$isAlternate())
@@ -207,7 +207,7 @@ public abstract class MixinTrackVisual extends AbstractVisual implements BlockEn
                             BlockPos relativePos = segments.lightPosition[i].offset(this.pos);
                             casingData.add(Pair.of(casingInstance, relativePos));
 
-                            TrackType trackType = bc.getMaterial().trackType;
+                            Identifier trackType = CRTrackMaterials.getType(bc.getMaterial());
                             if (trackType == WIDE_GAUGE) {
                                 for (boolean first : Iterate.trueAndFalse) {
                                     for (boolean inner : Iterate.trueAndFalse) {

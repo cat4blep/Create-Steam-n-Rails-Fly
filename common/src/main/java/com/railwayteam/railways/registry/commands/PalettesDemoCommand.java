@@ -23,7 +23,7 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.palettes.PalettesColor;
 import com.railwayteam.railways.registry.CRPalettes;
 import com.railwayteam.railways.registry.CRPalettes.Styles;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -124,8 +124,6 @@ public class PalettesDemoCommand {
         public LocometalSubstituteProcessor(PalettesColor color) {
             this.color = color;
         }
-
-        @Override
         public @Nullable StructureBlockInfo processBlock(
             @NotNull LevelReader level,
             @NotNull BlockPos blockPos,
@@ -147,8 +145,6 @@ public class PalettesDemoCommand {
             }
             return superInfo;
         }
-
-        @Override
         protected @NotNull StructureProcessorType<?> getType() {
             return StructureProcessorType.NOP; // not actually a NOP, but this won't ever be serialized
         }

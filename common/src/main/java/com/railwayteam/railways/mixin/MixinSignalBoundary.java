@@ -19,11 +19,11 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.registry.CREdgePointTypes;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
-import com.simibubi.create.content.trains.graph.EdgePointType;
-import com.simibubi.create.content.trains.signal.SignalBoundary;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.graph.EdgePointType;
+import com.zurrtum.create.content.trains.signal.SignalBoundary;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import org.spongepowered.asm.mixin.Mixin;

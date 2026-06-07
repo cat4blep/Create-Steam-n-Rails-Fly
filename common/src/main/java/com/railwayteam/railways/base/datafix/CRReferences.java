@@ -34,13 +34,9 @@ public enum CRReferences implements TypeReference {
     CRReferences() {
         this.typeName = "railways:" + name().toLowerCase(Locale.ROOT);
     }
-
-    @Override
     public String typeName() {
         return typeName;
     }
-
-    @Override
     public String toString() {
         return "@" + typeName;
     }

@@ -19,9 +19,9 @@
 package com.railwayteam.railways.content.custom_bogeys.special.invisible;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.content.trains.bogey.BogeyVisual;
-import dev.engine_room.flywheel.api.instance.Instance;
-import dev.engine_room.flywheel.api.visualization.VisualizationContext;
+import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
+import com.zurrtum.create.client.flywheel.api.instance.Instance;
+import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,19 +29,9 @@ import java.util.function.Consumer;
 
 public class InvisibleBogeyVisual implements BogeyVisual {
     public InvisibleBogeyVisual(VisualizationContext ctx, float partialTick, boolean inContraption) {}
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle, PoseStack poseStack) {}
-
-    @Override
     public void hide() {}
-
-    @Override
     public void updateLight(int packedLight) {}
-
-    @Override
     public void collectCrumblingInstances(Consumer<@Nullable Instance> consumer) {}
-
-    @Override
     public void delete() {}
 }

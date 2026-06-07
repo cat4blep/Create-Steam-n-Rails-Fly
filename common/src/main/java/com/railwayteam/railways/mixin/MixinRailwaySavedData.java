@@ -23,12 +23,12 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.railwayteam.railways.mixin_interfaces.IShadowTrain;
 import com.railwayteam.railways.mixin_interfaces.RailwaySavedDataDuck;
-import com.simibubi.create.content.trains.RailwaySavedData;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.RailwaySavedData;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -51,15 +51,11 @@ public class MixinRailwaySavedData implements RailwaySavedDataDuck {
     private Map<UUID, Train> railways$shadowTrains = new HashMap<>();
 
     @Unique
-    private Map<ResourceLocation, UUID> railways$shadowKeys = new HashMap<>();
-
-    @Override
+    private Map<Identifier, UUID> railways$shadowKeys = new HashMap<>();
     public Map<UUID, Train> railway$getShadowTrains() {
         return railways$shadowTrains;
     }
-
-    @Override
-    public Map<ResourceLocation, UUID> railways$getShadowKeys() {
+    public Map<Identifier, UUID> railways$getShadowKeys() {
         return railways$shadowKeys;
     }
 
@@ -83,7 +79,7 @@ public class MixinRailwaySavedData implements RailwaySavedDataDuck {
         var iter = self.trains.values().iterator();
         while (iter.hasNext()) {
             Train train = iter.next();
-            ResourceLocation shadowKey = ((IShadowTrain) train).railways$getShadowKey();
+            Identifier shadowKey = ((IShadowTrain) train).railways$getShadowKey();
             if (shadowKey != null) {
                 iter.remove();
                 self.railways$shadowTrains.put(train.id, train);

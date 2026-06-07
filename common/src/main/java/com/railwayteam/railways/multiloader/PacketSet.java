@@ -20,7 +20,6 @@ package com.railwayteam.railways.multiloader;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.registry.CRPackets;
-import com.simibubi.create.foundation.networking.SimplePacketBase;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -30,7 +29,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
@@ -49,8 +51,8 @@ public abstract class PacketSet {
 	public final String id;
 	public final int version;
 
-	public final ResourceLocation c2sPacket;
-	public final ResourceLocation s2cPacket;
+	public final Identifier c2sPacket;
+	public final Identifier s2cPacket;
 
 	private final List<Function<FriendlyByteBuf, S2CPacket>> s2cPackets;
 	private final Object2IntMap<Class<? extends S2CPacket>> s2cTypes;
@@ -71,8 +73,8 @@ public abstract class PacketSet {
 		this.c2sPackets = c2sPackets;
 		this.c2sTypes = c2sTypes;
 
-		c2sPacket = new ResourceLocation(id, "c2s");
-		s2cPacket = new ResourceLocation(id, "s2c");
+		c2sPacket = Identifier.fromNamespaceAndPath(id, "c2s");
+		s2cPacket = Identifier.fromNamespaceAndPath(id, "s2c");
 	}
 
 	/**
@@ -91,11 +93,8 @@ public abstract class PacketSet {
 		}
 	}
 
-	/**
-	 * Send one of Create's packets to the server.
-	 */
 	@Environment(EnvType.CLIENT)
-	public abstract void send(SimplePacketBase packet);
+	public abstract void send(Packet<? super ServerGamePacketListener> packet);
 
 	/**
 	 * Send the given S2C packet to the given player.
@@ -104,10 +103,7 @@ public abstract class PacketSet {
 		sendTo(PlayerSelection.of(player), packet);
 	}
 
-	/**
-	 * Send the given Create packet to the given player.
-	 */
-	public abstract void sendTo(ServerPlayer player, SimplePacketBase packet);
+	public abstract void sendTo(ServerPlayer player, Packet<? super ClientGamePacketListener> packet);
 
 	/**
 	 * Send the given S2C packet to the given players.
@@ -124,10 +120,7 @@ public abstract class PacketSet {
 		}
 	}
 
-	/**
-	 * Send the given Create packet to the given players.
-	 */
-	public abstract void sendTo(PlayerSelection selection, SimplePacketBase packet);
+	public abstract void sendTo(PlayerSelection selection, Packet<? super ClientGamePacketListener> packet);
 
 	@Environment(EnvType.CLIENT)
 	public abstract void registerS2CListener();
@@ -166,7 +159,7 @@ public abstract class PacketSet {
 		}
 		Function<FriendlyByteBuf, C2SPacket> factory = c2sPackets.get(i);
 		C2SPacket packet = factory.apply(buf);
-		sender.server.execute(() -> packet.handle(sender));
+		sender.level().getServer().execute(() -> packet.handle(sender));
 	}
 
 	@ExpectPlatform
@@ -197,19 +190,15 @@ public abstract class PacketSet {
 		public CheckVersionPacket(FriendlyByteBuf buf) {
 			this(buf.readVarInt());
 		}
-
-		@Override
 		public void write(FriendlyByteBuf buffer) {
 			buffer.writeVarInt(serverVersion);
 		}
-
-		@Override
 		public void handle(Minecraft mc) {
 			if (CRPackets.PACKETS.version == serverVersion)
 				return;
 			Component error = Component.literal("Steam n' Rails on the client uses a different network format than the server.")
 					.append(" You should use the same version of the mod on both sides.");
-			mc.getConnection().onDisconnect(error);
+			Railways.LOGGER.error(error.getString());
 		}
 	}
 

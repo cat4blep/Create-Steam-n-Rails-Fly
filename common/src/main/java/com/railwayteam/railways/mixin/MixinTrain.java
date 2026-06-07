@@ -38,27 +38,27 @@ import com.railwayteam.railways.mixin_interfaces.ITrueMaxSpeedTrain;
 import com.railwayteam.railways.mixin_interfaces.IWaypointableNavigation;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CREdgePointTypes;
-import com.simibubi.create.Create;
-import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.Navigation;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TravellingPoint;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
-import com.simibubi.create.content.trains.graph.TrackGraph;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.signal.SignalBoundary;
-import com.simibubi.create.content.trains.signal.SignalEdgeGroup;
-import com.simibubi.create.content.trains.signal.TrackEdgePoint;
-import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.foundation.advancement.AllAdvancements;
-import com.simibubi.create.infrastructure.config.AllConfigs;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.nbt.NBTHelper;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.Navigation;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.TravellingPoint;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.graph.TrackGraph;
+import com.zurrtum.create.content.trains.graph.TrackNode;
+import com.zurrtum.create.content.trains.signal.SignalBoundary;
+import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
+import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
+import com.zurrtum.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.foundation.advancement.AllAdvancements;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.catnip.nbt.NBTHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
@@ -100,50 +100,32 @@ public abstract class MixinTrain implements IOccupiedCouplers, IIndexedSchedule,
     @Unique protected int railways$controlBlockedTicks = -1;
     @Unique protected int railways$controlBlockedSign = 0;
     @Unique protected boolean railways$skipRealismSpeedLimit = false;
-    @Unique protected @Nullable ResourceLocation railways$shadowKey = null;
-
-    @Override
+    @Unique protected @Nullable Identifier railways$shadowKey = null;
     public boolean railways$isControlBlocked() {
         return railways$controlBlockedTicks > 0;
     }
-
-    @Override
     public void railways$setControlBlocked(boolean controlBlocked, boolean forceBackwards) {
         railways$controlBlockedTicks = controlBlocked ? 3 : -1;
         railways$controlBlockedSign = forceBackwards ? -1 : Mth.sign(speed);
     }
-
-    @Override
     public int railways$getBlockedSign() {
         return railways$controlBlockedSign;
     }
-
-    @Override
     public void railways$setStrictSignals(boolean strictSignals) {
         railways$isStrictSignalTrain = strictSignals;
     }
-
-    @Override
     public boolean railways$isHandcar() {
         return railways$isHandcar;
     }
-
-    @Override
     public void railways$setHandcar(boolean handcar) {
         railways$isHandcar = handcar;
     }
-
-    @Override
     public int railways$getIndex() {
         return railways$index;
     }
-
-    @Override
     public void railways$setIndex(int index) {
         this.railways$index = index;
     }
-
-    @Override
     public Set<UUID> railways$getOccupiedCouplers() {
         return railways$occupiedCouplers;
     }
@@ -269,11 +251,11 @@ public abstract class MixinTrain implements IOccupiedCouplers, IIndexedSchedule,
                                              @Local Train train) {
         NBTHelper.iterateCompoundList(tag.getList("OccupiedCouplers", Tag.TAG_COMPOUND),
             c -> ((IOccupiedCouplers) train).railways$getOccupiedCouplers().add(c.getUUID("Id")));
-        ((IIndexedSchedule) train).railways$setIndex(tag.getInt("ScheduleHolderIndex"));
-        ((IHandcarTrain) train).railways$setHandcar(tag.getBoolean("IsHandcar"));
+        ((IIndexedSchedule) train).railways$setIndex(tag.getInt("ScheduleHolderIndex").orElse(0));
+        ((IHandcarTrain) train).railways$setHandcar(tag.getBoolean("IsHandcar").orElse(false));
 
-        if (tag.contains("ShadowKey", Tag.TAG_STRING)) {
-            ((IShadowTrain) train).railways$setShadow(new ResourceLocation(tag.getString("ShadowKey")));
+        if (tag.contains("ShadowKey")) {
+            ((IShadowTrain) train).railways$setShadow(new Identifier(tag.getString("ShadowKey").orElse("")));
         } else {
             ((IShadowTrain) train).railways$clearShadow();
         }
@@ -323,8 +305,6 @@ public abstract class MixinTrain implements IOccupiedCouplers, IIndexedSchedule,
             fuelTicks += LiquidFuelTrainHandler.handleFuelDraining(fuelFluids);
         }
     }
-
-    @Override
     public void railways$setLimitBypass(boolean shouldBypass) {
         railways$skipRealismSpeedLimit = shouldBypass;
     }
@@ -356,7 +336,6 @@ public abstract class MixinTrain implements IOccupiedCouplers, IIndexedSchedule,
     }
 
     // Award crash advancements when a train has crashed with a handcar
-    @Override
     public void railways$awardCrashAdvancements() {
         for (Carriage carriage : carriages)
             carriage.forEachPresentEntity(e -> e.getIndirectPassengers()
@@ -373,19 +352,13 @@ public abstract class MixinTrain implements IOccupiedCouplers, IIndexedSchedule,
         if (backwardsDriver != null)
             AllAdvancements.TRAIN_CRASH_BACKWARDS.awardTo(backwardsDriver);
     }
-
-    @Override
-    public void railways$setShadow(@NotNull ResourceLocation shadowKey) {
+    public void railways$setShadow(@NotNull Identifier shadowKey) {
         railways$shadowKey = shadowKey;
     }
-
-    @Override
     public void railways$clearShadow() {
         railways$shadowKey = null;
     }
-
-    @Override
-    public @Nullable ResourceLocation railways$getShadowKey() {
+    public @Nullable Identifier railways$getShadowKey() {
         return railways$shadowKey;
     }
 }

@@ -19,9 +19,9 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.content.extended_sliding_doors.SlidingDoorMode;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,10 +38,9 @@ public class MixinSlidingDoorBlockEntity implements SlidingDoorMode.IHasDoorMode
     private ScrollOptionBehaviour<SlidingDoorMode> railways$doorModeScroll;
 
     @Inject(method = "addBehaviours", at = @At("RETURN"))
-    private void addScrollBehaviour(List<BlockEntityBehaviour> behaviours, CallbackInfo ci) {
+    private void addScrollBehaviour(List<BlockEntityBehaviour<?>> behaviours, CallbackInfo ci) {
         SlidingDoorBlockEntity this_ = (SlidingDoorBlockEntity) (Object) this;
         railways$doorModeScroll = new ScrollOptionBehaviour<>(SlidingDoorMode.class, Component.translatable("create.sliding_door.mode"), this_, new SlidingDoorMode.SlidingDoorValueBoxTransform()) {
-            @Override
             public void read(CompoundTag nbt, boolean clientPacket) {
                 super.read(nbt, clientPacket);
                 setValue(value); // ensure that it is properly bounded
@@ -51,8 +50,6 @@ public class MixinSlidingDoorBlockEntity implements SlidingDoorMode.IHasDoorMode
 //        doorModeScroll.value = doorModeScroll.scrollableValue = 1;
         behaviours.add(railways$doorModeScroll);
     }
-
-    @Override
     public SlidingDoorMode railways$getSlidingDoorMode() {
         return railways$doorModeScroll == null ? SlidingDoorMode.NORMAL : railways$doorModeScroll.get();
     }

@@ -18,14 +18,14 @@
 
 package com.railwayteam.railways.mixin_interfaces;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface IShadowTrain {
-    void railways$setShadow(@NotNull ResourceLocation shadowKey);
+    void railways$setShadow(@NotNull Identifier shadowKey);
     void railways$clearShadow();
-    @Nullable ResourceLocation railways$getShadowKey();
+    @Nullable Identifier railways$getShadowKey();
     default boolean railways$isShadow() {
         return railways$getShadowKey() != null;
     }

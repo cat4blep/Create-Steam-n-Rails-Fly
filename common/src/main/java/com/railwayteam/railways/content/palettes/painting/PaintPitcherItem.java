@@ -34,7 +34,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,7 +42,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -75,18 +75,12 @@ public abstract class PaintPitcherItem extends Item {
     public static PaintPitcherItem create(Properties properties, @Nullable PalettesColor color) {
         throw new AssertionError();
     }
-
-    @Override
     public boolean isBarVisible(ItemStack stack) {
         return true;
     }
-
-    @Override
     public int getBarColor(ItemStack stack) {
         return color == null ? 0xfffdcb : color.getDiffuseColor();
     }
-
-    @Override
     public int getBarWidth(ItemStack stack) {
         return Math.round((float)getLevels(stack) * 13.0F / (float)MAX_LEVELS);
     }
@@ -100,7 +94,7 @@ public abstract class PaintPitcherItem extends Item {
     }
 
     public static void usePaint(Player player, InteractionHand hand) {
-        if (player.level.isClientSide) return;
+        if (player.level.isClientSide()) return;
         if (player.getAbilities().instabuild) return;
 
         ItemStack stack = player.getItemInHand(hand);
@@ -120,19 +114,12 @@ public abstract class PaintPitcherItem extends Item {
         if (levels <= 0) {
             throw new IllegalArgumentException("Levels must be between 1 and " + MAX_LEVELS);
         }
-
-        var tag = stack.getOrCreateTag();
-        tag.putInt("FillLevel", levels);
     }
 
     public int getLevels(ItemStack stack) {
         if (!(stack.getItem() instanceof PaintPitcherItem)) return 0;
 
-        var tag = stack.getTag();
-        if (tag == null || !tag.contains("FillLevel", Tag.TAG_INT))
-            return MAX_LEVELS;
-
-        return tag.getInt("FillLevel");
+        return MAX_LEVELS;
     }
 
     public long getFluidAmount(ItemStack stack) {
@@ -144,7 +131,6 @@ public abstract class PaintPitcherItem extends Item {
         if (levels == 0) {
             ItemStack stack = CRItems.EMPTY_PAINT_PITCHER.asStack();
             copyStackData(base, stack);
-            stack.removeTagKey("FillLevel");
             return stack;
         } else {
             ItemStack stack = new ItemStack(this);
@@ -156,39 +142,30 @@ public abstract class PaintPitcherItem extends Item {
 
     public void setFillInPlace(ItemStack stack, int levels) {
         if (levels <= 0) {
-            stack.removeTagKey("FillLevel");
             ((ItemStackDuck) (Object) stack).railways$setItem(CRItems.EMPTY_PAINT_PITCHER.get());
         } else {
             ((ItemStackDuck) (Object) stack).railways$setItem(this);
             setLevels(stack, levels);
         }
     }
-
-    @Override
-    public int getUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack, LivingEntity livingEntity) {
         return 42;
     }
-
-    @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.DRINK;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.DRINK;
     }
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand usedHand) {
         if (CRTags.AllItemTags.PAINT_DRINK_BLOCKERS.matches(player.getItemInHand(oppositeHand(usedHand))))
-            return InteractionResultHolder.pass(player.getItemInHand(usedHand));
+            return InteractionResult.PASS;
 
         player.startUsingItem(usedHand);
-        return InteractionResultHolder.consume(player.getItemInHand(usedHand));
+        return InteractionResult.CONSUME;
     }
-
-    @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         if (livingEntity instanceof ServerPlayer serverPlayer)
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, stack);
 
-        if (!level.isClientSide && color != null) {
+        if (!level.isClientSide() && color != null) {
             int levels = getLevels(stack);
             livingEntity.addEffect(new MobEffectInstance(
                 MobEffects.POISON, levels * 20, 0,
@@ -205,8 +182,6 @@ public abstract class PaintPitcherItem extends Item {
 
         return copyAsFilledStack(stack, 0);
     }
-
-    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         int levels = getLevels(stack);
         tooltipComponents.add(Component.translatable("item.railways.paint_pitcher.paint_level", levels, MAX_LEVELS));

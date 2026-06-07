@@ -18,13 +18,13 @@
 
 package com.railwayteam.railways.mixin_interfaces;
 
-import com.simibubi.create.content.trains.entity.Train;
-import net.minecraft.resources.ResourceLocation;
+import com.zurrtum.create.content.trains.entity.Train;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 import java.util.UUID;
 
 public interface RailwaySavedDataDuck {
     Map<UUID, Train> railway$getShadowTrains();
-    Map<ResourceLocation, UUID> railways$getShadowKeys();
+    Map<Identifier, UUID> railways$getShadowKeys();
 }

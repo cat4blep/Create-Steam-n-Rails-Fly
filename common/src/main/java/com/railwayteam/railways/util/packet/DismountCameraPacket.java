@@ -27,10 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 public class DismountCameraPacket implements C2SPacket {
     public DismountCameraPacket() {}
     public DismountCameraPacket(FriendlyByteBuf buf) {}
-    @Override
     public void write(FriendlyByteBuf buffer) {}
-
-    @Override
     public void handle(ServerPlayer sender) {
         if (sender.getCamera() instanceof ConductorEntity conductor) {
             conductor.stopViewing(sender);

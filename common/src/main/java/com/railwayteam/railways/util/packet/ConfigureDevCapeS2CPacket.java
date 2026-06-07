@@ -30,14 +30,10 @@ public record ConfigureDevCapeS2CPacket(UUID uuid, boolean useDevCape) implement
     public ConfigureDevCapeS2CPacket(FriendlyByteBuf buf) {
         this(buf.readUUID(), buf.readBoolean());
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeUUID(uuid);
         buffer.writeBoolean(useDevCape);
     }
-
-    @Override
     public void handle(Minecraft mc) {
         DevCapeUtils.usageStatusClientside.put(uuid, useDevCape);
     }

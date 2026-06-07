@@ -30,13 +30,9 @@ public record ConfigureDevCapeC2SPacket(boolean useDevCape) implements C2SPacket
     public ConfigureDevCapeC2SPacket(FriendlyByteBuf buf) {
         this(buf.readBoolean());
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBoolean(useDevCape);
     }
-
-    @Override
     public void handle(ServerPlayer sender) {
         DevCapeUtils.usageStatusServerside.put(sender.getUUID(), useDevCape);
 

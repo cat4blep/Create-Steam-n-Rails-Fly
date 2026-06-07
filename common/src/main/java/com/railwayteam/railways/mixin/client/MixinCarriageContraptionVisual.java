@@ -24,11 +24,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplayHolder;
 import com.railwayteam.railways.mixin_interfaces.IUpdateCount;
-import com.simibubi.create.content.contraptions.render.ContraptionVisual;
-import com.simibubi.create.content.trains.bogey.BogeyVisual;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
-import com.simibubi.create.content.trains.entity.CarriageContraptionVisual;
-import dev.engine_room.flywheel.api.visualization.VisualizationContext;
+import com.zurrtum.create.content.contraptions.render.ContraptionVisual;
+import com.zurrtum.create.client.content.trains.bogey.BogeyVisual;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionVisual;
+import com.zurrtum.create.client.flywheel.api.visualization.VisualizationContext;
 import net.minecraft.nbt.CompoundTag;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,18 +57,12 @@ public abstract class MixinCarriageContraptionVisual extends ContraptionVisual<C
 	@Shadow private int numBogeys;
 	@Unique
 	private int railways$updateCount = 0;
-
-	@Override
 	public int railways$getUpdateCount() {
 		return railways$updateCount;
 	}
-
-	@Override
 	public void railways$fromParent(IUpdateCount parent) {
 		railways$updateCount = parent.railways$getUpdateCount();
 	}
-
-	@Override
 	public void railways$markUpdate() {
 		railways$updateCount++;
 	}

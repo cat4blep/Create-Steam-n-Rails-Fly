@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard.double_
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.standard.double_axle.base.CrossShaftDoubleAxleBogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
-import com.simibubi.create.AllPartialModels;
+import com.zurrtum.create.client.AllPartialModels;
 
 import static com.railwayteam.railways.registry.CRBlockPartials.ARCHBAR_FRAME;
 

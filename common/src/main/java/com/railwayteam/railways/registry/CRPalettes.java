@@ -23,7 +23,6 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.base.EnumFilledList;
 import com.railwayteam.railways.base.data.BuilderTransformers;
 import com.railwayteam.railways.base.data.compat.emi.EmiRecipeDefaultsGen;
-import com.railwayteam.railways.content.animated_flywheel.FlywheelMovementBehaviour;
 import com.railwayteam.railways.content.palettes.FloatingMetalLadderBlock;
 import com.railwayteam.railways.content.palettes.PalettesColor;
 import com.railwayteam.railways.content.palettes.PalettesFlywheelBlock;
@@ -39,20 +38,20 @@ import com.railwayteam.railways.content.palettes.smokebox.PalettesSmokeboxBlock;
 import com.railwayteam.railways.content.palettes.trapdoors.PalettesTrapDoorBlock;
 import com.railwayteam.railways.util.BlockStateUtils;
 import com.railwayteam.railways.util.TextUtils;
-import com.simibubi.create.AllTags;
-import com.simibubi.create.content.contraptions.behaviour.TrapdoorMovingInteraction;
-import com.simibubi.create.content.decoration.MetalLadderBlock;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorMovementBehaviour;
-import com.simibubi.create.content.kinetics.flywheel.FlywheelBlock;
-import com.simibubi.create.foundation.block.connected.SimpleCTBehaviour;
-import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.item.ItemDescription;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.contraptions.behaviour.TrapdoorMovingInteraction;
+import com.zurrtum.create.content.decoration.MetalLadderBlock;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorMovementBehaviour;
+import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlock;
+import com.zurrtum.create.client.foundation.block.connected.SimpleCTBehaviour;
+import com.zurrtum.create.foundation.data.CreateRegistrate;
+import com.zurrtum.create.client.foundation.item.ItemDescription;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -84,10 +83,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.railwayteam.railways.util.TextUtils.*;
-import static com.simibubi.create.api.behaviour.interaction.MovingInteractionBehaviour.interactionBehaviour;
-import static com.simibubi.create.api.behaviour.movement.MovementBehaviour.movementBehaviour;
-import static com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures;
-import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
+import static com.railwayteam.railways.util.CreateBehaviourCompat.interactionBehaviour;
+import static com.railwayteam.railways.util.CreateBehaviourCompat.movementBehaviour;
+import static com.zurrtum.create.foundation.data.CreateRegistrate.connectedTextures;
+import static com.zurrtum.create.foundation.data.ModelGen.customItemModel;
 
 public class CRPalettes {
     private static final CreateRegistrate REGISTRATE = Railways.registrate();
@@ -235,11 +234,11 @@ public class CRPalettes {
             blocks.put(palettesColor, registered);
 
             if (palettesColor.isNetherite()) {
-                EmiRecipeDefaultsGen.TAG_DEFAULTS.put(dyeGroupTag, blocks.get(PalettesColor.NETHERITE).getId());
+                EmiRecipeDefaultsGen.TAG_DEFAULTS.put(dyeGroupTag, blocks.get(PalettesColor.NETHERITE).getId().toIdentifier());
             }
 
             if (cycleGroupCategory != null && cycleGroupCategory.baseStyle.get() == this) {
-                EmiRecipeDefaultsGen.TAG_DEFAULTS.put(CYCLE_GROUPS.get(Pair.of(palettesColor, cycleGroupCategory)), registered.getId());
+                EmiRecipeDefaultsGen.TAG_DEFAULTS.put(CYCLE_GROUPS.get(Pair.of(palettesColor, cycleGroupCategory)), registered.getId().toIdentifier());
             }
         }
 
@@ -260,8 +259,6 @@ public class CRPalettes {
                 this.color = color;
                 this.blockTags = blockTags;
             }
-
-            @Override
             public <B extends Block, P> NonNullUnaryOperator<BlockBuilder<B, P>> get() {
                 return b -> b.onRegister(this::onRegister).tag(blockTags);
             }
@@ -469,6 +466,7 @@ public class CRPalettes {
             .item()
             .tag(tags)
             .transform(customItemModel(join("/", "palettes", color.getSerializedName(), "locometal_boiler_flat_x")))
+            .build()
             .register();
     }
 
@@ -482,6 +480,7 @@ public class CRPalettes {
             .item()
             .tag(tags)
             .transform(customItemModel(join("/", "palettes", color.getSerializedName(), "brass_wrapped_locometal_boiler_flat_x")))
+            .build()
             .register();
     }
 
@@ -495,6 +494,7 @@ public class CRPalettes {
             .item()
             .tag(tags)
             .transform(customItemModel(join("/", "palettes", color.getSerializedName(), "copper_wrapped_locometal_boiler_flat_x")))
+            .build()
             .register();
     }
 
@@ -508,6 +508,7 @@ public class CRPalettes {
             .item()
             .tag(tags)
             .transform(customItemModel(join("/", "palettes", color.getSerializedName(), "iron_wrapped_locometal_boiler_flat_x")))
+            .build()
             .register();
     }
 
@@ -534,7 +535,6 @@ public class CRPalettes {
         return REGISTRATE.block(joinUnderscore(colorString, "locometal_flywheel"), PalettesFlywheelBlock.create(color))
             .transform(transformer.get())
             .transform(BuilderTransformers.locoMetalFlywheel(color, tags))
-            .onRegister(movementBehaviour(new FlywheelMovementBehaviour()))
             .lang(joinSpace(colorName, "Locometal Flywheel"))
             .register();
     }
@@ -676,17 +676,12 @@ public class CRPalettes {
         }
 
         @NotNull
-        @Override
         public Iterator<T> iterator() {
             return new Iterator<>() {
                 private int index = 0;
-
-                @Override
                 public boolean hasNext() {
                     return index < Styles.getCyclingValues(category).length;
                 }
-
-                @Override
                 public T next() {
                     if (!hasNext())
                         throw new NoSuchElementException();
@@ -712,8 +707,6 @@ public class CRPalettes {
         public DyedOnlyPalettesColorList(Function<PalettesColor, T> filler) {
             super(filler);
         }
-
-        @Override
         protected boolean filter(PalettesColor value) {
             return !value.isNetherite();
         }
@@ -723,8 +716,6 @@ public class CRPalettes {
         public VanillaDyedOnlyPalettesColorList(BiFunction<PalettesColor, DyeColor, T> filler) {
             super(c -> filler.apply(c, c.toDyeColor()));
         }
-
-        @Override
         protected boolean filter(PalettesColor value) {
             return value.isMainSeries();
         }

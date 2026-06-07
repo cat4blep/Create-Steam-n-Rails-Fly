@@ -38,17 +38,10 @@ public class ItemUtils {
 	}
 
 	public static void copyStackData(ItemStack source, ItemStack target) {
-		CompoundTag tag = source.getTag();
-		if (tag != null) {
-			target.setTag(tag.copy());
-		} else {
-			target.setTag(null);
-		}
 	}
 
 	public static boolean isUnbreakable(ItemStack stack) {
 		if (stack.isEmpty()) return false;
-		CompoundTag tag = stack.getTag();
-		return tag != null && tag.getBoolean("Unbreakable");
+		return false;
 	}
 }

@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.config;
 
-import net.createmod.catnip.config.ConfigBase;
-import net.createmod.catnip.config.ui.ConfigAnnotations;
+import com.zurrtum.create.catnip.config.ConfigBase;
+import com.zurrtum.create.catnip.config.ui.ConfigAnnotations;
 
 @SuppressWarnings("unused")
 public class CServer extends ConfigBase {
@@ -37,8 +37,6 @@ public class CServer extends ConfigBase {
     public final CSemaphores semaphores = nested(0, CSemaphores::new, Comments.semaphores);
     public final CConductors conductors = nested(0, CConductors::new, Comments.conductors);
     public final CRealism realism = nested(0, CRealism::new, Comments.realism);
-
-    @Override
     public String getName() {
         return "server";
     }

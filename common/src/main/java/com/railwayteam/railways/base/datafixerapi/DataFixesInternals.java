@@ -17,15 +17,11 @@
 package com.railwayteam.railways.base.datafixerapi;
 
 import com.mojang.datafixers.DSL.TypeReference;
-import com.mojang.datafixers.DataFixUtils;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import com.railwayteam.railways.Railways;
-import net.minecraft.SharedConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.datafix.DataFixTypes;
-import net.minecraft.util.datafix.DataFixers;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +48,7 @@ public abstract class DataFixesInternals {
     @Contract(pure = true)
     @Range(from = 0, to = Integer.MAX_VALUE)
     public static int getModDataVersion(@NotNull CompoundTag compound) {
-        return compound.getInt("Railways_DataVersion");
+        return compound.getInt("Railways_DataVersion").orElse(0);
     }
 
     @Contract(pure = true)
@@ -65,22 +61,7 @@ public abstract class DataFixesInternals {
 
     public static @NotNull DataFixesInternals get() {
         if (instance == null) {
-            Schema latestVanillaSchema;
-            try {
-                latestVanillaSchema = DataFixers.getDataFixer()
-                    .getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().getDataVersion().getVersion()));
-            } catch (Exception e) {
-                latestVanillaSchema = null;
-            }
-
-            if (latestVanillaSchema == null) {
-                Railways.LOGGER.warn("[Railways DFU] Failed to initialize! Either someone stopped DFU from initializing,");
-                Railways.LOGGER.warn("[Railways DFU] or this Minecraft build is hosed.");
-                Railways.LOGGER.warn("[Railways DFU] Using no-op implementation.");
-                instance = new NoOpDataFixesInternals();
-            } else {
-                instance = new DataFixesInternalsImpl(latestVanillaSchema);
-            }
+            instance = new NoOpDataFixesInternals();
         }
 
         return instance;

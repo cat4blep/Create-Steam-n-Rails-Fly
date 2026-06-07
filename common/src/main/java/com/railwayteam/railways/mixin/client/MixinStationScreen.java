@@ -21,20 +21,20 @@ package com.railwayteam.railways.mixin.client;
 import com.google.common.collect.ImmutableList;
 import com.railwayteam.railways.mixin_interfaces.ILimited;
 import com.railwayteam.railways.registry.CRPackets;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TrainIconType;
-import com.simibubi.create.content.trains.station.AbstractStationScreen;
-import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.content.trains.station.StationBlockEntity;
-import com.simibubi.create.content.trains.station.StationScreen;
-import com.simibubi.create.content.trains.station.TrainEditPacket;
-import com.simibubi.create.foundation.gui.widget.ScrollInput;
-import com.simibubi.create.foundation.utility.CreateLang;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.TrainIconType;
+import com.zurrtum.create.client.content.trains.station.AbstractStationScreen;
+import com.zurrtum.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
+import com.zurrtum.create.client.content.trains.station.StationScreen;
+import com.zurrtum.create.infrastructure.packet.c2s.TrainEditPacket;
+import com.zurrtum.create.client.foundation.gui.widget.ScrollInput;
+import com.zurrtum.create.client.foundation.utility.CreateLang;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -48,7 +48,7 @@ import java.util.List;
 public abstract class MixinStationScreen extends AbstractStationScreen {
     @Shadow private EditBox trainNameBox;
     private Checkbox limitEnableCheckbox;
-    private List<ResourceLocation> iconTypes;
+    private List<Identifier> iconTypes;
     private ScrollInput iconTypeScroll;
 
     private MixinStationScreen(StationBlockEntity te, GlobalStation station) {
@@ -60,13 +60,10 @@ public abstract class MixinStationScreen extends AbstractStationScreen {
         int x = guiLeft;
         int y = guiTop;
         limitEnableCheckbox = new Checkbox(x + background.getWidth() - 98, y + background.getHeight() - 26, 50, 20, Component.translatable("railways.station.train_limit"), station != null && ((ILimited) station).isLimitEnabled(), true) {
-            @Override
             public void onPress() {
                 super.onPress();
                 CRPackets.PACKETS.send(ILimited.makeLimitEnabledPacket(blockEntity.getBlockPos(), this.selected()));
             }
-
-            @Override
             public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
                 super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
                 if (this.isHoveredOrFocused()) {

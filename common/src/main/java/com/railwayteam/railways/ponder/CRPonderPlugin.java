@@ -23,22 +23,17 @@ import com.railwayteam.railways.registry.CRPonderTags;
 import net.createmod.ponder.api.registration.PonderPlugin;
 import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public class CRPonderPlugin implements PonderPlugin {
-    @Override
     public @NotNull String getModId() {
         return Railways.MOD_ID;
     }
-
-    @Override
-    public void registerScenes(@NotNull PonderSceneRegistrationHelper<ResourceLocation> helper) {
+    public void registerScenes(@NotNull PonderSceneRegistrationHelper<Identifier> helper) {
         CRPonderIndex.register(helper);
     }
-
-    @Override
-    public void registerTags(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public void registerTags(PonderTagRegistrationHelper<Identifier> helper) {
         CRPonderTags.register(helper);
     }
 }

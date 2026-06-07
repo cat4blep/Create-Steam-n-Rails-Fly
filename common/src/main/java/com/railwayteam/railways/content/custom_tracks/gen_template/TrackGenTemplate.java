@@ -20,50 +20,45 @@ package com.railwayteam.railways.content.custom_tracks.gen_template;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import net.minecraft.resources.ResourceLocation;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import net.minecraft.resources.Identifier;
 
 public interface TrackGenTemplate {
-    ResourceLocation getTexture(TrackMaterial material, TextureKey key);
-    ResourceLocation getParentModel(TrackMaterial material, String model);
+    Identifier getTexture(TrackMaterial material, TextureKey key);
+    Identifier getParentModel(TrackMaterial material, String model);
 
     TrackGenTemplate DEFAULT = new Default();
     class Default implements TrackGenTemplate {
         protected Default() {}
-
-        @Override
-        public ResourceLocation getTexture(TrackMaterial material, TextureKey key) {
+        public Identifier getTexture(TrackMaterial material, TextureKey key) {
             if (key == TextureKey.PARTICLE) {
-                return material.particle;
+                return CRTrackMaterials.particle(material);
             }
 
             if (material == CRTrackMaterials.NARROW_GAUGE_ANDESITE || material == CRTrackMaterials.WIDE_GAUGE_ANDESITE) {
-                return Create.asResource("block/" + key.getPath());
+                return Identifier.fromNamespaceAndPath("create", "block/" + key.getPath());
             }
 
             String resName;
-            if (material.trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
-                resName = material.resourceName().replaceFirst("_narrow", "");
-            } else if (material.trackType == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
-                resName = material.resourceName().replaceFirst("_wide", "");
+            if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
+                resName = material.getId().getPath().replaceFirst("_narrow", "");
+            } else if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
+                resName = material.getId().getPath().replaceFirst("_wide", "");
             } else {
-                resName = material.resourceName();
+                resName = material.getId().getPath();
             }
             String texturePrefix = "block/track/" + resName + "/";
 
-            return material.id.withPath(texturePrefix + key.getPrefix() + resName);
+            return CRTrackMaterials.id(material).withPath(texturePrefix + key.getPrefix() + resName);
         }
-
-        @Override
-        public ResourceLocation getParentModel(TrackMaterial material, String model) {
-            ResourceLocation prefix;
-            if (material.trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
+        public Identifier getParentModel(TrackMaterial material, String model) {
+            Identifier prefix;
+            if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
                 prefix = Railways.asResource("block/narrow_gauge_base/");
-            } else if (material.trackType == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
+            } else if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
                 prefix = Railways.asResource("block/wide_gauge_base/");
             } else {
-                prefix = Create.asResource("block/track/");
+                prefix = Identifier.fromNamespaceAndPath("create", "block/track/");
             }
 
             return prefix.withSuffix(model);

@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.conductor.whistle;
 
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRShapes;
-import com.simibubi.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -35,24 +35,17 @@ public class ConductorWhistleFlagBlock extends Block implements IBE<ConductorWhi
     public ConductorWhistleFlagBlock(Properties pProperties) {
         super(pProperties);
     }
-
-    @Override
     public Class<ConductorWhistleFlagBlockEntity> getBlockEntityClass() {
         return ConductorWhistleFlagBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends ConductorWhistleFlagBlockEntity> getBlockEntityType() {
         return CRBlockEntities.CONDUCTOR_WHISTLE_FLAG.get();
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        IBE.onRemove(pState, pLevel, pPos, pNewState);
+        if (!pState.is(pNewState.getBlock()))
+            pLevel.removeBlockEntity(pPos);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return CRShapes.CONDUCTOR_WHISTLE_FLAG;

@@ -18,24 +18,16 @@
 
 package com.railwayteam.railways.base.data;
 
-import com.railwayteam.railways.multiloader.CommonTags;
-import com.railwayteam.railways.registry.CRItems;
 import com.railwayteam.railways.registry.CRTags;
 import com.railwayteam.railways.registry.CRTags.AllBlockTags;
 import com.railwayteam.railways.registry.CRTags.AllItemTags;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.foundation.data.TagGen;
+import com.zurrtum.create.foundation.data.TagGen;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
-import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.minecraft.data.tags.TagsProvider.TagAppender;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,27 +38,16 @@ import java.util.Map;
  * Based on {@link TagGen}
  */
 public class CRTagGen {
-	private static final Map<TagKey<Block>, List<ResourceLocation>> OPTIONAL_TAGS = new HashMap<>();
+	private static final Map<TagKey<Block>, List<Identifier>> OPTIONAL_TAGS = new HashMap<>();
 
 	@SafeVarargs
-	public static void addOptionalTag(ResourceLocation id, TagKey<Block>... tags) {
+	public static void addOptionalTag(Identifier id, TagKey<Block>... tags) {
 		for (TagKey<Block> tag : tags) {
 			OPTIONAL_TAGS.computeIfAbsent(tag, (e) -> new ArrayList<>()).add(id);
 		}
 	}
 
 	public static void generateBlockTags(RegistrateTagsProvider<Block> prov) {
-		prov.addTag(CRTags.AllBlockTags.SEMAPHORE_POLES.tag)
-				.add(AllBlocks.METAL_GIRDER.get(), AllBlocks.METAL_GIRDER_ENCASED_SHAFT.get())
-				.forceAddTag(BlockTags.FENCES);
-
-		prov.addTag(CRTags.AllBlockTags.TRACK_CASING_BLACKLIST.tag);
-		prov.addTag(AllBlockTags.TRACK_CASING_WHITELIST.tag)
-			.add(Blocks.SNOW)
-			.add(Blocks.MOSS_CARPET);
-
-		CommonTags.COLORLESS_GLASS_B.generateCommon(prov);
-
 		for (CRTags.AllBlockTags tag : CRTags.AllBlockTags.values()) {
 			if (tag.alwaysDatagen) {
 				tagAppender(prov, tag);
@@ -74,39 +55,12 @@ public class CRTagGen {
 		}
 		for (TagKey<Block> tag : OPTIONAL_TAGS.keySet()) {
 			var appender = tagAppender(prov, tag);
-			for (ResourceLocation loc : OPTIONAL_TAGS.get(tag))
+			for (Identifier loc : OPTIONAL_TAGS.get(tag))
 				appender.addOptional(loc);
 		}
 	}
 
 	public static void generateItemTags(RegistrateTagsProvider<Item> prov) {
-		CommonTags.DYES.values().forEach(tag -> tag.generateCommon(prov));
-		CommonTags.IRON_NUGGETS.generateCommon(prov);
-		CommonTags.ZINC_NUGGETS.generateCommon(prov);
-		CommonTags.BRASS_NUGGETS.generateCommon(prov);
-		CommonTags.COPPER_INGOTS.generateCommon(prov);
-		CommonTags.BRASS_INGOTS.generateCommon(prov);
-		CommonTags.IRON_INGOTS.generateCommon(prov);
-		CommonTags.COLORLESS_GLASS_I.generateCommon(prov);
-		CommonTags.STRING.generateCommon(prov)
-			.generateBoth(prov, tag -> tag.add(Items.STRING.builtInRegistryHolder().key()));
-		CommonTags.IRON_PLATES.generateCommon(prov);
-		CommonTags.BRASS_PLATES.generateCommon(prov);
-		CommonTags.WORKBENCH.generateCommon(prov)
-				.generateBoth(prov, tag -> tag.add(Items.CRAFTING_TABLE.builtInRegistryHolder().key()));
-
-		prov.addTag(AllItemTags.NOT_TRAIN_FUEL.tag);
-
-		prov.addTag(AllItemTags.BINDING_AGENTS.tag)
-			.add(Items.CLAY_BALL);
-
-		prov.addTag(AllItemTags.PAINT_DRINK_BLOCKERS.tag)
-			.add(CRItems.PAINT_BRUSH.get())
-			.add(AllItems.POTATO_CANNON.get());
-
-		prov.addTag(AllItemTags.PAINT_BRUSH_REPAIR_ITEMS.tag)
-			.add(Items.FEATHER);
-
 		for (AllItemTags tag : AllItemTags.values()) {
 			if (tag.alwaysDatagen)
 				tagAppender(prov, tag);
@@ -121,8 +75,34 @@ public class CRTagGen {
 		return tagAppender(prov, tag.tag);
 	}
 
-	@ExpectPlatform // this has to be platformed out because addTag on fabric has a signature that includes FabricTagProvider$FabricTagBuilder
 	public static <T> TagAppender<T> tagAppender(RegistrateTagsProvider<T> prov, TagKey<T> tag) {
-		throw new AssertionError();
+		return new TagAppender<>();
+	}
+
+	public static class TagAppender<T> {
+		public TagAppender<T> add(T entry) {
+			return this;
+		}
+
+		@SafeVarargs
+		public final TagAppender<T> add(T... entries) {
+			return this;
+		}
+
+		public TagAppender<T> add(ResourceKey<T> entry) {
+			return this;
+		}
+
+		public TagAppender<T> addOptional(Identifier id) {
+			return this;
+		}
+
+		public TagAppender<T> addOptionalTag(Identifier id) {
+			return this;
+		}
+
+		public TagAppender<T> forceAddTag(TagKey<T> tag) {
+			return this;
+		}
 	}
 }

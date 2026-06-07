@@ -6,510 +6,211 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.railwayteam.railways.content.switches;
 
 import com.railwayteam.railways.content.switches.TrackSwitchBlock.SwitchState;
-import com.railwayteam.railways.mixin_interfaces.ISwitchDisabledEdge;
 import com.railwayteam.railways.registry.CREdgePointTypes;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
-import com.simibubi.create.content.trains.graph.EdgePointType;
-import com.simibubi.create.content.trains.graph.TrackEdge;
-import com.simibubi.create.content.trains.graph.TrackGraph;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.graph.TrackNodeLocation;
-import com.simibubi.create.content.trains.signal.SignalPropagator;
-import com.simibubi.create.content.trains.signal.SingleBlockEntityEdgePoint;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.nbt.NBTHelper;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.graph.EdgePointType;
+import com.zurrtum.create.content.trains.graph.TrackGraph;
+import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 
-/*
-done: actually disable edges that aren't the active target
-in Navigation.java we need to hook into this: - actually don't anymore
-```java
-if (!validTypes.contains(target.getValue().getTrackMaterial().trackType))
-    continue;
-```
-
-and in Train.java we need to hook into this:
-```java
-blocked |= carriage.blocked || carriage.isOnIncompatibleTrack();
-```
-actually hooked into Carriage#isOnIncompatibleTrack
-
-
-done: don't actually block, just remove it from the list of things we can go toward
-to do this:
-hook into {@link TrackEdge#canTravelTo }
- */
-@SuppressWarnings("DuplicatedCode")
 public class TrackSwitch extends SingleBlockEntityEdgePoint {
-    private TrackNodeLocation switchPoint;
-    private final List<TrackNodeLocation> exits = new ArrayList<>();
+	private static int selectionPriorityTicker;
 
-    private static int selectionPriorityTicker = 0;
+	private TrackNodeLocation switchPoint;
+	private final List<TrackNodeLocation> exits = new ArrayList<>();
+	private @NotNull SwitchState switchState = SwitchState.NORMAL;
+	private boolean automatic;
+	private boolean locked;
+	private boolean autoTrainsSwitch;
+	private boolean forceTickClient;
 
-    @ApiStatus.Internal
-    public static int getSelectionPriority() {
-        selectionPriorityTicker++;
-        return selectionPriorityTicker;
-    }
+	@ApiStatus.Internal
+	public static int getSelectionPriority() {
+		return ++selectionPriorityTicker;
+	}
 
-    public TrackSwitch() {
-    }
+	public EdgePointType<?> getType() {
+		return CREdgePointTypes.SWITCH;
+	}
 
-    private @Nullable TrackNodeLocation straightExit;
-    private @Nullable TrackNodeLocation leftExit;
-    private @Nullable TrackNodeLocation rightExit;
+	public boolean canCoexistWith(EdgePointType<?> otherType, boolean front) {
+		return otherType == EdgePointType.SIGNAL;
+	}
 
-    private @NotNull SwitchState switchState = SwitchState.NORMAL;
-    private boolean automatic;
-    private boolean locked;
-    private boolean autoTrainsSwitch;
+	public void blockEntityAdded(BlockEntity tile, boolean front) {
+		super.blockEntityAdded(tile, front);
+		if (tile instanceof TrackSwitchBlockEntity te) {
+			te.calculateExits(this);
+			automatic = te.isAutomatic();
+			locked = te.isLocked();
+		}
+	}
 
-    public boolean shouldAutoTrainsSwitch() {
-        return autoTrainsSwitch;
-    }
+	public void onRemoved(TrackGraph graph) {
+		exits.clear();
+	}
 
-    void setAutoTrainsSwitch(boolean autoTrainsSwitch) {
-        this.autoTrainsSwitch = autoTrainsSwitch;
-    }
+	public boolean shouldAutoTrainsSwitch() {
+		return autoTrainsSwitch;
+	}
 
-    public boolean isAutomatic() {
-        return automatic;
-    }
+	void setAutoTrainsSwitch(boolean autoTrainsSwitch) {
+		this.autoTrainsSwitch = autoTrainsSwitch;
+	}
 
-    public boolean isLocked() {
-        return locked;
-    }
+	public boolean isAutomatic() {
+		return automatic;
+	}
 
-    void setLocked(boolean locked) {
-        this.locked = locked;
-    }
+	public boolean isLocked() {
+		return locked;
+	}
 
-    private @Nullable TrackNodeLocation getExit(SwitchState state) {
-        return switch (state) {
-            case NORMAL -> straightExit;
-            case REVERSE_RIGHT -> rightExit;
-            case REVERSE_LEFT -> leftExit;
-        };
-    }
+	void setLocked(boolean locked) {
+		this.locked = locked;
+	}
 
-    private Map<SwitchState, Optional<TrackNodeLocation>> getExistingExits() {
-        return Map.of(
-                SwitchState.NORMAL, Optional.ofNullable(straightExit),
-                SwitchState.REVERSE_LEFT, Optional.ofNullable(leftExit),
-                SwitchState.REVERSE_RIGHT, Optional.ofNullable(rightExit)
-        );
-    }
+	@ApiStatus.Internal
+	public @Nullable SwitchState getTargetState(TrackNodeLocation loc) {
+		if (loc == null)
+			return null;
+		if (loc.equals(getSwitchTarget()))
+			return switchState;
+		return null;
+	}
 
-    /**
-     * @param loc location to approach from
-     * @return (if found) state where `loc` can be traversed
-     */
-    @ApiStatus.Internal
-    public @Nullable SwitchState getTargetState(TrackNodeLocation loc) {
-        for (Map.Entry<SwitchState, Optional<TrackNodeLocation>> entry : getExistingExits().entrySet()) {
-            if (entry.getValue().isPresent() && entry.getValue().get().equals(loc)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
+	void updateExits(TrackNodeLocation switchPoint, Collection<TrackNodeLocation> newExits) {
+		this.switchPoint = switchPoint;
+		exits.clear();
+		exits.addAll(newExits);
+		ensureValidState();
+	}
 
-    @Override
-    public EdgePointType<?> getType() {
-        return CREdgePointTypes.SWITCH;
-    }
+	@Nullable TrackNodeLocation getSwitchPoint() {
+		return switchPoint;
+	}
 
-    @Override
-    public boolean canCoexistWith(EdgePointType<?> otherType, boolean front) {
-        return otherType == EdgePointType.SIGNAL;
-    }
+	Collection<TrackNodeLocation> getExits() {
+		return List.copyOf(exits);
+	}
 
-    @Override
-    public void blockEntityAdded(BlockEntity tile, boolean front) {
-        super.blockEntityAdded(tile, front);
+	void ensureValidState() {
+		if (!isStateValid(switchState))
+			switchState = exits.isEmpty() ? SwitchState.NORMAL : SwitchState.NORMAL;
+	}
 
-        if (tile instanceof TrackSwitchBlockEntity te) {
-            te.calculateExits(this);
-            automatic = te.isAutomatic();
-            locked = te.isLocked();
-        }
+	private boolean isStateValid(SwitchState state) {
+		return state == SwitchState.NORMAL || !exits.isEmpty();
+	}
 
-        notifyTrains(tile.getLevel());
-    }
+	public boolean trySetSwitchState(@NotNull SwitchState state) {
+		if (locked)
+			return false;
+		return setSwitchState(state);
+	}
 
-    @Override
-    public void onRemoved(TrackGraph graph) {
-        exits.clear();
-        sortExits();
-        removeFromAllGraphs();
-    }
+	public boolean setSwitchState(@NotNull SwitchState state) {
+		if (!isStateValid(state))
+			return false;
+		if (switchState != state) {
+			switchState = state;
+			forceTickClient = true;
+			return true;
+		}
+		return false;
+	}
 
-    private void notifyTrains(Level level) {
-        TrackGraph graph = Create.RAILWAYS.sided(level).getGraph(level, edgeLocation.getFirst());
-        if (graph == null)
-            return;
-        TrackEdge edge = graph.getConnection(edgeLocation.map(graph::locateNode));
-        if (edge == null)
-            return;
-        SignalPropagator.notifyTrains(graph, edge);
-    }
+	public @NotNull SwitchState getSwitchState() {
+		return switchState;
+	}
 
-    void updateExits(TrackNodeLocation switchPoint, Collection<TrackNodeLocation> newExits) {
-        this.switchPoint = switchPoint;
+	public @Nullable TrackNodeLocation getSwitchTarget() {
+		if (exits.isEmpty())
+			return null;
+		int index = switch (switchState) {
+			case NORMAL -> 0;
+			case REVERSE_LEFT -> Math.min(1, exits.size() - 1);
+			case REVERSE_RIGHT -> exits.size() - 1;
+		};
+		return exits.get(index);
+	}
 
-        if (edgeLocation == null) {
-            exits.clear();
-            return;
-        }
-        Vec3 forward = edgeLocation.getFirst().getLocation().vectorTo(edgeLocation.getSecond().getLocation());
-        exits.clear();
-        exits.addAll(newExits.stream()
-                // Exit should be in the same direction switch is facing
-                .filter(e -> forward.dot(switchPoint.getLocation().vectorTo(e.getLocation())) > 0)
-                .toList());
-        sortExits();
-        ensureValidState();
-    }
+	public boolean hasStraightExit() {
+		return !exits.isEmpty();
+	}
 
-    private void sortExits() {
-        Vec3 forward = edgeLocation.getFirst().getLocation().vectorTo(edgeLocation.getSecond().getLocation()).normalize();
-        exits.sort(Comparator.comparing(e -> {
-            // Relative exit directions -- 0 is straight on, negative for left, positive for right
-            Vec3 exitDir = switchPoint.getLocation().vectorTo(e.getLocation());
-            return forward.x * exitDir.z - forward.z * exitDir.x;
-        }));
+	public boolean hasLeftExit() {
+		return exits.size() > 1;
+	}
 
-        if (exits.size() == 1) {
-            leftExit = null;
-            straightExit = exits.get(0);
-            rightExit = null;
-        } else if (exits.size() == 2) {
-            Vec3 firstExitDir = switchPoint.getLocation().vectorTo(exits.get(0).getLocation()).normalize();
-            Vec3 secondExitDir = switchPoint.getLocation().vectorTo(exits.get(1).getLocation()).normalize();
+	public boolean hasRightExit() {
+		return exits.size() > 1;
+	}
 
-            double firstExitRelativeDir = forward.x * firstExitDir.z - forward.z * firstExitDir.x;
-            double secondExitRelativeDir = forward.x * secondExitDir.z - forward.z * secondExitDir.x;
+	public void write(CompoundTag nbt, DimensionPalette dimensions) {
+		nbt.putString("SwitchState", switchState.getSerializedName());
+		nbt.putBoolean("Automatic", automatic);
+		nbt.putBoolean("Locked", locked);
+		nbt.putBoolean("AutoTrainsSwitch", autoTrainsSwitch);
+	}
 
-            double cutoff = 0.2;
+	public void write(FriendlyByteBuf buffer, DimensionPalette dimensions) {
+		super.write(buffer, dimensions);
+		buffer.writeInt(switchState.ordinal());
+		buffer.writeBoolean(automatic);
+		buffer.writeBoolean(locked);
+		buffer.writeBoolean(autoTrainsSwitch);
+	}
 
-            // Determine which exit is left/right/straight based on relative exit directions
-            // 0.2 *should* be straight enough, maybe
-            if (firstExitRelativeDir < 0 && secondExitRelativeDir <= cutoff) {
-                //    / /         /
-                // --+-'   or  --+---  = left, straight
-                leftExit = exits.get(0);
-                straightExit = exits.get(1);
-                rightExit = null;
-            } else if (firstExitRelativeDir >= -cutoff && secondExitRelativeDir > 0) {
-                // --+-.       --+---
-                //    \ \  or     \    = right, straight
-                leftExit = null;
-                straightExit = exits.get(0);
-                rightExit = exits.get(1);
-            } else {
-                //    /
-                // --<   = left, right
-                //    \
-                leftExit = exits.get(0);
-                straightExit = null;
-                rightExit = exits.get(1);
-            }
-        } else if (exits.size() == 3) {
-            leftExit = exits.get(0);
-            straightExit = exits.get(1);
-            rightExit = exits.get(2);
-        } else {
-            leftExit = null;
-            straightExit = null;
-            rightExit = null;
-        }
-    }
+	public void read(CompoundTag nbt, boolean migration, DimensionPalette dimensions) {
+		String exit = nbt.getString("SwitchState").orElse(SwitchState.NORMAL.getSerializedName());
+		try {
+			switchState = SwitchState.valueOf(exit.toUpperCase(Locale.ROOT));
+		} catch (IllegalArgumentException e) {
+			switchState = SwitchState.NORMAL;
+		}
+		automatic = nbt.getBoolean("Automatic").orElse(false);
+		locked = nbt.getBoolean("Locked").orElse(false);
+		autoTrainsSwitch = nbt.getBoolean("AutoTrainsSwitch").orElse(false);
+	}
 
-    @Nullable TrackNodeLocation getSwitchPoint() {
-        return switchPoint;
-    }
+	public void read(FriendlyByteBuf buffer, DimensionPalette dimensions) {
+		super.read(buffer, dimensions);
+		switchState = SwitchState.values()[buffer.readInt()];
+		automatic = buffer.readBoolean();
+		locked = buffer.readBoolean();
+		autoTrainsSwitch = buffer.readBoolean();
+	}
 
-    Collection<TrackNodeLocation> getExits() {
-        return exits.stream().toList();
-    }
+	boolean doForceTickClient() {
+		if (!forceTickClient)
+			return false;
+		forceTickClient = false;
+		return true;
+	}
 
-    private boolean isStateValid(SwitchState state) {
-        if (state == null)
-            return false;
-        return switch (state) {
-            case NORMAL -> hasStraightExit();
-            case REVERSE_RIGHT -> hasRightExit();
-            case REVERSE_LEFT -> hasLeftExit();
-        };
-    }
+	public void tick(TrackGraph graph, boolean preTrains) {
+	}
 
-    private SwitchState getValidSwitchState() {
-        for (SwitchState state : SwitchState.values()) {
-            if (isStateValid(state))
-                return state;
-        }
-        return SwitchState.NORMAL;
-    }
+	public void updateEdges(TrackGraph graph) {
+	}
 
-    void ensureValidState() {
-        if (!isStateValid(switchState)) {
-            switchState = getValidSwitchState();
-        }
-    }
-
-    /**
-     * Tries to set state, but fails if locked
-     * @param state Which state to attempt to switch to
-     * @return success or failure
-     */
-    public boolean trySetSwitchState(@NotNull SwitchState state) {
-        if (isLocked())
-            return false;
-        return setSwitchState(state);
-    }
-
-    public boolean setSwitchState(@NotNull SwitchState state) {
-        if (isStateValid(state) && switchState != state) {
-            switchState = state;
-            ticks = 10000; // force a tick
-            forceTickClient = true;
-            return true;
-        }
-        return false;
-    }
-
-    public @NotNull SwitchState getSwitchState() {
-        return switchState;
-    }
-
-    public @Nullable TrackNodeLocation getSwitchTarget() {
-        //ensureValidState();
-        return switch (switchState) {
-            case NORMAL -> straightExit;
-            case REVERSE_RIGHT -> rightExit;
-            case REVERSE_LEFT -> leftExit;
-        };
-    }
-
-    public boolean hasStraightExit() {
-        return straightExit != null;
-    }
-
-    public boolean hasLeftExit() {
-        return leftExit != null;
-    }
-
-    public boolean hasRightExit() {
-        return rightExit != null;
-    }
-
-    @Override
-    public void write(CompoundTag nbt, DimensionPalette dimensions) {
-        super.write(nbt, dimensions);
-        nbt.put("SwitchPoint", switchPoint.write(dimensions));
-        nbt.put("Exits", NBTHelper.writeCompoundList(exits, e -> e.write(dimensions)));
-        nbt.putString("SwitchState", switchState.getSerializedName());
-        nbt.putBoolean("Automatic", automatic);
-        nbt.putBoolean("Locked", locked);
-        nbt.putBoolean("AutoTrainsSwitch", autoTrainsSwitch);
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buffer, DimensionPalette dimensions) {
-        super.write(buffer, dimensions);
-        buffer.writeInt(switchState.ordinal());
-        buffer.writeBoolean(automatic);
-        buffer.writeBoolean(locked);
-        switchPoint.send(buffer, dimensions);
-        buffer.writeCollection(exits, (buf, e) -> e.send(buf, dimensions));
-    }
-
-    @Override
-    public void read(CompoundTag nbt, boolean migration, DimensionPalette dimensions) {
-        super.read(nbt, migration, dimensions);
-        String exit = nbt.getString("SwitchState");
-        try {
-            switchState = SwitchState.valueOf(exit.toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            switchState = getValidSwitchState();
-        }
-        automatic = nbt.getBoolean("Automatic");
-        locked = nbt.getBoolean("Locked");
-        autoTrainsSwitch = nbt.getBoolean("AutoTrainsSwitch");
-        updateExits(
-                TrackNodeLocation.read(nbt.getCompound("SwitchPoint"), dimensions),
-                nbt.getList("Exits", Tag.TAG_COMPOUND)
-                        .stream()
-                        .map(t -> TrackNodeLocation.read((CompoundTag) t, dimensions))
-                        .toList()
-        );
-    }
-
-    @Override
-    public void read(FriendlyByteBuf buffer, DimensionPalette dimensions) {
-        super.read(buffer, dimensions);
-        switchState = SwitchState.values()[buffer.readInt()];
-        automatic = buffer.readBoolean();
-        locked = buffer.readBoolean();
-        updateExits(
-                TrackNodeLocation.receive(buffer, dimensions),
-                buffer.readList(buf -> TrackNodeLocation.receive(buf, dimensions))
-        );
-    }
-
-    private int ticks = 0;
-    boolean forceTickClient = false;
-
-    boolean doForceTickClient() {
-        if (forceTickClient) {
-            forceTickClient = false;
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void tick(TrackGraph graph, boolean preTrains) {
-        super.tick(graph, preTrains);
-        if (preTrains) {
-            ticks++;
-            if (ticks < 10) {
-                return;
-            }
-            ticks = 0;
-            updateEdges(graph);
-            if (automatic)
-                switchForEdges(graph);
-        }
-    }
-
-    public void updateEdges(TrackGraph graph) {
-        updateEdges(graph, false);
-    }
-
-    public void setEdgesActive(TrackGraph graph) {
-        updateEdges(graph, true);
-    }
-
-    private void updateEdges(TrackGraph graph, boolean forceActive) {
-        TrackNodeLocation from = switchPoint;
-        for (TrackNodeLocation to : exits) {
-            if (to != null) {
-                TrackNode toNode = graph.locateNode(to);
-                Map<TrackNode, TrackEdge> connections = graph.getConnectionsFrom(toNode);
-                if (connections == null)
-                    continue;
-                TrackNode closestFromNode = null;
-                TrackEdge closestEdge = null;
-                double closestDistance = Double.MAX_VALUE;
-                for (Map.Entry<TrackNode, TrackEdge> otherEnd : connections.entrySet()) {
-                    double distance = otherEnd.getKey().getLocation().distSqr(from);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestEdge = otherEnd.getValue();
-                        closestFromNode = otherEnd.getKey();
-                    }
-                }
-                if (closestEdge != null) {
-                    ((ISwitchDisabledEdge) closestEdge.getEdgeData()).setEnabled(forceActive || getSwitchTarget() == to);
-                    ((ISwitchDisabledEdge) closestEdge.getEdgeData()).setAutomatic(!forceActive && automatic && !locked && autoTrainsSwitch);
-                }
-                if (closestFromNode != null) {
-                    TrackEdge reverseEdge = graph.getConnection(Couple.create(closestFromNode, toNode));
-                    if (reverseEdge != null) {
-                        ((ISwitchDisabledEdge) reverseEdge.getEdgeData()).setEnabled(forceActive || getSwitchTarget() == to);
-                        ((ISwitchDisabledEdge) reverseEdge.getEdgeData()).setAutomatic(!forceActive && automatic && !locked && autoTrainsSwitch);
-                    }
-                }
-                // not sure if this enabled state will be synchronized to client... hmm...
-            }
-        }
-    }
-
-    private void switchForEdges(TrackGraph graph) {
-        TrackNodeLocation from = switchPoint;
-        TrackNodeLocation highestPriorityExit = null;
-        int highestPriority = -100;
-        for (TrackNodeLocation to : exits) {
-            if (to != null) {
-                TrackNode toNode = graph.locateNode(to);
-                Map<TrackNode, TrackEdge> connections = graph.getConnectionsFrom(toNode);
-                if (connections == null)
-                    continue;
-                TrackNode closestFromNode = null;
-                TrackEdge closestEdge = null;
-                double closestDistance = Double.MAX_VALUE;
-                for (Map.Entry<TrackNode, TrackEdge> otherEnd : connections.entrySet()) {
-                    double distance = otherEnd.getKey().getLocation().distSqr(from);
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestEdge = otherEnd.getValue();
-                        closestFromNode = otherEnd.getKey();
-                    }
-                }
-                if (closestEdge != null) {
-                    ISwitchDisabledEdge switchEdge = (ISwitchDisabledEdge) closestEdge.getEdgeData();
-                    if (switchEdge.isAutomaticallySelected()) {
-                        if (switchEdge.getAutomaticallySelectedPriority() > highestPriority) {
-                            highestPriorityExit = to;
-                            highestPriority = switchEdge.getAutomaticallySelectedPriority();
-                        }
-                        switchEdge.ackAutomaticSelection();
-                    }
-                }
-                if (closestFromNode != null) {
-                    TrackEdge reverseEdge = graph.getConnection(Couple.create(closestFromNode, toNode));
-                    if (reverseEdge != null) {
-                        ISwitchDisabledEdge reverseSwitchEdge = (ISwitchDisabledEdge) reverseEdge.getEdgeData();
-                        if (reverseSwitchEdge.isAutomaticallySelected()) {
-                            if (reverseSwitchEdge.getAutomaticallySelectedPriority() > highestPriority) {
-                                highestPriorityExit = to;
-                                highestPriority = reverseSwitchEdge.getAutomaticallySelectedPriority();
-                            }
-                            reverseSwitchEdge.ackAutomaticSelection();
-                        }
-                    }
-                }
-                // not sure if this enabled state will be synchronized to client... hmm...
-            }
-        }
-        if (highestPriorityExit != null) {
-            for (SwitchState state : SwitchState.values()) {
-                if (highestPriorityExit == getExit(state)) {
-                    setSwitchState(state);
-                    break;
-                }
-            }
-        }
-    }
+	public void setEdgesActive(TrackGraph graph) {
+	}
 }

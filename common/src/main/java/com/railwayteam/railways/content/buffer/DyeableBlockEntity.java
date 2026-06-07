@@ -19,8 +19,8 @@
 package com.railwayteam.railways.content.buffer;
 
 import com.railwayteam.railways.util.BlockStateUtils;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionResult;
@@ -42,29 +42,23 @@ public class DyeableBlockEntity extends SmartBlockEntity implements IDyedBuffer 
     public DyeableBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
     public @Nullable DyeColor getColor() {
         return color;
     }
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {}
 
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
-
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         if (color != null)
             tag.putInt("Color", color.getId());
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
         DyeColor prevColor = color;
 
         if (tag.contains("Color"))
-            color = DyeColor.byId(tag.getInt("Color"));
+            color = DyeColor.byId(tag.getInt("Color").orElse(0));
         else
             color = null;
 

@@ -21,7 +21,7 @@ package com.railwayteam.railways.content.buffer;
 import com.railwayteam.railways.Railways;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -39,13 +39,9 @@ public class StandardTrackBufferBlock extends WoodVariantTrackBufferBlock {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(STYLE, Style.STANDARD));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(STYLE));
     }
-
-    @Override
     protected BlockState getCycledStyle(BlockState originalState, Direction targetedFace) {
         return originalState.cycle(STYLE);
     }
@@ -60,11 +56,9 @@ public class StandardTrackBufferBlock extends WoodVariantTrackBufferBlock {
             this.model = model;
         }
 
-        public ResourceLocation getModel() {
+        public Identifier getModel() {
             return Railways.asResource("block/buffer/" + model);
         }
-
-        @Override
         public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }

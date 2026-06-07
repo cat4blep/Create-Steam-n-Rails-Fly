@@ -21,7 +21,7 @@ package com.railwayteam.railways.multiloader;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -33,7 +33,7 @@ import java.util.function.Predicate;
  * Find players to send S2C packets to.
  */
 public abstract class PlayerSelection {
-	public abstract void accept(ResourceLocation id, FriendlyByteBuf buffer);
+	public abstract void accept(Identifier id, FriendlyByteBuf buffer);
 
 	@ExpectPlatform
 	public static PlayerSelection all() {

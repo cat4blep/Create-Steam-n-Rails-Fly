@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.content.palettes;
 
-import com.simibubi.create.content.decoration.palettes.ConnectedGlassBlock;
-import com.simibubi.create.content.decoration.palettes.WindowBlock;
+import com.zurrtum.create.content.decoration.palettes.ConnectedGlassBlock;
+import com.zurrtum.create.content.decoration.palettes.WindowBlock;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -57,24 +57,16 @@ public class RotatedPillarWindowBlock extends WindowBlock {
         this.registerDefaultState(defaultBlockState()
             .setValue(AXIS, Axis.Y));
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState rotate(BlockState state, Rotation rotation) {
         return rotatePillar(state, rotation);
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(AXIS);
     }
-
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState().setValue(AXIS, context.getClickedFace().getAxis());
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
         boolean axisDisagreement = false;

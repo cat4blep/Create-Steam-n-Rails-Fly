@@ -23,17 +23,17 @@ import com.railwayteam.railways.content.custom_tracks.casing.CasingCollisionUtil
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.multiloader.PlayerSelection;
 import com.railwayteam.railways.registry.CRPackets;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.foundation.blockEntity.RemoveBlockEntityPacket;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import net.createmod.catnip.levelWrappers.SchematicLevel;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.infrastructure.packet.s2c.RemoveBlockEntityPacket;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.catnip.levelWrappers.SchematicLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,13 +60,9 @@ public abstract class MixinTrackBlockEntity extends SmartBlockEntity implements 
     protected MixinTrackBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
     public @Nullable Block railways$getTrackCasing() {
         return railways$trackCasing;
     }
-
-    @Override
     public void railways$setTrackCasing(@Nullable Block trackCasing) {
         if (trackCasing != null && !CasingChecker.isValid(trackCasing)) //sanity check
             return;
@@ -75,7 +71,7 @@ public abstract class MixinTrackBlockEntity extends SmartBlockEntity implements 
         if (this.level != null) {
             if (this.railways$trackCasing == null) { //Clean up the tile entity if it is no longer needed
                 CasingCollisionUtils.manageTracks((TrackBlockEntity) (Object) this, true);
-                if (!this.level.isClientSide) {
+                if (!this.level.isClientSide()) {
                     if (!this.connections.isEmpty() || getBlockState().getOptionalValue(TrackBlock.SHAPE)
                         .orElse(TrackShape.NONE)
                         .isPortal())
@@ -91,13 +87,9 @@ public abstract class MixinTrackBlockEntity extends SmartBlockEntity implements 
             }
         }
     }
-
-    @Override
     public boolean railways$isAlternate() {
         return railways$isAlternateModel;
     }
-
-    @Override
     public void railways$setAlternate(boolean alternate) {
         if (getBlockState().getValue(TrackBlock.SHAPE).getModel().equals("ascending")) {
             alternate = false;
@@ -154,13 +146,13 @@ public abstract class MixinTrackBlockEntity extends SmartBlockEntity implements 
     @Inject(method = "read", at = @At("RETURN"))
     private void readCasing(CompoundTag tag, boolean clientPacket, CallbackInfo ci) {
         if (tag.contains("AlternateModel")) {
-            this.railways$setAlternate(tag.getBoolean("AlternateModel"));
+            this.railways$setAlternate(tag.getBoolean("AlternateModel").orElse(false));
         } else {
             this.railways$setAlternate(false);
         }
 
         if (tag.contains("TrackCasing")) {
-            ResourceLocation casingName = ResourceLocation.of(tag.getString("TrackCasing"), ':');
+            Identifier casingName = Identifier.of(tag.getString("TrackCasing").orElse(""), ':');
             if (BuiltInRegistries.BLOCK.containsKey(casingName)) {
                 this.railways$setTrackCasing(BuiltInRegistries.BLOCK.get(casingName));
                 return;

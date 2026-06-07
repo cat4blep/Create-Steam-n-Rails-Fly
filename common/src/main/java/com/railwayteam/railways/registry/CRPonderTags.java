@@ -18,14 +18,14 @@
 
 package com.railwayteam.railways.registry;
 
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.infrastructure.ponder.AllCreatePonderTags;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.infrastructure.ponder.AllCreatePonderTags;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class CRPonderTags {
-    public static void register(PonderTagRegistrationHelper<ResourceLocation> helper) {
+    public static void register(PonderTagRegistrationHelper<Identifier> helper) {
         PonderTagRegistrationHelper<RegistryEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
         HELPER.addToTag(AllCreatePonderTags.DISPLAY_SOURCES)

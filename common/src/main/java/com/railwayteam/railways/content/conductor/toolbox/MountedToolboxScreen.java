@@ -18,18 +18,20 @@
 
 package com.railwayteam.railways.content.conductor.toolbox;
 
-import com.simibubi.create.content.equipment.toolbox.ToolboxScreen;
-import com.simibubi.create.foundation.gui.menu.AbstractSimiContainerScreen;
+import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-public class MountedToolboxScreen extends ToolboxScreen {
+public class MountedToolboxScreen extends AbstractSimiContainerScreen<MountedToolboxContainer> {
   public MountedToolboxScreen(MountedToolboxContainer container, Inventory inv, Component title) {
     super(container, inv, title);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"}) // this should be safe
   public static AbstractSimiContainerScreen<MountedToolboxContainer> create(MountedToolboxContainer container, Inventory inv, Component title) {
-    return (AbstractSimiContainerScreen) new MountedToolboxScreen(container, inv, title);
+    return new MountedToolboxScreen(container, inv, title);
+  }
+
+  protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
   }
 }

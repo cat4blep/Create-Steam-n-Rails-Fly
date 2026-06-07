@@ -29,14 +29,14 @@ import com.railwayteam.railways.mixin_interfaces.IShadowTrain;
 import com.railwayteam.railways.mixin_interfaces.RailwaySavedDataDuck;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.util.packet.ShadowTrainRestorePacket;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.trains.entity.Train;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
@@ -65,7 +65,7 @@ public class ShadowRealmCommand {
                     ))));
     }
 
-    private static int $banish(CommandSourceStack source, UUID trainId, ResourceLocation shadowKey) throws CommandSyntaxException {
+    private static int $banish(CommandSourceStack source, UUID trainId, Identifier shadowKey) throws CommandSyntaxException {
         Train train = Create.RAILWAYS.trains.get(trainId);
         if (train == null) {
             source.sendFailure(Component.literal("No Train with id " + trainId.toString()
@@ -97,7 +97,7 @@ public class ShadowRealmCommand {
                 )));
     }
 
-    private static int $restore(CommandSourceStack source, ResourceLocation shadowKey) throws CommandSyntaxException {
+    private static int $restore(CommandSourceStack source, Identifier shadowKey) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
 
         var savedData = ((AccessorGlobalRailwayManager) Create.RAILWAYS).railways$getSavedData();
@@ -129,7 +129,7 @@ public class ShadowRealmCommand {
                 )));
     }
 
-    private static int $kill(CommandSourceStack source, ResourceLocation shadowKey) {
+    private static int $kill(CommandSourceStack source, Identifier shadowKey) {
         var savedData = ((AccessorGlobalRailwayManager) Create.RAILWAYS).railways$getSavedData();
         UUID trainId = ((RailwaySavedDataDuck) savedData).railways$getShadowKeys().get(shadowKey);
         if (trainId == null) {

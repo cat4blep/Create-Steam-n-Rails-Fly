@@ -36,13 +36,9 @@ public record ModVersionPacket(String version) implements S2CPacket {
   public ModVersionPacket(FriendlyByteBuf buf) {
     this(buf.readUtf());
   }
-
-  @Override
   public void write(FriendlyByteBuf buffer) {
     buffer.writeUtf(this.version);
   }
-
-  @Override
   @Environment(EnvType.CLIENT)
   public void handle(Minecraft mc) {
     LocalPlayer player = mc.player;

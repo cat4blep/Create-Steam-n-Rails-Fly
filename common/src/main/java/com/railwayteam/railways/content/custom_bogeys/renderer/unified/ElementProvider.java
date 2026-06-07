@@ -18,10 +18,10 @@
 
 package com.railwayteam.railways.content.custom_bogeys.renderer.unified;
 
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.render.SpriteShiftEntry;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 

@@ -6,32 +6,14 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.railwayteam.railways.content.conductor;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import com.railwayteam.railways.Railways;
-import com.railwayteam.railways.registry.CRBlockPartials;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.render.CachedBuffers;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -40,116 +22,41 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ConductorCapModel<T extends LivingEntity> extends Model implements HeadedModel {
-	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(Railways.asResource("conductor_cap"), "main");
 
 	private final ModelPart cap;
-	@Nullable
-	private final PartialModel override;
-	private final boolean doNotTilt;
 
-	public ConductorCapModel(ModelPart root, @Nullable PartialModel override, boolean doNotTilt) {
-		super(override == null ? RenderType::armorCutoutNoCull : rl -> RenderType.cutout());
-		this.cap = root.getChild("cap");
-		this.override = override;
-		this.doNotTilt = doNotTilt;
+	public ConductorCapModel(ModelPart root) {
+		super(root, ignored -> null);
+		this.cap = root.hasChild("cap") ? root.getChild("cap") : root;
 	}
 
-	private static ConductorCapModel<?> defaultModel = null;
-	private static final Map<Pair<String, Boolean>, ConductorCapModel<?>> customModels = new HashMap<>();
+	public ConductorCapModel(ModelPart root, Object ignoredOverride, boolean ignoredTilt) {
+		this(root);
+	}
 
 	public static void clearModelCache() {
-		defaultModel = null;
-		customModels.clear();
 	}
 
 	public static ConductorCapModel<?> of(ItemStack stack, HumanoidModel<?> base, LivingEntity entity) {
-		if (defaultModel == null) {
-			EntityModelSet set = Minecraft.getInstance().getEntityModels();
-			ModelPart root = set.bakeLayer(ConductorCapModel.LAYER_LOCATION);
-			CRBlockPartials.CUSTOM_CONDUCTOR_CAPS.forEach((name, partial) -> {
-				ConductorCapModel<?> model = new ConductorCapModel<>(root, partial, CRBlockPartials.shouldPreventTiltingCap(name));
-				customModels.put(Pair.of(name, false), model); // normal caps should apply whether they are on a conductor
-				customModels.put(Pair.of(name, true), model);
-			});
-			CRBlockPartials.CUSTOM_CONDUCTOR_ONLY_CAPS.forEach((name, partial) -> {
-				ConductorCapModel<?> model = new ConductorCapModel<>(root, partial, CRBlockPartials.shouldPreventTiltingCap(name));
-				Pair<String, Boolean> key = Pair.of(name, true); // for conductors, override conductor model
-				customModels.put(key, model);
-			});
-			defaultModel = new ConductorCapModel<>(root, null, false);
-		}
-		String name = stack.getHoverName().getString();
-		if (name.startsWith("[sus]"))
-			name = name.substring(5);
-		ConductorCapModel<?> model = customModels.getOrDefault(Pair.of(name, entity instanceof ConductorEntity), defaultModel);
-		model.setProperties(base);
-		return model;
+		return new ConductorCapModel<>(base.head);
 	}
 
-	public static LayerDefinition createBodyLayer () {
-		MeshDefinition meshdefinition = new MeshDefinition();
-		PartDefinition partdefinition = meshdefinition.getRoot();
-
-		PartDefinition hat = partdefinition.addOrReplaceChild("cap",
+	public static LayerDefinition createBodyLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		root.addOrReplaceChild("cap",
 			CubeListBuilder.create().texOffs(0, 0)
 				.addBox(-4.5F, -9.0F, -4.0F, 9.0F, 3.0F, 9.0F, new CubeDeformation(0.0F)),
-			PartPose.offset(0.0F, 0.0F, 0.0F));
-
-		PartDefinition brim = hat.addOrReplaceChild("brim",
-			CubeListBuilder.create().texOffs(6, 12)
-				.addBox(-4.5F, 3.8F, -3.0F, 9.0F, 0.02F, 3.0F, new CubeDeformation(0.0F)),
-			PartPose.offsetAndRotation(0.0F, -10.0F, -4.0F, 0.2618F, 0.0F, 0.0F));
-
-		return LayerDefinition.create(meshdefinition, 64, 64);
+			PartPose.ZERO);
+		return LayerDefinition.create(mesh, 64, 64);
 	}
 
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		if (override != null) {
-			poseStack.pushPose();
-			cap.translateAndRotate(poseStack);
-//			poseStack.mulPose(Quaternion.fromXYZDegrees(new Vector3f(0, 0, 180)));
-			poseStack.translate(0, -0.25d, 0);
-			poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-			poseStack.scale(0.625F, -0.625F, -0.625F);
-			// DONE: this should be an easy replacement but it requires tweaking and testing - simple replacement
-//			ForgeHooksClient.handleCameraTransforms(poseStack, override.get(), ItemTransforms.TransformType.HEAD, false);
-//			override.get().applyTransform(ItemTransforms.TransformType.HEAD, poseStack, false);
-			override.get().getTransforms().head.apply(false, poseStack);
-			poseStack.translate(-0.5, -0.5, -0.5);
-			CachedBuffers.partial(override, Blocks.AIR.defaultBlockState())
-				.light(packedLight)
-				.overlay(packedOverlay)
-				.renderInto(poseStack, Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.translucent()));
-			poseStack.popPose();
-		} else {
-			cap.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		}
-	}
-
-	@Override
 	public ModelPart getHead() {
-		return this.cap;
-	}
-
-	public void setProperties (HumanoidModel<?> base) {
-		this.cap.copyFrom(doNotTilt ? base.head : base.hat);
-		if (base instanceof PlayerModel<?> && override == null) {
-			float s = 1 / 16f;
-			this.cap.offsetScale(new Vector3f(s, s, s));
-			this.cap.offsetPos(new Vector3f(0, 0, -10 / 16f));
-		}
+		return cap;
 	}
 }

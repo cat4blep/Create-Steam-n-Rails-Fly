@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.content.palettes;
 
-import com.simibubi.create.content.kinetics.flywheel.FlywheelBlock;
+import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlock;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 
 public class PalettesFlywheelBlock extends FlywheelBlock {

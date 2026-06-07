@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -52,45 +52,28 @@ public interface RotationType {
     int getModelYRot(BlockState state);
 
     RotationType NONE = new RotationType() {
-        @Override
         public BlockState makeDefaultState(BlockState state) {
             return state;
         }
-
-        @Override
         public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {}
-
-        @Override
         public BlockState getStateForPlacement(BlockPlaceContext context, BlockState state) {
             return state;
         }
-
-        @Override
         public BlockState rotate(BlockState state, Rotation rot) {
             return state;
         }
-
-        @Override
         public BlockState mirror(BlockState state, Mirror mirror) {
             return state;
         }
-
-        @Override
         public BlockState cloneRotation(BlockState state, BlockState rotationSource) {
             return state;
         }
-
-        @Override
         public VoxelShape getShape(BlockState state, ShapeWrapper shape) {
             return shape.get();
         }
-
-        @Override
         public int getModelYRot(BlockState state) {
             return 0;
         }
-
-        @Override
         public String toString() {
             return "RotationType.NONE";
         }
@@ -98,98 +81,62 @@ public interface RotationType {
 
     RotationType AXIS = new RotationType() {
         private static final EnumProperty<Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
-
-        @Override
         public BlockState makeDefaultState(BlockState state) {
             return state.setValue(AXIS, Axis.X);
         }
-
-        @Override
         public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             builder.add(AXIS);
         }
-
-        @Override
         public BlockState getStateForPlacement(BlockPlaceContext context, BlockState state) {
             Axis axis = context.getHorizontalDirection().getAxis();
             return axis.isHorizontal() ? state.setValue(AXIS, axis) : state;
         }
-
-        @Override
         public BlockState rotate(BlockState state, Rotation rot) {
             return RotatedPillarBlock.rotatePillar(state, rot);
         }
-
-        @Override
         public BlockState mirror(BlockState state, Mirror mirror) {
             return state;
         }
-
-        @Override
         public BlockState cloneRotation(BlockState state, BlockState rotationSource) {
             return state.setValue(AXIS, rotationSource.getValue(AXIS));
         }
-
-        @Override
         public VoxelShape getShape(BlockState state, ShapeWrapper shape) {
             return shape.get(state.getValue(AXIS));
         }
-
-        @Override
         public int getModelYRot(BlockState state) {
             return state.getValue(AXIS) == Axis.X ? 90 : 0;
         }
-
-        @Override
         public String toString() {
             return "RotationType.AXIS";
         }
     };
 
     RotationType FACING = new RotationType() {
-        private static final DirectionProperty HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
-
-        @Override
+        private static final EnumProperty<Direction> HORIZONTAL_FACING = BlockStateProperties.HORIZONTAL_FACING;
         public BlockState makeDefaultState(BlockState state) {
             return state.setValue(HORIZONTAL_FACING, Direction.NORTH);
         }
-
-        @Override
         public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
             builder.add(HORIZONTAL_FACING);
         }
-
-        @Override
         public BlockState getStateForPlacement(BlockPlaceContext context, BlockState state) {
             return state.setValue(HORIZONTAL_FACING, context.getHorizontalDirection());
         }
-
-        @Override
         public BlockState rotate(BlockState state, Rotation rot) {
             return state.setValue(HORIZONTAL_FACING, rot.rotate(state.getValue(HORIZONTAL_FACING)));
         }
-
-        @Override
         public BlockState mirror(BlockState state, Mirror mirror) {
             return rotate(state, mirror.getRotation(state.getValue(HORIZONTAL_FACING)));
         }
-
-        @Override
         public BlockState cloneRotation(BlockState state, BlockState rotationSource) {
             return state.setValue(HORIZONTAL_FACING, rotationSource.getValue(HORIZONTAL_FACING));
         }
-
-        @Override
         public VoxelShape getShape(BlockState state, ShapeWrapper shape) {
             return shape.get(state.getValue(HORIZONTAL_FACING));
         }
-
-        @Override
         public int getModelYRot(BlockState state) {
             return ((int) state.getValue(HORIZONTAL_FACING).toYRot() + 180) % 360;
         }
-
-        @Override
         public String toString() {
             return "RotationType.FACING";
         }

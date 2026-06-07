@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.mixin_interfaces;
 
-import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
+import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
 
 public interface IFuelInventory {
     MountedFluidStorageWrapper railways$getFluidFuels();

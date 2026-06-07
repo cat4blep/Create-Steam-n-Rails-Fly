@@ -19,8 +19,8 @@
 package com.railwayteam.railways.mixin;
 
 
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.Carriage.DimensionalCarriageEntity;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.Carriage.DimensionalCarriageEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;

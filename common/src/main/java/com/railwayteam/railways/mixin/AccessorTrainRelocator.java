@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.mixin;
 
-import com.simibubi.create.content.trains.entity.TrainRelocator;
+import com.zurrtum.create.content.trains.entity.TrainRelocator;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;

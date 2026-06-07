@@ -19,11 +19,11 @@
 package com.railwayteam.railways.content.smokestack.block;
 
 import com.railwayteam.railways.util.ShapeWrapper;
-import com.simibubi.create.AllTags;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +31,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -40,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -64,8 +66,6 @@ public abstract class AbstractSmokeStackBlock<T extends SmartBlockEntity> extend
         this.registerDefaultState(this.makeDefaultState());
         this.shape = shape;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return shape.get();
@@ -77,20 +77,15 @@ public abstract class AbstractSmokeStackBlock<T extends SmartBlockEntity> extend
             .setValue(POWERED, false)
             .setValue(WATERLOGGED, false);
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(ENABLED, POWERED, WATERLOGGED));
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull FluidState getFluidState(BlockState state) {
         return fluidState(state);
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState blockstate = this.defaultBlockState();
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
@@ -101,33 +96,27 @@ public abstract class AbstractSmokeStackBlock<T extends SmartBlockEntity> extend
 
         return blockstate.setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, state, currentPos);
+        updateWater(level, level, state, currentPos);
         return state;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
-                                 BlockHitResult pHit) {
-        if (AllTags.AllItemTags.WRENCH.matches(pPlayer.getItemInHand(pHand))) {
-            return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState pState, Level pLevel, BlockPos pPos,
+                                          Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (AllTags.AllItemTags.WRENCH.matches(itemStack)) {
+            return InteractionResult.PASS;
         }
         pState = pState.cycle(ENABLED);
         pLevel.setBlock(pPos, pState, 2);
         if (pState.getValue(WATERLOGGED))
             pLevel.scheduleTick(pPos, Fluids.WATER, Fluids.WATER.getTickDelay(pLevel));
-        return InteractionResult.sidedSuccess(pLevel.isClientSide);
+        return InteractionResult.SUCCESS;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-        if (!level.isClientSide) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, Orientation orientation, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, orientation, isMoving);
+        if (!level.isClientSide()) {
             boolean powered = level.hasNeighborSignal(pos);
             boolean shouldBeEnabled = !powered;
             if (powered != state.getValue(POWERED)) {
@@ -142,8 +131,6 @@ public abstract class AbstractSmokeStackBlock<T extends SmartBlockEntity> extend
             }
         }
     }
-
-    @Override
     public Item asItem() {
         return super.asItem();
     }

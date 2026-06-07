@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.compat.Mods;
 import com.railwayteam.railways.compat.tracks.GenericTrackCompat;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Map;
 
@@ -35,9 +35,7 @@ public class TwilightForestTrackCompat extends GenericTrackCompat {
         "minewood", "mining_slab",
         "transwood", "transformation_slab"
     );
-
-    @Override
-    protected ResourceLocation getSlabLocation(String name) {
+    protected Identifier getSlabLocation(String name) {
         if (slab_map.containsKey(name)) return asResource(slab_map.get(name));
         return asResource(name.replaceAll("wood", "")+"_slab");
     }

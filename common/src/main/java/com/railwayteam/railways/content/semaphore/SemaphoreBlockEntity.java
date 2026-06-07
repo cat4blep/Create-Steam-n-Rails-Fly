@@ -25,16 +25,16 @@ import com.railwayteam.railways.registry.CRIcons;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.registry.CRTags;
 import com.railwayteam.railways.util.packet.OverridableSignalPacket;
-import com.simibubi.create.content.trains.signal.SignalBlock;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
-import com.simibubi.create.foundation.gui.AllIcons;
-import net.createmod.catnip.animation.LerpedFloat;
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.math.VecHelper;
+import com.zurrtum.create.content.trains.signal.SignalBlock;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
+import com.zurrtum.create.client.foundation.gui.AllIcons;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -69,27 +69,22 @@ public class SemaphoreBlockEntity extends SmartBlockEntity implements IOverridab
         return cachedWasUpsideDown;
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
-        cachedWasUpsideDown = tag.getBoolean("CachedWasUpsideDown");
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
+        cachedWasUpsideDown = tag.getBoolean("CachedWasUpsideDown").orElse(false);
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         tag.putBoolean("CachedWasUpsideDown", cachedWasUpsideDown);
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
 
     }
-    @Override
     public void tick() {
 
         super.tick();
-        if (!level.isClientSide)
+        if (!level.isClientSide())
             return;
 
         if (overrideLastingTicks > 0) {
@@ -151,8 +146,6 @@ public class SemaphoreBlockEntity extends SmartBlockEntity implements IOverridab
 
 
     }
-
-    @Override
     public void lazyTick() {
         super.lazyTick();
         if (overrideLastingTicks > 0) return;
@@ -225,21 +218,17 @@ public class SemaphoreBlockEntity extends SmartBlockEntity implements IOverridab
         }
         return isValid;
     }
-
-    @Override
     public void railways$refresh(@Nullable SignalBlockEntity signalBE, SignalBlockEntity.SignalState state, int ticks, boolean distantSignal) {
         if (level == null) return;
         cachedSignalTE = new WeakReference<>(signalBE);
         signalState = state;
         overrideLastingTicks = ticks;
         isDistantSignal = distantSignal;
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             CRPackets.PACKETS.sendTo(PlayerSelection.tracking(this),
                 new OverridableSignalPacket(getBlockPos(),signalBE == null ? null : signalBE.getBlockPos(), state, ticks, distantSignal));
         }
     }
-
-    @Override
     public Optional<SignalBlockEntity.SignalState> railways$getOverriddenState() {
         if (overrideLastingTicks > 0 && signalState != null)
             return Optional.of(signalState);
@@ -258,8 +247,6 @@ public class SemaphoreBlockEntity extends SmartBlockEntity implements IOverridab
                 return d == facing || (facing.getCounterClockWise() == (flipped ? d.getOpposite() : d));
             });
         }
-
-        @Override
         protected Vec3 getSouthLocation() {
             return VecHelper.voxelSpace(8, 8, 11);
         }
@@ -279,13 +266,9 @@ public class SemaphoreBlockEntity extends SmartBlockEntity implements IOverridab
             this.icon = icon;
             this.translationKey = "railways.semaphore.search_mode." + Lang.asId(name());
         }
-
-        @Override
         public AllIcons getIcon() {
             return icon;
         }
-
-        @Override
         public String getTranslationKey() {
             return translationKey;
         }

@@ -32,18 +32,12 @@ public class WideTrackBufferBlock extends TrackBufferBlock<TrackBufferBlockEntit
     public WideTrackBufferBlock(Properties pProperties) {
         super(pProperties);
     }
-
-    @Override
     public Class<TrackBufferBlockEntity> getBlockEntityClass() {
         return TrackBufferBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends TrackBufferBlockEntity> getBlockEntityType() {
         return CRBlockEntities.TRACK_BUFFER.get();
     }
-
-    @Override
     protected BlockState getCycledStyle(BlockState originalState, Direction targetedFace) {
         return originalState;
     }

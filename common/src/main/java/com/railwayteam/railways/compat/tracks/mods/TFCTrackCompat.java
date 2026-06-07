@@ -21,29 +21,22 @@ package com.railwayteam.railways.compat.tracks.mods;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.compat.Mods;
 import com.railwayteam.railways.compat.tracks.GenericTrackCompat;
-import com.railwayteam.railways.mixin.AccessorIngredient$TagValue;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.crafting.Ingredient;
-
-import java.util.stream.Stream;
 
 public class TFCTrackCompat extends GenericTrackCompat {
     TFCTrackCompat() {
         super(Mods.TFC);
     }
-
-    @Override
     protected Ingredient getIngredientForRail() {
-        return Ingredient.fromValues(Stream.of(
-                AccessorIngredient$TagValue.railways$create(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "rods/wrought_iron"))),
-                AccessorIngredient$TagValue.railways$create(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "rods/zinc")))
-        ));
+        return Ingredient.of(HolderSet.emptyNamed(BuiltInRegistries.ITEM,
+                TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("forge", "rods/wrought_iron"))));
     }
-
-    @Override
-    protected ResourceLocation getSlabLocation(String name) {
+    protected Identifier getSlabLocation(String name) {
         return asResource("wood/planks/" + name + "_slab");
     }
 

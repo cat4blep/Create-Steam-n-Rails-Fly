@@ -40,8 +40,6 @@ public class EmiExcludedTagGen implements DataProvider {
     public EmiExcludedTagGen(PackOutput packOutput) {
         this.packOutput = packOutput;
     }
-
-    @Override
     public @NotNull CompletableFuture<?> run(@NotNull CachedOutput output) {
         Path path = this.packOutput.getOutputFolder()
             .resolve("assets/emi/tag/exclusions/railways.json");
@@ -69,8 +67,6 @@ public class EmiExcludedTagGen implements DataProvider {
         }
         return object;
     }
-
-    @Override
     public String getName() {
         return "Steam 'n' Rails EMI excluded tags";
     }

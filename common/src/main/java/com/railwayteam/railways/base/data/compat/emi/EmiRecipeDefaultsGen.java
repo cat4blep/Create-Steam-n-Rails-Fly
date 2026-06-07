@@ -26,7 +26,7 @@ import com.railwayteam.railways.content.palettes.PalettesColor;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class EmiRecipeDefaultsGen implements DataProvider {
-    public static final List<ResourceLocation> DEFAULT_RECIPES = new ArrayList<>();
-    public static final Map<TagKey<Item>, ResourceLocation> TAG_DEFAULTS = new LinkedHashMap<>(); // preserve insertion order
+    public static final List<Identifier> DEFAULT_RECIPES = new ArrayList<>();
+    public static final Map<TagKey<Item>, Identifier> TAG_DEFAULTS = new LinkedHashMap<>(); // preserve insertion order
 
     private final PackOutput packOutput;
 
@@ -49,7 +49,6 @@ public class EmiRecipeDefaultsGen implements DataProvider {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    @Override
     public @NotNull CompletableFuture<?> run(@NotNull CachedOutput output) {
         Path path = this.packOutput.getOutputFolder()
             .resolve("assets/emi/recipe/defaults/railways.json");
@@ -64,7 +63,7 @@ public class EmiRecipeDefaultsGen implements DataProvider {
         for (PalettesColor color : PalettesColor.values()) {
             if (color.isNetherite()) continue;
             String path = "create/filling/railways/empty_paint_pitcher/with/railways/paint/" + color.getSerializedName();
-            DEFAULT_RECIPES.add(new ResourceLocation("emi", path));
+            DEFAULT_RECIPES.add(Identifier.fromNamespaceAndPath("emi", path));
             DEFAULT_RECIPES.add(jeiMangle(Railways.asResource(path)));
         }
     }
@@ -76,7 +75,7 @@ public class EmiRecipeDefaultsGen implements DataProvider {
         JsonObject tags = new JsonObject();
 
         DEFAULT_RECIPES.forEach(loc -> added.add(loc.toString()));
-        for (ResourceLocation loc : DEFAULT_RECIPES) {
+        for (Identifier loc : DEFAULT_RECIPES) {
             if (loc.getNamespace().equals("jei")) continue;
             if (loc.getNamespace().equals("emi")) continue;
             added.add(jeiMangle(loc).toString());
@@ -96,11 +95,9 @@ public class EmiRecipeDefaultsGen implements DataProvider {
         return object;
     }
 
-    private static ResourceLocation jeiMangle(ResourceLocation loc) {
-        return new ResourceLocation("jei", "/" + loc.getNamespace() + "/" + loc.getPath());
+    private static Identifier jeiMangle(Identifier loc) {
+        return Identifier.fromNamespaceAndPath("jei", "/" + loc.getNamespace() + "/" + loc.getPath());
     }
-
-    @Override
     public @NotNull String getName() {
         return "Steam 'n' Rails EMI recipe tree defaults";
     }

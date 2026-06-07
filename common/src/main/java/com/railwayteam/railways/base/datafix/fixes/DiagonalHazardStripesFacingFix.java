@@ -24,8 +24,6 @@ public class DiagonalHazardStripesFacingFix extends AxisToFacingFix {
     public DiagonalHazardStripesFacingFix(Schema outputSchema, String name) {
         super(outputSchema, name);
     }
-
-    @Override
     protected boolean applyToBlockState(String blockId) {
         if (!blockId.startsWith("railways:")) return false;
 

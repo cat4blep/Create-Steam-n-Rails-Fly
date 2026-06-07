@@ -21,9 +21,9 @@ package com.railwayteam.railways.content.custom_tracks;
 import com.railwayteam.railways.content.custom_tracks.gen_template.OutputPrefixer;
 import com.railwayteam.railways.content.custom_tracks.gen_template.TextureKey;
 import com.railwayteam.railways.content.custom_tracks.gen_template.TrackGenTemplate;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.foundation.data.SpecialBlockStateGen;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.foundation.data.SpecialBlockStateGen;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -52,13 +52,9 @@ public abstract class CustomTrackBlockStateGenerator extends SpecialBlockStateGe
     ) {
         throw new AssertionError();
     }
-
-    @Override
     protected int getXRotation(BlockState state) {
         return 0;
     }
-
-    @Override
     protected int getYRotation(BlockState state) {
         return state.getValue(TrackBlock.SHAPE)
             .getModelRotation();

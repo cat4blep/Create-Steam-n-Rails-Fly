@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.mixin.client;
 
-import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -28,5 +28,5 @@ import java.util.Map;
 @Mixin(BogeyStyle.class)
 public interface AccessorBogeyStyle {
     @Accessor(remap = false)
-    Map<BogeySizes.BogeySize, BogeyStyle.SizeRenderer> getSizeRenderers();
+    Map<BogeySize, BogeyStyle.SizeRenderer> getSizeRenderers();
 }

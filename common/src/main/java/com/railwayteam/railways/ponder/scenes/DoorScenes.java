@@ -18,14 +18,14 @@
 
 package com.railwayteam.railways.ponder.scenes;
 
-import com.simibubi.create.AllItems;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.contraptions.elevator.ElevatorContactBlock;
-import com.simibubi.create.content.decoration.palettes.AllPaletteBlocks;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlock;
-import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
-import net.createmod.catnip.animation.LerpedFloat;
-import net.createmod.catnip.math.Pointing;
+import com.zurrtum.create.AllItems;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.content.contraptions.elevator.ElevatorContactBlock;
+import com.zurrtum.create.content.decoration.palettes.AllPaletteBlocks;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
+import com.zurrtum.create.foundation.ponder.CreateSceneBuilder;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
+import com.zurrtum.create.catnip.math.Pointing;
 import net.createmod.ponder.api.PonderPalette;
 import net.createmod.ponder.api.element.ElementLink;
 import net.createmod.ponder.api.element.WorldSectionElement;
@@ -168,28 +168,20 @@ public class DoorScenes {
         scene.addInstruction(new PonderInstruction() {
 
             private final LerpedFloat scale = LerpedFloat.linear().startWithValue(1.0);
-
-            @Override
             public void onScheduled(PonderScene scene) {
                 super.onScheduled(scene);
                 scale.setValue(1.0);
                 scale.chase(.85, .3, LerpedFloat.Chaser.EXP);
             }
-
-            @Override
             public void reset(PonderScene scene) {
                 super.reset(scene);
                 scale.setValue(1.0);
                 scale.chase(.85, .3, LerpedFloat.Chaser.EXP);
                 sceneBuilder.scaleSceneView(1.0f);
             }
-
-            @Override
             public boolean isComplete() {
                 return scale.settled();
             }
-
-            @Override
             public void tick(PonderScene scene) {
                 scale.tickChaser();
                 sceneBuilder.scaleSceneView(scale.getValue());

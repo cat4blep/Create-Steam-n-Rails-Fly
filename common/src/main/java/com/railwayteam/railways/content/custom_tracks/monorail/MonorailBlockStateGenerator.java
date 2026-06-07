@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.content.custom_tracks.monorail;
 
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.foundation.data.SpecialBlockStateGen;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.foundation.data.SpecialBlockStateGen;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -28,13 +28,9 @@ public abstract class MonorailBlockStateGenerator extends SpecialBlockStateGen {
     public static MonorailBlockStateGenerator create() {
         throw new AssertionError();
     }
-
-    @Override
     protected int getXRotation(BlockState state) {
         return 0;
     }
-
-    @Override
     protected int getYRotation(BlockState state) {
         return state.getValue(TrackBlock.SHAPE)
             .getModelRotation();

@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.util;
 
-import net.createmod.catnip.math.VoxelShaper;
+import com.zurrtum.create.catnip.math.VoxelShaper;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.VoxelShape;
 

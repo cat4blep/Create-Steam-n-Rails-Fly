@@ -19,7 +19,7 @@
 package com.railwayteam.railways.util;
 
 import com.railwayteam.railways.Railways;
-import com.simibubi.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.Train;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.Nullable;

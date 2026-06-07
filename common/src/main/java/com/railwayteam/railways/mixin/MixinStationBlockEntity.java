@@ -28,19 +28,19 @@ import com.railwayteam.railways.mixin_interfaces.IIndexedSchedule;
 import com.railwayteam.railways.registry.CRBogeyStyles;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.Utils;
-import com.simibubi.create.AllBogeyStyles;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlockEntity;
-import com.simibubi.create.content.trains.bogey.BogeySizes.BogeySize;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.content.trains.station.StationBlockEntity;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.AllBogeyStyles;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlockEntity;
+import com.zurrtum.create.content.trains.bogey.BogeySize;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -87,12 +87,12 @@ public abstract class MixinStationBlockEntity extends SmartBlockEntity {
     private void railways$setBogeyData(Player player, InteractionHand hand, ITrackBlock track, BlockState state, BlockPos pos,
                               CallbackInfoReturnable<Boolean> cir, BoundingBox bb, BlockPos up, BlockPos down,
                               int bogeyOffset, ItemStack handItem, boolean upsideDown, BlockPos targetPos) {
-        if (track.getMaterial().trackType == CRTrackMaterials.CRTrackType.MONORAIL)
+        if (CRTrackMaterials.getType(track.getMaterial()) == CRTrackMaterials.CRTrackType.MONORAIL)
             return;
         Pair<BogeyStyle, BogeySize> styleData = BogeyMenuHandlerServer.getStyle(player.getUUID());
         BogeyStyle style = styleData.getFirst();
 
-        TrackMaterial.TrackType trackType = track.getMaterial().trackType;
+        Identifier trackType = CRTrackMaterials.getType(track.getMaterial());
 
         Optional<BogeyStyle> mappedStyleOptional = CRBogeyStyles.getMapped(style, trackType, true);
         if (mappedStyleOptional.isPresent())

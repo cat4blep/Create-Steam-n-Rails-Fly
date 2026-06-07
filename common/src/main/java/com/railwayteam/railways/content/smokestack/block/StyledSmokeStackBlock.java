@@ -46,18 +46,12 @@ public class StyledSmokeStackBlock extends SmokeStackBlock {
         super(properties, rotationType, emissionParams, shape, createsStationarySmoke);
         this.cycleGroup = cycleGroup;
     }
-
-    @Override
     protected BlockState makeDefaultState() {
         return super.makeDefaultState().setValue(STYLE, SmokestackStyle.STEEL);
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(STYLE));
     }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return cycleGroup.get().get(state.getValue(STYLE)).asStack();
     }

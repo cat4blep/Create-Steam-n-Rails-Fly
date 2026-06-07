@@ -35,14 +35,9 @@ public class SpyConductorInteractPacket implements C2SPacket {
     public SpyConductorInteractPacket(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
     }
-
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(pos);
     }
-
-    @Override
     public void handle(ServerPlayer sender) {
         ConductorEntity conductor;
         if ((conductor = ConductorPossessionController.getPossessingConductor(sender)) != null) {

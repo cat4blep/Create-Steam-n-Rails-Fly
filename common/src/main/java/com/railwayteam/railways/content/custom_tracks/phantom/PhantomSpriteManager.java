@@ -24,7 +24,7 @@ import com.railwayteam.railways.mixin_interfaces.IPotentiallyInvisibleSpriteCont
 import com.railwayteam.railways.registry.CRTags;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
 
 import java.lang.ref.WeakReference;
@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class PhantomSpriteManager {
-    private static final Map<ResourceLocation, WeakReference<SpriteContents>> map = new ConcurrentHashMap<>();
+    private static final Map<Identifier, WeakReference<SpriteContents>> map = new ConcurrentHashMap<>();
     private static boolean lastVisible = false;
     public static boolean firstRun = true;
     public static boolean hasChanged = false;
@@ -62,12 +62,12 @@ public abstract class PhantomSpriteManager {
             firstRun = false;
             lastVisible = visible;
             hasChanged = true;
-            List<ResourceLocation> expired = new ArrayList<>();
-            for (Map.Entry<ResourceLocation, WeakReference<SpriteContents>> entry : map.entrySet()) {
+            List<Identifier> expired = new ArrayList<>();
+            for (Map.Entry<Identifier, WeakReference<SpriteContents>> entry : map.entrySet()) {
                 if (entry.getValue().get() == null)
                     expired.add(entry.getKey());
             }
-            for (ResourceLocation key : expired) {
+            for (Identifier key : expired) {
                 map.remove(key);
             }
         }

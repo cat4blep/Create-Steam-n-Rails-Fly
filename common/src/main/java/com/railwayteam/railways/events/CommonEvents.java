@@ -29,7 +29,7 @@ public class CommonEvents {
 
     @MultiLoaderEvent
     public static void onWorldTickStart(Level level) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         RedstoneLinkInstruction.tick(level);
     }

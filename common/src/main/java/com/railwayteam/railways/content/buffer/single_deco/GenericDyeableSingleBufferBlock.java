@@ -19,7 +19,7 @@
 package com.railwayteam.railways.content.buffer.single_deco;
 
 import com.tterrag.registrate.util.nullness.NonNullFunction;
-import net.createmod.catnip.math.VoxelShaper;
+import com.zurrtum.create.catnip.math.VoxelShaper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -42,13 +42,9 @@ public class GenericDyeableSingleBufferBlock extends AbstractDyeableSingleBuffer
     public static NonNullFunction<Properties, GenericDyeableSingleBufferBlock> createFactory(VoxelShaper shaper) {
         return properties -> new GenericDyeableSingleBufferBlock(properties, shaper);
     }
-
-    @Override
     protected BlockState cycleStyle(BlockState originalState, Direction targetedFace) {
         return originalState;
     }
-
-    @Override
     protected VoxelShaper getShaper(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return shaper;
     }

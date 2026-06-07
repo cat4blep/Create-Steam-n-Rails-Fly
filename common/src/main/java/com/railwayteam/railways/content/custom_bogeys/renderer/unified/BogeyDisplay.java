@@ -20,10 +20,10 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.unified;
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.impl.UnifiedBogeyRenderer;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.impl.UnifiedBogeyVisual;
-import com.simibubi.create.content.trains.bogey.BogeyRenderer;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import com.simibubi.create.content.trains.bogey.BogeyVisualizer;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.client.content.trains.bogey.BogeyRenderer;
+import com.zurrtum.create.client.content.trains.bogey.SizeRenderer;
+import com.zurrtum.create.client.content.trains.bogey.BogeyVisualizer;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -51,19 +51,17 @@ public interface BogeyDisplay {
     @FunctionalInterface
     interface SimpleFactory extends Factory {
         BogeyDisplay create(ElementProvider<?> prov);
-
-        @Override
         @ApiStatus.NonExtendable
         default BogeyDisplay create(ElementProvider<?> prov, boolean inContraption) {
             return create(prov);
         }
     }
 
-    static BogeyStyle.SizeRenderer createSizeRenderer(Factory factory) {
-        return new BogeyStyle.SizeRenderer(new UnifiedBogeyRenderer(factory), UnifiedBogeyVisual.create(factory));
+    static SizeRenderer createSizeRenderer(Factory factory) {
+        return new SizeRenderer(new UnifiedBogeyRenderer(factory), UnifiedBogeyVisual.create(factory));
     }
 
-    static BogeyStyle.SizeRenderer createSizeRenderer(SimpleFactory factory) {
-        return new BogeyStyle.SizeRenderer(new UnifiedBogeyRenderer(factory), UnifiedBogeyVisual.create(factory));
+    static SizeRenderer createSizeRenderer(SimpleFactory factory) {
+        return new SizeRenderer(new UnifiedBogeyRenderer(factory), UnifiedBogeyVisual.create(factory));
     }
 }

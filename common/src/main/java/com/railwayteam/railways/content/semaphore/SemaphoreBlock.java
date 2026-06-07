@@ -23,13 +23,14 @@ import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRShapes;
 import com.railwayteam.railways.registry.CRTags;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
-import com.simibubi.create.foundation.block.IBE;
-import net.createmod.catnip.ghostblock.GhostBlocks;
-import net.createmod.catnip.placement.IPlacementHelper;
-import net.createmod.catnip.placement.PlacementHelpers;
-import net.createmod.catnip.placement.PlacementOffset;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.client.catnip.ghostblock.GhostBlocks;
+import com.zurrtum.create.catnip.placement.IPlacementHelper;
+import com.zurrtum.create.catnip.placement.PlacementHelpers;
+import com.zurrtum.create.catnip.placement.PlacementOffset;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -57,6 +58,7 @@ import java.util.function.Predicate;
 
 public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<SemaphoreBlockEntity>, IWrenchable {
 
+    public static final MapCodec<SemaphoreBlock> CODEC = simpleCodec(SemaphoreBlock::new);
     public static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
     public static final int girderPlacementHelperId = PlacementHelpers.register(new GirderPlacementHelper());
     public static final BooleanProperty FLIPPED = BooleanProperty.create("flipped");
@@ -67,28 +69,22 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(FLIPPED,false).setValue(FULL,false).setValue(UPSIDE_DOWN, false));
     }
-    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
+    }
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         super.createBlockStateDefinition(pBuilder.add(FACING).add(FLIPPED).add(FULL).add(UPSIDE_DOWN));
     }
     @SuppressWarnings("deprecation")
-    @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
-                                 BlockHitResult ray) {
-        ItemStack heldItem = player.getItemInHand(hand);
-
-        //IPlacementHelper placementHelper = PlacementHelpers.get(placementHelperId);
-
-
-        ItemStack itemInHand = player.getItemInHand(hand);
+    protected InteractionResult useItemOn(ItemStack itemInHand, BlockState state, Level world, BlockPos pos,
+                                          Player player, InteractionHand hand, BlockHitResult ray) {
         IPlacementHelper helper = PlacementHelpers.get(SemaphoreBlock.girderPlacementHelperId);
 
         if (helper.matchesItem(itemInHand))
             return helper.getOffset(player, world, state, pos, ray)
-                            .placeInWorld(world, (BlockItem) itemInHand.getItem(), player, hand, ray);
+                            .placeInWorld(world, (BlockItem) itemInHand.getItem(), player, hand);
         return InteractionResult.PASS;
     }
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if(state==null)
@@ -103,7 +99,6 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
 
         return state.setValue(FACING,facing).setValue(FLIPPED,flipped).setValue(UPSIDE_DOWN,upside_down);
     }
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
         BlockState rotated;
@@ -168,7 +163,6 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, world, pos, oldState, isMoving);
         BlockPos currentPos = pos.below();
@@ -201,18 +195,12 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
         public PlacementHelper() {
 
         }
-
-        @Override
         public Predicate<ItemStack> getItemPredicate() {
             return CRBlocks.SEMAPHORE::isIn;
         }
-
-        @Override
         public Predicate<BlockState> getStatePredicate() {
             return state -> CRBlocks.SEMAPHORE.has(state) || CRTags.AllBlockTags.SEMAPHORE_POLES.matches(state);
         }
-
-        @Override
         public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos,
                                          BlockHitResult ray) {
 
@@ -242,8 +230,6 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
 
             return PlacementOffset.fail();
         }
-
-        @Override
         public void displayGhost(PlacementOffset offset) {
             if (!offset.hasGhostState())
                 return;
@@ -259,18 +245,12 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
         public GirderPlacementHelper() {
 
         }
-
-        @Override
         public Predicate<ItemStack> getItemPredicate() {
             return CRTags.AllBlockTags.SEMAPHORE_POLES::matches;
         }
-
-        @Override
         public Predicate<BlockState> getStatePredicate() {
             return CRBlocks.SEMAPHORE::has;
         }
-
-        @Override
         public PlacementOffset getOffset(Player player, Level world, BlockState state, BlockPos pos,
                                          BlockHitResult ray) {
 
@@ -296,19 +276,14 @@ public class SemaphoreBlock extends HorizontalDirectionalBlock implements IBE<Se
             return PlacementOffset.fail();
         }
     }
-
-    @Override
     public Class<SemaphoreBlockEntity> getBlockEntityClass() {
         return SemaphoreBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends SemaphoreBlockEntity> getBlockEntityType() {
         return CRBlockEntities.SEMAPHORE.get();
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return CRShapes.SEMAPHORE.get(pState.getValue(FACING));
     }

@@ -19,7 +19,7 @@
 package com.railwayteam.railways.registry;
 
 import com.railwayteam.railways.content.moving_bes.GuiBlockMovingInteractionBehaviour;
-import com.simibubi.create.api.behaviour.interaction.MovingInteractionBehaviour;
+import com.zurrtum.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 

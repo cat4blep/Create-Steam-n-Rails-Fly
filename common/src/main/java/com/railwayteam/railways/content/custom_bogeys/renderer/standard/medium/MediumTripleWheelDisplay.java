@@ -20,9 +20,9 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard.medium;
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
-import com.simibubi.create.AllPartialModels;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 
@@ -39,8 +39,6 @@ public class MediumTripleWheelDisplay implements BogeyDisplay {
         wheels = prov.create(MEDIUM_SHARED_WHEELS, 3);
         secondaryShafts = prov.create(AllPartialModels.SHAFT, 2);
     }
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle) {
         for (int i : Iterate.zeroAndOne) {
             secondaryShafts[i]

@@ -21,12 +21,12 @@ package com.railwayteam.railways.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.railwayteam.railways.registry.CRBogeyStyles;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -45,14 +45,14 @@ import java.util.Map;
 
 @Mixin(value = AbstractBogeyBlock.class, remap = false)
 public abstract class MixinAbstractBogeyBlock {
-    @Unique private final ThreadLocal<TrackType> railways$trackType = new ThreadLocal<>();
+    @Unique private final ThreadLocal<Identifier> railways$trackType = new ThreadLocal<>();
 
     @Inject(method = "getNextStyle(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lcom/simibubi/create/content/trains/bogey/BogeyStyle;", at = @At("HEAD"), remap = true)
     private void storeSupportType(Level level, BlockPos pos, CallbackInfoReturnable<BogeyStyle> cir) {
         AbstractBogeyBlock<?> $this = (AbstractBogeyBlock<?>) (Object) this;
         BlockPos trackPos = $this.isUpsideDown(level.getBlockState(pos)) ? pos.above() : pos.below();
         if (level.getBlockState(trackPos).getBlock() instanceof ITrackBlock trackBlock) {
-            railways$trackType.set(trackBlock.getMaterial().trackType);
+            railways$trackType.set(CRTrackMaterials.getType(trackBlock.getMaterial()));
         } else {
             railways$trackType.remove();
         }
@@ -69,7 +69,7 @@ public abstract class MixinAbstractBogeyBlock {
         AbstractBogeyBlock<?> $this = (AbstractBogeyBlock<?>) (Object) this;
         BlockPos trackPos = $this.isUpsideDown(state) ? pos.above() : pos.below();
         if (level.getBlockState(trackPos).getBlock() instanceof ITrackBlock trackBlock) {
-            railways$trackType.set(trackBlock.getMaterial().trackType);
+            railways$trackType.set(CRTrackMaterials.getType(trackBlock.getMaterial()));
         } else {
             railways$trackType.remove();
         }
@@ -82,8 +82,8 @@ public abstract class MixinAbstractBogeyBlock {
     }
 
     @WrapOperation(method = "getNextStyle(Lcom/simibubi/create/content/trains/bogey/BogeyStyle;)Lcom/simibubi/create/content/trains/bogey/BogeyStyle;", at = @At(value = "INVOKE", target = "Ljava/util/Map;values()Ljava/util/Collection;"))
-    private Collection<BogeyStyle> filterStyles(Map<ResourceLocation, BogeyStyle> instance, Operation<Collection<BogeyStyle>> original) {
-        TrackType trackType = railways$trackType.get();
+    private Collection<BogeyStyle> filterStyles(Map<Identifier, BogeyStyle> instance, Operation<Collection<BogeyStyle>> original) {
+        Identifier trackType = railways$trackType.get();
         if (trackType == null) {
             return original.call(instance);
         } else {

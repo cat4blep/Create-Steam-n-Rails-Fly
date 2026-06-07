@@ -21,8 +21,8 @@ package com.railwayteam.railways.content.palettes.trapdoors;
 import com.railwayteam.railways.content.palettes.doors.HingedDoorBlock;
 import com.railwayteam.railways.registry.CRBlockSetTypes;
 import com.railwayteam.railways.util.EntityUtils;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -45,12 +45,10 @@ public class PalettesTrapDoorBlock extends TrapDoorBlock implements IWrenchable 
     public static final BooleanProperty WINDOWED = HingedDoorBlock.WINDOWED;
 
     public PalettesTrapDoorBlock(Properties properties) {
-        super(properties, CRBlockSetTypes.LOCOMETAL);
+        super(CRBlockSetTypes.LOCOMETAL, properties);
         registerDefaultState(defaultBlockState()
             .setValue(WINDOWED, false));
     }
-
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
@@ -58,16 +56,12 @@ public class PalettesTrapDoorBlock extends TrapDoorBlock implements IWrenchable 
         world.setBlock(pos, newState, UPDATE_ALL);
         return InteractionResult.SUCCESS;
     }
-
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (EntityUtils.isHolding(player, AllItems.WRENCH::isIn)) {
+        if (AllTags.AllItemTags.WRENCH.matches(player.getItemInHand(hand))) {
             return InteractionResult.PASS;
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return InteractionResult.PASS;
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(WINDOWED));
     }

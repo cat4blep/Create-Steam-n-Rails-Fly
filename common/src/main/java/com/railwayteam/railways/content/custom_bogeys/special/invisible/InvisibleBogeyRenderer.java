@@ -19,11 +19,10 @@
 package com.railwayteam.railways.content.custom_bogeys.special.invisible;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.content.trains.bogey.BogeyRenderer;
+import com.zurrtum.create.client.content.trains.bogey.BogeyRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.nbt.CompoundTag;
 
 public class InvisibleBogeyRenderer implements BogeyRenderer {
-    @Override
     public void render(CompoundTag bogeyData, float wheelAngle, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, boolean inContraption) {}
 }

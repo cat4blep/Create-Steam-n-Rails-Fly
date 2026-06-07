@@ -19,8 +19,8 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.mixin_interfaces.CopycatDuck;
-import com.simibubi.create.content.decoration.copycat.CopycatBlockEntity;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,12 +36,10 @@ public abstract class MixinCopycatBlockEntity extends SmartBlockEntity implement
     private MixinCopycatBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
     public void railways$setMaterialSimple(BlockState material) {
         this.material = material;
 
-        if (level == null || !level.isClientSide) {
+        if (level == null || !level.isClientSide()) {
             notifyUpdate();
             return;
         }

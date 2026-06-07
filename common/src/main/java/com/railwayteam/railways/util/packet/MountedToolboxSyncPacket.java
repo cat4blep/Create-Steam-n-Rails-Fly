@@ -41,14 +41,10 @@ public class MountedToolboxSyncPacket implements S2CPacket {
     id = buf.readInt();
     nbt = buf.readNbt();
   }
-
-  @Override
   public void write(FriendlyByteBuf buffer) {
     buffer.writeInt(this.id);
     buffer.writeNbt(this.nbt);
   }
-
-  @Override
   @Environment(EnvType.CLIENT)
   public void handle(Minecraft mc) {
     Level level = mc.level;

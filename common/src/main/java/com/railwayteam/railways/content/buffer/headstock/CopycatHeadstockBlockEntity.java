@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.buffer.headstock;
 
 import com.railwayteam.railways.content.buffer.IDyedBuffer;
 import com.railwayteam.railways.util.BlockStateUtils;
-import com.simibubi.create.content.decoration.copycat.CopycatBlockEntity;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionResult;
@@ -38,28 +38,24 @@ public class CopycatHeadstockBlockEntity extends CopycatBlockEntity implements I
     protected DyeColor color;
 
     public CopycatHeadstockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
+        super(pos, state);
     }
-
-    @Override
     public @Nullable DyeColor getColor() {
         return color;
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         if (color != null)
             tag.putInt("Color", color.getId());
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
         DyeColor prevColor = color;
 
         if (tag.contains("Color"))
-            color = DyeColor.byId(tag.getInt("Color"));
+            color = DyeColor.byId(tag.getInt("Color").orElse(0));
         else
             color = null;
 

@@ -48,13 +48,9 @@ public enum VariableStackPart implements StringRepresentable {
     public boolean isFullHeight() {
         return fullHeight;
     }
-
-    @Override
     public String toString() {
         return name;
     }
-
-    @Override
     public @NotNull String getSerializedName() {
         return name;
     }

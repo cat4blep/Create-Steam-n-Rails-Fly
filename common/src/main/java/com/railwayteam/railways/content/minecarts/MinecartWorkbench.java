@@ -40,8 +40,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MinecartWorkbench extends MinecartBlock implements MenuProvider {
-  public static final Type TYPE = Type.valueOf("RAILWAY_WORKBENCH");
-
   private final double VALID_RANGE = 32d;
   private static final EntityTypeTest<Entity, MinecartWorkbench> test = EntityTypeTest.forClass(MinecartWorkbench.class);
 
@@ -53,20 +51,15 @@ public class MinecartWorkbench extends MinecartBlock implements MenuProvider {
     super(CREntities.CART_BLOCK.get(), level, x, y, z, Blocks.CRAFTING_TABLE);
   }
 
-  @Override
-  public Type getMinecartType() {
-    return TYPE;
-  }
-
   @NotNull
-  @Override
   public InteractionResult interact (@NotNull Player player, @NotNull InteractionHand hand) {
     InteractionResult ret = super.interact(player, hand);
     if (ret.consumesAction()) return ret;
     player.openMenu(this);
-    if (!player.level.isClientSide) {
+    if (!player.level.isClientSide()) {
       this.gameEvent(GameEvent.CONTAINER_OPEN, player);
-      PiglinAi.angerNearbyPiglins(player, true);
+      if (player.level instanceof net.minecraft.server.level.ServerLevel serverLevel)
+        PiglinAi.angerNearbyPiglins(serverLevel, player, true);
       return InteractionResult.CONSUME;
     } else {
       return InteractionResult.SUCCESS;
@@ -74,10 +67,8 @@ public class MinecartWorkbench extends MinecartBlock implements MenuProvider {
   }
 
   @Nullable
-  @Override
   public AbstractContainerMenu createMenu (int p_39954_, @NotNull Inventory inv, @NotNull Player player) {
     return new CraftingMenu(p_39954_, inv, ContainerLevelAccess.create(level, blockPosition())) {
-      @Override
       public boolean stillValid(@NotNull Player player) {
         return player.level.getEntities(
         test, player.getBoundingBox().inflate(VALID_RANGE), Entity::isAlive
@@ -85,8 +76,6 @@ public class MinecartWorkbench extends MinecartBlock implements MenuProvider {
       }
     };
   }
-
-  @Override
   public ItemStack getPickResult() {
     return CRItems.ITEM_BENCHCART.asStack();
   }

@@ -42,20 +42,15 @@ public class AxialHazardStripesBlock extends HazardStripesBlock {
         registerDefaultState(defaultBlockState()
             .setValue(AXIS, Axis.Z));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(AXIS));
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         return state == null ? null : state.setValue(AXIS, context.getHorizontalDirection().getAxis());
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState rotate(BlockState state, Rotation rotation) {
         return switch (rotation) {
@@ -63,8 +58,6 @@ public class AxialHazardStripesBlock extends HazardStripesBlock {
             default -> state;
         };
     }
-
-    @Override
     public int getYRot(BlockState state) {
         return switch (state.getValue(AXIS)) {
             case X -> 90;

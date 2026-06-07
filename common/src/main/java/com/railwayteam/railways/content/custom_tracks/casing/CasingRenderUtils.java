@@ -6,196 +6,39 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.railwayteam.railways.content.custom_tracks.casing;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.railwayteam.railways.Railways;
-import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
-import com.railwayteam.railways.registry.CRBlockPartials;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.BezierConnection.SegmentAngles;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import dev.engine_room.flywheel.api.instance.InstancerProvider;
-import dev.engine_room.flywheel.api.material.CardinalLightingMode;
-import dev.engine_room.flywheel.lib.instance.InstanceTypes;
-import dev.engine_room.flywheel.lib.instance.TransformedInstance;
-import dev.engine_room.flywheel.lib.material.LightShaders;
-import dev.engine_room.flywheel.lib.material.SimpleMaterial;
-import dev.engine_room.flywheel.lib.model.ModelUtil;
-import dev.engine_room.flywheel.lib.model.SimpleModel;
-import dev.engine_room.flywheel.lib.model.baked.BakedModelBuilder;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.render.CachedBuffers;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
+import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
+import com.zurrtum.create.client.flywheel.lib.instance.TransformedInstance;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.content.trains.track.BezierConnection;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType.NARROW_GAUGE;
-import static com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType.WIDE_GAUGE;
-import static com.railwayteam.railways.util.MathUtils.copy;
-
 public abstract class CasingRenderUtils {
-
-    private static final HashMap<Pair<PartialModel, Block>, PartialModel> reTexturedModels = new HashMap<>();
-
     public static void clearModelCache() {
-        reTexturedModels.clear();
-        CRBlockPartials.registerCasingSpecs();
-        Minecraft.getInstance().levelRenderer.allChanged();
     }
 
     public static PartialModel reTexture(PartialModel model, Block block) {
-        Pair<PartialModel, Block> key = Pair.of(model, block);
-        if (!reTexturedModels.containsKey(key)) {
-            BakedModel blockModel = Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(block.defaultBlockState());
-            BakedModel texturedCasing = new SpriteCopyingBakedModel(model.get(), blockModel);
-            PartialModel texturedPartial = RuntimeFakePartialModel.make(Railways.asResource("runtime_casing"), texturedCasing);
-            reTexturedModels.put(key, texturedPartial);
-            return texturedPartial;
-        }
-
-        return reTexturedModels.get(key);
+        return model;
     }
 
     public static void renderBezierCasings(PoseStack ms, Level level, PartialModel texturedPartial, BlockState state, VertexConsumer vb, BezierConnection bc) {
-        int heightDiff = Math.abs(bc.bePositions.get(false).getY() - bc.bePositions.get(true).getY());
-        double shiftDown = ((IHasTrackCasing) bc).railways$isAlternate() && heightDiff > 0 ? -0.25 : 0;
-        if (heightDiff / bc.getLength() <= 4 / 30d) {
-            for (Vec3 pos : casingPositions(bc)) {
-                ms.pushPose();
-                BlockPos tePosition = bc.bePositions.getFirst();
-                int light = LevelRenderer.getLightColor(level, BlockPos.containing(pos).offset(tePosition));
-
-                CachedBuffers.partial(texturedPartial, state)
-                        .translate(pos.x, pos.y, pos.z)
-                        .translate(0, shiftDown, 0)
-                        .scale(1.001f)
-                        .light(light)
-                        .renderInto(ms, vb);
-                ms.popPose();
-            }
-        } else {
-            ms.pushPose();
-            BlockPos tePosition = bc.bePositions.getFirst();
-            SegmentAngles segments = bc.getBakedSegments();
-
-            TransformStack.of(ms)
-                    .nudge((int) tePosition.asLong());
-
-            for (int i = 1; i < segments.length; i++) {
-                if (i % 2 == 0) continue;
-                int light = LevelRenderer.getLightColor(level, segments.lightPosition[i].offset(tePosition));
-                Matrix4f pose = copy(segments.tieTransform[i].pose());
-                pose.translate(new Vector3f(0, (i % 4) * 0.001f, 0));
-                CachedBuffers.partial(texturedPartial, state)
-                        .mulPose(pose)
-                        .mulNormal(segments.tieTransform[i].normal())
-                        .translate(0, shiftDown, 0)
-                        .scale(1.02f)
-                        .light(light)
-                        .renderInto(ms, vb);
-
-                TrackType trackType = bc.getMaterial().trackType;
-                if (trackType == WIDE_GAUGE) {
-                    for (boolean first : Iterate.trueAndFalse) {
-                        for (boolean inner : Iterate.trueAndFalse) {
-                            Pose transform = segments.railTransforms[i].get(first);
-                            Matrix4f pose2 = copy(transform.pose());
-                            pose2.translate(new Vector3f(0, (i % 4) * 0.001f, 0));
-                            CachedBuffers.partial(texturedPartial, state)
-                                    .mulPose(pose2)
-                                    .mulNormal(transform.normal())
-                                    .translate((first ? -(61 / 64.) : -(1 / 32.)) + (inner ? 0 : (first ? 1 : -1)), shiftDown, 0)
-                                    .light(light)
-                                    .renderInto(ms, vb);
-                        }
-                    }
-                } else {
-                    for (boolean first : Iterate.trueAndFalse) {
-                        Pose transform = segments.railTransforms[i].get(first);
-                        Matrix4f pose2 = copy(transform.pose());
-                        pose2.translate(new Vector3f(0, (i % 4) * 0.001f, 0));
-                        CachedBuffers.partial(texturedPartial, state)
-                                .mulPose(pose2)
-                                .mulNormal(transform.normal())
-                                .translate(-0.5 + (trackType == NARROW_GAUGE ? (first ? 0.5 : -0.5) : 0), shiftDown, 0)
-                                .light(light)
-                                .renderInto(ms, vb);
-                    }
-                }
-            }
-            ms.popPose();
-        }
     }
 
     public static List<Vec3> casingPositions(BezierConnection bc) {
-        List<Vec3> positions = new ArrayList<>();
-        List<int[]> takenPositions = new ArrayList<>();
-        for (BezierConnection.Segment segment : bc) {
-            double factor = 1.3;
-            if (bc.getMaterial().trackType == WIDE_GAUGE)
-                factor += 0.5;
-            else if (bc.getMaterial().trackType == NARROW_GAUGE)
-                factor -= 7 / 16.;
-            Vec3 pos1 = segment.position.add(segment.normal.scale(factor));
-            Vec3 pos2 = segment.position.add(segment.normal.scale(-factor));
-
-            float steps = 4;
-            Vec3 stepVec = pos1.vectorTo(pos2).scale(1 / steps);
-
-            Vec3 curPos = pos1;
-
-            for (int i = 0; i <= steps; i++) {
-                int x = (int) Math.floor(curPos.x);
-                int z = (int) Math.floor(curPos.z);
-                if (takenPositions.stream().noneMatch(pos -> pos[0] == x && pos[1] == z)) {
-                    takenPositions.add(new int[]{x, z});
-                    positions.add(new Vec3(x, curPos.y - (3 / 16d), z));
-                }
-                curPos = curPos.add(stepVec);
-            }
-        }
-        return positions.stream().toList();
+        return List.of();
     }
 
     public static TransformedInstance makeCasingInstance(PartialModel baseModel, Block casingBlock, InstancerProvider instancerProvider) {
-        PartialModel texturedPartial = reTexture(baseModel, casingBlock);
-        SimpleModel model = BakedModelBuilder.create(texturedPartial.get())
-                .materialFunc((renderType, shaded) ->
-					SimpleMaterial.builderOf(ModelUtil.getMaterial(RenderType.cutoutMipped(), shaded))
-						.light(LightShaders.FLAT)
-						.cardinalLightingMode(shaded ? CardinalLightingMode.CHUNK : CardinalLightingMode.OFF)
-						.build()
-				)
-                .build();
-        return instancerProvider.instancer(InstanceTypes.TRANSFORMED, model)
-                .createInstance();
+        return null;
     }
 }

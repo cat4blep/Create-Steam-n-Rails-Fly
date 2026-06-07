@@ -19,14 +19,17 @@
 package com.railwayteam.railways.util;
 
 import com.google.common.collect.ImmutableList;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsBoard;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueSettingsFormatter;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsBoard;
+import com.zurrtum.create.client.foundation.blockEntity.ValueSettingsFormatter;
+import com.zurrtum.create.foundation.blockEntity.behaviour.ValueSettings;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.function.IntConsumer;
 
 public class MinRespectingScrollValueBehaviour extends ScrollValueBehaviour {
     private int min;
@@ -35,25 +38,30 @@ public class MinRespectingScrollValueBehaviour extends ScrollValueBehaviour {
         super(label, be, slot);
     }
 
-    @Override
     public ScrollValueBehaviour between(int min, int max) {
         this.min = min;
-        return super.between(min, max);
+        return this;
     }
 
-    @Override
+    public ScrollValueBehaviour setValue(int value) {
+        return this;
+    }
+
+    public ScrollValueBehaviour withCallback(IntConsumer callback) {
+        return this;
+    }
+
+    public ScrollValueBehaviour requiresWrench() {
+        return this;
+    }
     public ValueSettingsBoard createBoard(Player player, BlockHitResult hitResult) {
-        return new ValueSettingsBoard(this.label, this.max - this.min, 1,
+        return new ValueSettingsBoard(this.label, 1, 1,
             ImmutableList.of(Component.literal("Value")),
-            new ValueSettingsFormatter(vs -> new ValueSettings(vs.row(), vs.value() + this.min).format()));
+            new ValueSettingsFormatter(vs -> Component.literal(Integer.toString(vs.value() + this.min))));
     }
-
-    @Override
     public void setValueSettings(Player player, ValueSettings vs, boolean ctrlDown) {
         super.setValueSettings(player, new ValueSettings(vs.row(), vs.value() + this.min), ctrlDown);
     }
-
-    @Override
     public ValueSettings getValueSettings() {
         ValueSettings vs = super.getValueSettings();
         return new ValueSettings(vs.row(), vs.value() - min);

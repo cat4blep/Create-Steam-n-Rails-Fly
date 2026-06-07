@@ -47,8 +47,6 @@ public class EnumRecipeList<E extends Enum<E>> extends EnumFilledList<E, Generat
         public DyedOnlyPalettesRecipeList(Function<@NotNull PalettesColor, GeneratedRecipe> filler) {
             super(filler);
         }
-
-        @Override
         protected boolean filter(PalettesColor value) {
             return !value.isNetherite();
         }
@@ -58,8 +56,6 @@ public class EnumRecipeList<E extends Enum<E>> extends EnumFilledList<E, Generat
         public VanillaDyedOnlyPalettesRecipeList(BiFunction<PalettesColor, DyeColor, GeneratedRecipe> filler) {
             super(c -> filler.apply(c, c.toDyeColor()));
         }
-
-        @Override
         protected boolean filter(PalettesColor value) {
             return value.isMainSeries();
         }

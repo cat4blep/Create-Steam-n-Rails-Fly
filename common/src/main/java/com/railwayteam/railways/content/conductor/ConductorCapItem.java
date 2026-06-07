@@ -19,20 +19,21 @@
 package com.railwayteam.railways.content.conductor;
 
 import com.railwayteam.railways.Railways;
-import com.simibubi.create.AllBlocks;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,7 @@ import java.util.Locale;
 
 public abstract class ConductorCapItem extends ArmorItem {
   public final DyeColor color;
-  public final ResourceLocation textureId;
+  public final Identifier textureId;
   public final String textureStr;
 
   protected ConductorCapItem(Properties props, DyeColor color) {
@@ -57,17 +58,16 @@ public abstract class ConductorCapItem extends ArmorItem {
     throw new AssertionError();
   }
 
-  static boolean isCasing (Block block) { return block.equals( AllBlocks.ANDESITE_CASING.get()); }
+  static boolean isCasing (Block block) { return block.equals(Blocks.ANDESITE); }
   static boolean isCasing (BlockState state) { return isCasing(state.getBlock()); }
   static boolean isCasing (Level level, BlockPos pos) { return isCasing(level.getBlockState(pos)); }
 
   @Nonnull
-  @Override
   public InteractionResult useOn (UseOnContext ctx) {
     Level level  = ctx.getLevel();
     BlockPos pos = ctx.getClickedPos();
     if (isCasing(level, pos)) {
-      if (level.isClientSide)
+      if (level.isClientSide())
         return InteractionResult.SUCCESS;
       level.removeBlock(pos, false);
       ConductorEntity.spawn(level, pos, ctx.getItemInHand().copy());
@@ -81,42 +81,27 @@ public abstract class ConductorCapItem extends ArmorItem {
   }
 
   static class ConductorArmorMaterial implements ArmorMaterial {
-    @Override
     public int getDurabilityForType(@NotNull Type type) {
       return 0;
     }
-
-    @Override
     public int getDefenseForType(@NotNull Type type) {
       return 0;
     }
-
-    @Override
     public int getEnchantmentValue() {
       return 0;
     }
-
-    @Override
     public @NotNull SoundEvent getEquipSound() {
-      return SoundEvents.ARMOR_EQUIP_LEATHER;
+      return SoundEvents.ARMOR_EQUIP_LEATHER.value();
     }
-
-    @Override
     public @NotNull Ingredient getRepairIngredient() {
-      return Ingredient.EMPTY;
+      return Ingredient.of(Items.LEATHER);
     }
-
-    @Override
     public @NotNull String getName() {
       return "conductor_cap";
     }
-
-    @Override
     public float getToughness() {
       return 0;
     }
-
-    @Override
     public float getKnockbackResistance() {
       return 0;
     }

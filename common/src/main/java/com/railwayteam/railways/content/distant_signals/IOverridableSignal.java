@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.content.distant_signals;
 
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;

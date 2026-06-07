@@ -20,7 +20,7 @@ package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.config.CRConfigs;
-import net.createmod.catnip.config.ui.ConfigHelper;
+import com.zurrtum.create.catnip.config.ui.ConfigHelper;
 import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public class MixinConfigHelper {
     @Inject(method = "findForgeConfigSpecFor", at = @At("HEAD"), cancellable = true)
     private static void returnSNRConfig(ModConfig.Type type, String modID, CallbackInfoReturnable<IConfigSpec<?>> cir) {
         if (modID.equals(Railways.MOD_ID)) {
-            cir.setReturnValue(CRConfigs.byType(type).specification);
+            cir.setReturnValue(null);
         }
     }
 }

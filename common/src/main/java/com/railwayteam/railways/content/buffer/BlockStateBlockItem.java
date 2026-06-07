@@ -53,12 +53,6 @@ public class BlockStateBlockItem<T extends Comparable<T>> extends BlockItem {
     public static <T extends Comparable<T>> NonNullFunction<Properties, BlockStateBlockItem<T>> create(NonNullSupplier<Block> blockSupplier, Property<T> property, T value, boolean primary) {
         return (p) -> new BlockStateBlockItem<>(blockSupplier.get(), p, property, value, primary);
     }
-
-    @Override
-    public @NotNull String getDescriptionId() {
-        return this.getOrCreateDescriptionId();
-    }
-
     /*@Override
     public void fillItemCategory(@NotNull CreativeModeTab category, @NotNull NonNullList<ItemStack> items) {
         if (this.allowedIn(category)) {
@@ -74,8 +68,6 @@ public class BlockStateBlockItem<T extends Comparable<T>> extends BlockItem {
         }
         return blockState != null && this.canPlace(context, blockState) ? blockState : null;
     }
-
-    @Override
     public void registerBlocks(@NotNull Map<Block, Item> blockToItemMap, @NotNull Item item) {
         if (this.primary) {
             super.registerBlocks(blockToItemMap, item);

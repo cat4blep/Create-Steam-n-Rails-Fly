@@ -18,15 +18,13 @@
 
 package com.railwayteam.railways.config;
 
-import net.createmod.catnip.config.ConfigBase;
+import com.zurrtum.create.catnip.config.ConfigBase;
 
 @SuppressWarnings("unused")
 public class CSemaphores extends ConfigBase {
 
     public final ConfigBool simplifiedPlacement = b(true, "simplifiedPlacement", Comments.simplifiedPlacement);
     public final ConfigBool flipYellowOrder = b(false, "flipYellowOrder", Comments.flipYellowOrder);
-
-    @Override
     public String getName() {
         return "semaphores";
     }

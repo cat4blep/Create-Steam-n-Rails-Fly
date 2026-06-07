@@ -20,11 +20,11 @@ package com.railwayteam.railways.mixin_interfaces;
 
 import com.railwayteam.railways.content.switches.TrackSwitch;
 import com.railwayteam.railways.content.switches.TrackSwitchBlock;
-import com.simibubi.create.content.trains.graph.TrackEdge;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.signal.TrackEdgePoint;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackNode;
+import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Pair;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
@@ -54,8 +54,6 @@ public interface IGenerallySearchableNavigation {
             this.node2 = node2;
             this.edge = edge;
         }
-
-        @Override
         public int compareTo(FrontierEntry o) {
             return Double.compare(distance + penalty, o.distance + o.penalty);
         }

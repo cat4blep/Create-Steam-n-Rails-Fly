@@ -20,24 +20,22 @@ package com.railwayteam.railways.content.coupling;
 
 import com.google.common.collect.ImmutableList;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlockEntity;
-import com.simibubi.create.api.behaviour.display.DisplaySource;
-import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
-import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
-import com.simibubi.create.content.trains.display.FlapDisplayBlockEntity;
-import com.simibubi.create.content.trains.display.FlapDisplayLayout;
-import com.simibubi.create.content.trains.display.FlapDisplaySection;
+import com.zurrtum.create.api.behaviour.display.DisplaySource;
+import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
+import com.zurrtum.create.content.trains.display.FlapDisplayBlockEntity;
+import com.zurrtum.create.content.trains.display.FlapDisplayLayout;
+import com.zurrtum.create.content.trains.display.FlapDisplaySection;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 import java.util.List;
 
-import static com.simibubi.create.content.redstone.displayLink.source.BoilerDisplaySource.notEnoughSpaceSingle;
+import static com.zurrtum.create.content.redstone.displayLink.source.BoilerDisplaySource.notEnoughSpaceSingle;
 
 
 public class TrackCouplerDisplaySource extends DisplaySource {
-
-    @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
         if (stats.maxRows() < 2)
             return notEnoughSpaceSingle;
@@ -65,13 +63,9 @@ public class TrackCouplerDisplaySource extends DisplaySource {
         }
         return null;
     }
-
-    @Override
     protected String getTranslationKey() {
         return "track_coupler_info";
     }
-
-    @Override
     public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout) {
         if (!layout.isLayout("Default"))
             layout.configure("Default",
@@ -81,8 +75,6 @@ public class TrackCouplerDisplaySource extends DisplaySource {
     protected FlapDisplaySection createSectionForValue(DisplayLinkContext context, int size) {
         return new FlapDisplaySection(size * FlapDisplaySection.MONOSPACE, "alphabet", false, false);
     }
-
-    @Override
     public int getPassiveRefreshTicks() {
         return 40;
     }

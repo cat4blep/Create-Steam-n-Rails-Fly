@@ -20,7 +20,7 @@ package com.railwayteam.railways.config;
 
 import com.railwayteam.railways.content.smokestack.SmokeType;
 import com.railwayteam.railways.content.smokestack.particles.legacy.SmokeParticle.SmokeQuality;
-import net.createmod.catnip.config.ConfigBase;
+import com.zurrtum.create.catnip.config.ConfigBase;
 
 @SuppressWarnings("unused")
 public class CClient extends ConfigBase {
@@ -51,9 +51,6 @@ public class CClient extends ConfigBase {
     public final ConfigGroup cartoonSmoke = group(2, "cartoon", Comments.cartoonSmoke);
     public final ConfigBool spawnFasterPuffs = b(true, "spawnFasterPuffs", Comments.spawnFasterPuffs);
     public final ConfigBool spawnSteam = b(false, "spawnSteam", Comments.spawnSteam);
-
-
-    @Override
     public String getName() {
         return "client";
     }

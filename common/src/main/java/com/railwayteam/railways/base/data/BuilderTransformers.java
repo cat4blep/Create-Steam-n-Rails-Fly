@@ -56,13 +56,13 @@ import com.railwayteam.railways.registry.CRPalettes.WindowType;
 import com.railwayteam.railways.registry.CRPalettes.Wrapping;
 import com.railwayteam.railways.registry.CRTags;
 import com.railwayteam.railways.util.FusedSupplier;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllTags;
-import com.simibubi.create.content.contraptions.behaviour.DoorMovingInteraction;
-import com.simibubi.create.content.decoration.MetalLadderBlock;
-import com.simibubi.create.content.kinetics.flywheel.FlywheelBlock;
-import com.simibubi.create.foundation.data.SharedProperties;
-import com.simibubi.create.foundation.item.ItemDescription;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.contraptions.behaviour.DoorMovingInteraction;
+import com.zurrtum.create.content.decoration.MetalLadderBlock;
+import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlock;
+import com.zurrtum.create.foundation.data.SharedProperties;
+import com.zurrtum.create.client.foundation.item.ItemDescription;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -70,12 +70,12 @@ import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.createmod.catnip.data.Couple;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import com.zurrtum.create.catnip.data.Couple;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -83,6 +83,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -101,8 +102,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-import static com.simibubi.create.api.behaviour.interaction.MovingInteractionBehaviour.interactionBehaviour;
-import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
+import static com.railwayteam.railways.util.CreateBehaviourCompat.interactionBehaviour;
+import static com.zurrtum.create.foundation.data.TagGen.pickaxeOnly;
 
 public class BuilderTransformers {
     @ExpectPlatform
@@ -127,7 +128,7 @@ public class BuilderTransformers {
             .properties(BlockBehaviour.Properties::noOcclusion)
             .transform(pickaxeOnly())
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag)
-            .loot((p, l) -> p.dropOther(l, AllBlocks.RAILWAY_CASING.get()));
+            .loot((p, l) -> p.dropOther(l, Blocks.ANDESITE));
     }
 
     @ExpectPlatform
@@ -268,8 +269,7 @@ public class BuilderTransformers {
             .tag(CRTags.AllBlockTags.LOCOMETAL_BOILERS.tag)
             .tag(AllTags.AllBlockTags.COPYCAT_DENY.tag)
             .transform(pickaxeOnly())
-            .onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.railways.boiler"))
-            .blockstate(BoilerGenerator.create(color, wrapping)::generate);
+            .onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.railways.boiler"));
     }
 
     public static <B extends DoorBlock, P> NonNullUnaryOperator<BlockBuilder<B, P>> locometalDoor(PalettesColor color, String type, TagKey<Item>[] itemTags, TagKey<Block>[] blockTags) {
@@ -359,7 +359,7 @@ public class BuilderTransformers {
     }
 
     @ExpectPlatform
-    public static <B extends TrackBufferBlock<?>, P> NonNullUnaryOperator<BlockBuilder<B, P>> bufferBlockState(Function<BlockState, ResourceLocation> modelFunc, Function<BlockState, Direction> facingFunc) {
+    public static <B extends TrackBufferBlock<?>, P> NonNullUnaryOperator<BlockBuilder<B, P>> bufferBlockState(Function<BlockState, Identifier> modelFunc, Function<BlockState, Direction> facingFunc) {
         throw new AssertionError();
     }
 

@@ -19,12 +19,11 @@
 package com.railwayteam.railways.content.custom_tracks.monorail;
 
 import com.google.common.collect.ImmutableMap;
-import com.railwayteam.railways.mixin.client.AccessorTrackBlockOutline;
 import com.railwayteam.railways.registry.CRShapes;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.Utils;
-import com.simibubi.create.AllShapes;
-import com.simibubi.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -45,10 +44,7 @@ public class CustomTrackBlockOutline {
 	public static final Map<VoxelShape, VoxelShape> TRACK_TO_MONORAIL = Map.of(
 		AllShapes.TRACK_ORTHO.get(Direction.EAST), CRShapes.MONORAIL_TRACK_ORTHO.get(Direction.EAST),
 		AllShapes.TRACK_ORTHO.get(Direction.SOUTH), CRShapes.MONORAIL_TRACK_ORTHO.get(Direction.SOUTH),
-		AllShapes.TRACK_CROSS, CRShapes.MONORAIL_TRACK_CROSS,
-		AccessorTrackBlockOutline.getLongOrthoOffset(), MONORAIL_LONG_ORTHO_OFFSET,
-		AccessorTrackBlockOutline.getLongOrtho(), MONORAIL_LONG_ORTHO,
-		AccessorTrackBlockOutline.getLongCross(), MONORAIL_LONG_CROSS
+		AllShapes.TRACK_CROSS, CRShapes.MONORAIL_TRACK_CROSS
 	);
 
 	public static final Map<VoxelShape, VoxelShape> TRACK_TO_NARROW = ImmutableMap.<VoxelShape, VoxelShape>builder().putAll(Map.of(
@@ -57,10 +53,7 @@ public class CustomTrackBlockOutline {
 		AllShapes.TRACK_CROSS, CRShapes.NARROW_TRACK_CROSS,
 		AllShapes.TRACK_DIAG.get(Direction.EAST), CRShapes.NARROW_TRACK_DIAG.get(Direction.EAST),
 		AllShapes.TRACK_DIAG.get(Direction.SOUTH), CRShapes.NARROW_TRACK_DIAG.get(Direction.SOUTH))).putAll(Map.of(
-		AllShapes.TRACK_CROSS_DIAG, CRShapes.NARROW_TRACK_CROSS_DIAG,
-		AccessorTrackBlockOutline.getLongOrthoOffset(), NARROW_LONG_ORTHO_OFFSET,
-		AccessorTrackBlockOutline.getLongOrtho(), NARROW_LONG_ORTHO,
-		AccessorTrackBlockOutline.getLongCross(), NARROW_LONG_CROSS
+		AllShapes.TRACK_CROSS_DIAG, CRShapes.NARROW_TRACK_CROSS_DIAG
 	)).build();
 
 	public static VoxelShape convert(Object o, TrackMaterial material) {
@@ -71,16 +64,9 @@ public class CustomTrackBlockOutline {
 
 	public static VoxelShape convert(VoxelShape trackShape, TrackMaterial material) {
 		if (material == CRTrackMaterials.MONORAIL) {
-			if (trackShape.equals(AccessorTrackBlockOutline.getLongOrthoOffset())) {
-				return MONORAIL_LONG_ORTHO_OFFSET;
-			} else if (trackShape.equals(AccessorTrackBlockOutline.getLongOrtho())) {
-				return MONORAIL_LONG_ORTHO;
-			} else if (trackShape.equals(AccessorTrackBlockOutline.getLongCross())) {
-				return MONORAIL_LONG_CROSS;
-			}
             return TRACK_TO_MONORAIL.getOrDefault(trackShape, trackShape);
         }
-		if (material.trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE)
+		if (CRTrackMaterials.getType(material) == CRTrackMaterials.CRTrackType.NARROW_GAUGE)
 			return TRACK_TO_NARROW.getOrDefault(trackShape, trackShape);
 		return trackShape;
 	}

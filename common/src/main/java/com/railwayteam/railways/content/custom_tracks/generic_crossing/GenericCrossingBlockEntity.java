@@ -20,15 +20,17 @@ package com.railwayteam.railways.content.custom_tracks.generic_crossing;
 
 import com.railwayteam.railways.content.custom_tracks.generic_crossing.TrackShapeLookup.GenericCrossingData;
 import com.railwayteam.railways.mixin_interfaces.IGenericCrossingTrackBE;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.foundation.blockEntity.IMergeableBE;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.AllTrackMaterials;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.foundation.blockEntity.IMergeableBE;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,32 +52,27 @@ public class GenericCrossingBlockEntity extends SmartBlockEntity implements IMer
     @NotNull
     public TrackMaterial getPrimary() {
         if (materials == null)
-            return TrackMaterial.ANDESITE;
-        return materials.getFirst() == null ? TrackMaterial.ANDESITE : materials.getFirst();
+            return AllTrackMaterials.ANDESITE;
+        return materials.getFirst() == null ? AllTrackMaterials.ANDESITE : materials.getFirst();
     }
 
     @NotNull
     public TrackMaterial getSecondary() {
         if (materials == null)
-            return TrackMaterial.ANDESITE;
-        return materials.getSecond() == null ? TrackMaterial.ANDESITE : materials.getSecond();
+            return AllTrackMaterials.ANDESITE;
+        return materials.getSecond() == null ? AllTrackMaterials.ANDESITE : materials.getSecond();
     }
-
-    @Override
     public void accept(BlockEntity other) {
         level.scheduleTick(worldPosition, getBlockState().getBlock(), 1);
     }
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {}
 
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
-
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
 
         boolean updateMesh = false;
-        TrackMaterial primary = TrackMaterial.deserialize(tag.getString("PrimaryMaterial"));
-        TrackMaterial secondary = TrackMaterial.deserialize(tag.getString("SecondaryMaterial"));
+        TrackMaterial primary = TrackMaterial.fromId(Identifier.parse(tag.getString("PrimaryMaterial").orElse(AllTrackMaterials.ANDESITE.getId().toString())));
+        TrackMaterial secondary = TrackMaterial.fromId(Identifier.parse(tag.getString("SecondaryMaterial").orElse(AllTrackMaterials.ANDESITE.getId().toString())));
 
         if (primary != getPrimary() || secondary != getSecondary()) updateMesh = true;
 
@@ -90,15 +87,12 @@ public class GenericCrossingBlockEntity extends SmartBlockEntity implements IMer
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 16);
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
 
-        tag.putString("PrimaryMaterial", getPrimary().id.toString());
-        tag.putString("SecondaryMaterial", getSecondary().id.toString());
+        tag.putString("PrimaryMaterial", getPrimary().getId().toString());
+        tag.putString("SecondaryMaterial", getSecondary().getId().toString());
     }
-
-    @Override
     public @Nullable Pair<TrackMaterial, TrackShape> railways$getFirstCrossingPiece() {
         TrackMaterial primary = getPrimary();
         Couple<TrackShape> unmerged = TrackShapeLookup.getUnmerged(getBlockState().getValue(GenericCrossingBlock.SHAPE));
@@ -106,8 +100,6 @@ public class GenericCrossingBlockEntity extends SmartBlockEntity implements IMer
 
         return Pair.of(primary, unmerged.getFirst());
     }
-
-    @Override
     public @Nullable Pair<TrackMaterial, TrackShape> railways$getSecondCrossingPiece() {
         TrackMaterial secondary = getSecondary();
         Couple<TrackShape> unmerged = TrackShapeLookup.getUnmerged(getBlockState().getValue(GenericCrossingBlock.SHAPE));
@@ -117,7 +109,7 @@ public class GenericCrossingBlockEntity extends SmartBlockEntity implements IMer
     }
 
     public void initFrom(GenericCrossingData crossingData) {
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         boolean flip = crossingData.merged().getSecond();
         TrackMaterial primary = flip ? crossingData.overlayMaterial() : crossingData.existingMaterial();
         TrackMaterial secondary = flip ? crossingData.existingMaterial() : crossingData.overlayMaterial();

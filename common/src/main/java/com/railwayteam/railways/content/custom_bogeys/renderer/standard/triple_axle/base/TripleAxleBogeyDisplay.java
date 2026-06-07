@@ -20,10 +20,10 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard.triple_
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
-import com.simibubi.create.AllPartialModels;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 
@@ -39,8 +39,6 @@ public class TripleAxleBogeyDisplay implements BogeyDisplay {
         this.shafts = prov.create(AllPartialModels.SHAFT, 2);
         this.finalTranslateY = recenterWheels ? -12 / 16f : 0;
     }
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle) {
         for (int i: Iterate.zeroAndOne) {
             shafts[i]

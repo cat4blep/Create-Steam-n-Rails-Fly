@@ -25,23 +25,23 @@ import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRBogeyStyles;
 import com.railwayteam.railways.registry.CRShapes;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import com.simibubi.create.content.trains.graph.TrackEdge;
-import com.simibubi.create.content.trains.graph.TrackGraphHelper;
-import com.simibubi.create.content.trains.graph.TrackGraphLocation;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackPropagator;
-import com.simibubi.create.content.trains.track.TrackShape;
+import com.zurrtum.create.AllItems;
+import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackGraphHelper;
+import com.zurrtum.create.content.trains.graph.TrackGraphLocation;
+import com.zurrtum.create.content.trains.graph.TrackNode;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackPropagator;
+import com.zurrtum.create.content.trains.track.TrackShape;
 import com.tterrag.registrate.util.entry.BlockEntry;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.math.AngleHelper;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.catnip.math.AngleHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -67,20 +67,16 @@ public class MonorailTrackBlock extends TrackBlock {
     public MonorailTrackBlock(Properties properties, TrackMaterial material) {
         super(properties, material);
     }
-
-    @Override
     public BlockState getBogeyAnchor(BlockGetter world, BlockPos pos, BlockState state) {
         BlockEntry<? extends AbstractMonoBogeyBlock<?>> block = CRBlocks.MONO_BOGEY;
         if (BogeyMenuHandlerServer.getCurrentPlayer() != null) {
-            Pair<BogeyStyle, BogeySizes.BogeySize> styleData = BogeyMenuHandlerServer.getStyle(BogeyMenuHandlerServer.getCurrentPlayer());
+            var styleData = BogeyMenuHandlerServer.getStyle(BogeyMenuHandlerServer.getCurrentPlayer());
             if (styleData.getFirst() == CRBogeyStyles.INVISIBLE || styleData.getFirst() == CRBogeyStyles.INVISIBLE_MONOBOGEY)
                 block = CRBlocks.INVISIBLE_MONO_BOGEY;
         }
         return block.getDefaultState()
             .setValue(BlockStateProperties.HORIZONTAL_AXIS, state.getValue(SHAPE) == TrackShape.XO ? Direction.Axis.X : Direction.Axis.Z);
     }
-
-    @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos,
                                         CollisionContext pContext) {
         return switch (pState.getValue(SHAPE)) {
@@ -88,13 +84,9 @@ public class MonorailTrackBlock extends TrackBlock {
             default -> CRShapes.MONORAIL_COLLISION;
         };
     }
-
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return getFullShape(state);
     }
-
-    @Override
     public VoxelShape getInteractionShape(BlockState state, BlockGetter pLevel, BlockPos pPos) {
         return getFullShape(state);
     }
@@ -160,8 +152,6 @@ public class MonorailTrackBlock extends TrackBlock {
         }
         return CRShapes.MONORAIL_TRACK_FALLBACK;
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public PartialModel prepareAssemblyOverlay(BlockGetter world, BlockPos pos, BlockState state, Direction direction,
                                                PoseStack ms) {
@@ -170,8 +160,6 @@ public class MonorailTrackBlock extends TrackBlock {
             .translateY(14/16f);
         return CRBlockPartials.MONORAIL_TRACK_ASSEMBLING_OVERLAY;
     }
-
-    @Override
     @SuppressWarnings("deprecation") // deprecated to call, fine to implement
     public void randomTick(BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
         if (!state.hasProperty(SHAPE)) return;
@@ -185,14 +173,12 @@ public class MonorailTrackBlock extends TrackBlock {
         if (edge.getTrackMaterial() != getMaterial())
             TrackPropagator.onRailAdded(level, pos, state);
     }
-
-    @Override
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        InteractionResult result = super.use(state, world, pos, player, hand, hit);
+        InteractionResult result = InteractionResult.PASS;
         if (result.consumesAction())
             return result;
 
-        if (!world.isClientSide && AllItems.BRASS_HAND.isIn(player.getItemInHand(hand))) {
+        if (!world.isClientSide() && player.getItemInHand(hand).is(AllItems.BRASS_HAND)) {
             TrackPropagator.onRailAdded(world, pos, state);
             return InteractionResult.SUCCESS;
         }

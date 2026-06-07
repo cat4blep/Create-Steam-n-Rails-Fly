@@ -18,16 +18,16 @@
 
 package com.railwayteam.railways.mixin.client;
 
-import dev.engine_room.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.registry.CRBlockPartials;
-import com.simibubi.create.content.trains.station.StationBlockEntity;
-import com.simibubi.create.content.trains.station.StationRenderer;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackShape;
+import com.zurrtum.create.content.trains.station.StationBlockEntity;
+import com.zurrtum.create.client.content.trains.station.StationRenderer;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackShape;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,7 +48,7 @@ public class MixinStationRenderer {
             && be.getLevel().getBlockEntity(currentPos) instanceof IHasTrackCasing casing && casing.railways$getTrackCasing() != null) {
             TrackShape shape = trackState.getValue(TrackBlock.SHAPE);
             CRBlockPartials.TrackCasingSpec spec = CRBlockPartials.TRACK_CASINGS.get(shape);
-            TrackMaterial.TrackType trackType = trackBlock.getMaterial().trackType;
+            Identifier trackType = CRTrackMaterials.getType(trackBlock.getMaterial());
             if (spec != null)
                 TransformStack.of(ms)
                     .translate(

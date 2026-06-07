@@ -24,12 +24,12 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.BezierConnection.SegmentAngles;
-import com.simibubi.create.content.trains.track.TrackRenderer;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.BezierConnection.SegmentAngles;
+import com.zurrtum.create.client.content.trains.track.TrackRenderer;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -53,9 +53,9 @@ public class MixinSegmentAngles {
 
 	@ModifyExpressionValue(method = "<init>", at = @At(value = "CONSTANT", args = "doubleValue=0.9649999737739563"), remap = false)
 	private static double railways$modifyRailWidth(double original, @Local(argsOnly = true) BezierConnection bc) {
-		if (bc.getMaterial().trackType == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
+		if (CRTrackMaterials.getType(bc.getMaterial()) == CRTrackMaterials.CRTrackType.WIDE_GAUGE) {
 			return original + 0.5;
-		} else if (bc.getMaterial().trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
+		} else if (CRTrackMaterials.getType(bc.getMaterial()) == CRTrackMaterials.CRTrackType.NARROW_GAUGE) {
 			return original - (7 / 16D);
 		}
 		return original;
@@ -64,7 +64,7 @@ public class MixinSegmentAngles {
 	// we can't use @Inject(cancellable = true) here because we're targeting a constructor
 	@WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/trains/track/BezierConnection;iterator()Ljava/util/Iterator;"), remap = false)
 	private Iterator<BezierConnection.Segment> makeMonorailSegments(BezierConnection bc, Operation<Iterator<BezierConnection.Segment>> original) {
-		if (bc.getMaterial().trackType == CRTrackMaterials.CRTrackType.MONORAIL) {
+		if (CRTrackMaterials.getType(bc.getMaterial()) == CRTrackMaterials.CRTrackType.MONORAIL) {
 			int segmentCount = length - 1;
 			Couple<Vec3> previousOffsets = null;
 

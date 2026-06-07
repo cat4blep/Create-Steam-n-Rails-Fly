@@ -22,14 +22,14 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.cycle_menu.TagCycleHandlerClient;
 import com.railwayteam.railways.content.cycle_menu.TagCycleHandlerServer;
 import com.railwayteam.railways.multiloader.Env;
-import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.item.ItemDescription;
+import com.zurrtum.create.foundation.data.CreateRegistrate;
+import com.zurrtum.create.client.foundation.item.ItemDescription;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class BlockStateBlockItemGroup<C, T extends BlockStateBlockItemGroup.IStyle<C> & Comparable<T>> {
     private static final CreateRegistrate REGISTRATE = Railways.registrate();
-    private static final HashMap<ResourceLocation, BlockStateBlockItemGroup<?, ?>> ALL = new HashMap<>();
+    private static final HashMap<Identifier, BlockStateBlockItemGroup<?, ?>> ALL = new HashMap<>();
 
     private final C context;
     @NotNull private final Property<T> property;
@@ -85,10 +85,10 @@ public class BlockStateBlockItemGroup<C, T extends BlockStateBlockItemGroup.ISty
 
         this.register();
 
-        ALL.put(blockEntry.getId(), this);
+        ALL.put(blockEntry.getId().toIdentifier(), this);
     }
 
-    public static BlockStateBlockItemGroup<?, ?> get(ResourceLocation id) {
+    public static BlockStateBlockItemGroup<?, ?> get(Identifier id) {
         return ALL.get(id);
     }
 
@@ -125,16 +125,14 @@ public class BlockStateBlockItemGroup<C, T extends BlockStateBlockItemGroup.ISty
             items.put(v, REGISTRATE.item(v.getBlockId(context), BlockStateBlockItem.create(blockEntry::get, property, v, primary))
                 .lang(v.getLangName(context))
                 .onRegisterAfter(Registries.ITEM, i -> ItemDescription.useKey(i, tooltipKey))
-                .transform(itemTransformer)
                 .tag(cycleTag)
-                .model((c, p) -> p.withExistingParent("item/" + c.getName(), v.getModel(context)))
                 .register());
             primary = false;
         }
     }
 
     public interface IStyle<T> {
-        ResourceLocation getModel(T context);
+        Identifier getModel(T context);
 
         String getBlockId(T context);
 

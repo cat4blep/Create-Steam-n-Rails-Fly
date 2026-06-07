@@ -25,7 +25,7 @@ import com.railwayteam.railways.content.smokestack.SmokestackStyle;
 import com.railwayteam.railways.content.smokestack.block.StyledSmokeStackBlock;
 import com.railwayteam.railways.content.smokestack.block.be.SmokeStackBlockEntity;
 import com.railwayteam.railways.util.ShapeWrapper;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
@@ -86,13 +86,9 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
         this.partProperty = partProperty;
         this.defaultPart = defaultPart;
     }
-
-    @Override
     public EnumProperty<VariableStackPart> partProperty() {
         return partProperty;
     }
-
-    @Override
     public VariableStackPart defaultPart() {
         return defaultPart;
     }
@@ -108,18 +104,12 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
     protected VariableStackPart getConstructSafeDefaultPart() {
         return defaultPart != null ? defaultPart : definitionDefaultPart.get();
     }
-
-    @Override
     protected BlockState makeDefaultState() {
         return super.makeDefaultState().setValue(getConstructSafePartProperty(), getConstructSafeDefaultPart());
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(getConstructSafePartProperty()));
     }
-
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return rotationType.getShape(state, shape.get(state.getValue(partProperty)));
     }
@@ -130,8 +120,6 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
         BlockState below = level.getBlockState(pos.below());
         return !(below.isAir() || below.is(this) || below.is(extenderBlock()));
     }*/
-
-    @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
         state = super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
 
@@ -156,22 +144,16 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
         if (state.getBlock() instanceof VariableSmokeStackBlock block && !level.getBlockTicks().hasScheduledTick(pos, block))
             level.scheduleTick(pos, block, 1);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         withBlockEntityDo(level, pos, SmokeStackBlockEntity::updateHeight);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (oldState.getBlock() != this || oldState.getValue(partProperty) != state.getValue(partProperty))
             queueHeightUpdate(level, pos);
     }
-
-    @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack heldItem = pPlayer.getItemInHand(pHand);
         if (heldItem.is(getCloneItemStack(pLevel, pPos, pState).getItem())) {
@@ -179,7 +161,7 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
             return InteractionResult.SUCCESS;
         }
 
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return InteractionResult.PASS;
     }
 
     public static void incrementSize(LevelAccessor level, BlockPos pos) {
@@ -238,8 +220,6 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
             return;
         }
     }
-
-    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();

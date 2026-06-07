@@ -21,13 +21,13 @@ package com.railwayteam.railways.base.data.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.railwayteam.railways.Railways;
-import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipe;
-import com.simibubi.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
-import com.simibubi.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipe;
+import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 import net.fabricmc.fabric.api.resource.conditions.v1.ConditionJsonProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,7 +36,7 @@ import java.util.function.Consumer;
  * Extends Create's Fabric recipe builder with Forge conditional recipe support as well.
  */
 public class RailwaysSequencedAssemblyRecipeBuilder extends SequencedAssemblyRecipeBuilder {
-    public RailwaysSequencedAssemblyRecipeBuilder(ResourceLocation id) {
+    public RailwaysSequencedAssemblyRecipeBuilder(Identifier id) {
         super(id);
     }
 
@@ -46,14 +46,12 @@ public class RailwaysSequencedAssemblyRecipeBuilder extends SequencedAssemblyRec
      * @return this
      */
     public RailwaysSequencedAssemblyRecipeBuilder conditionalMaterial(TrackMaterial trackMaterial) {
-        String namespace = trackMaterial.id.getNamespace();
+        String namespace = CRTrackMaterials.id(trackMaterial).getNamespace();
         if (!Railways.MOD_ID.equals(namespace)) {
             recipeConditions.add(DefaultResourceConditions.allModsLoaded(namespace));
         }
         return this;
     }
-
-    @Override
     public void build(Consumer<FinishedRecipe> consumer) {
         consumer.accept(new RailwaysDataGenResult(build(), recipeConditions));
     }
@@ -64,8 +62,6 @@ public class RailwaysSequencedAssemblyRecipeBuilder extends SequencedAssemblyRec
             super(recipe, recipeConditions);
             this.recipeConditions = recipeConditions;
         }
-
-        @Override
         public void serializeRecipeData(JsonObject json) {
             super.serializeRecipeData(json);
             if (recipeConditions.isEmpty())

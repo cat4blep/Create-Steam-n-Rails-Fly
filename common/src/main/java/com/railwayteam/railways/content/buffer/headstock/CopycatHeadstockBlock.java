@@ -24,13 +24,13 @@ import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRShapes;
 import com.railwayteam.railways.util.AdventureUtils;
 import com.railwayteam.railways.util.client.OcclusionTestLevel;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.copycat.CopycatBlockEntity;
-import com.simibubi.create.content.decoration.copycat.CopycatSpecialCases;
-import com.simibubi.create.content.decoration.copycat.WaterloggedCopycatBlock;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
+import com.zurrtum.create.content.decoration.copycat.CopycatSpecialCases;
+import com.zurrtum.create.content.decoration.copycat.WaterloggedCopycatBlock;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -57,7 +57,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -69,7 +69,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements BlockStateBlockItemGroup.GroupedBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<HeadstockStyle> STYLE = HeadstockBlock.STYLE;
     public static final BooleanProperty UPSIDE_DOWN = HeadstockBlock.UPSIDE_DOWN;
 
@@ -81,18 +81,12 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             .setValue(UPSIDE_DOWN, false)
         );
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(FACING, STYLE, UPSIDE_DOWN));
     }
-
-    @Override
     public boolean isAcceptedRegardless(BlockState material) {
         return CopycatSpecialCases.isBarsMaterial(material);
     }
-
-    @Override
     public boolean isIgnoredConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face,
                                              BlockPos fromPos, BlockPos toPos) {
         Direction facing = state.getValue(FACING);
@@ -111,8 +105,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             && !(coord != 0 && coord == facing.getAxisDirection()
             .getStep());
     }
-
-    @Override
     public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         Direction facing = state.getValue(FACING);
         boolean upsideDown = state.getValue(UPSIDE_DOWN);
@@ -133,7 +125,7 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
                 .getStep();
 
 //        if (isOccluded(state, toState, facing.getOpposite()))
-        Direction delta = Direction.fromDelta(diff.getX(), diff.getY(), diff.getZ());
+        Direction delta = Direction.getNearest(diff, Direction.UP);
         if (isOccluded(state, toState, delta == null ? Direction.UP : delta))
             return true;
         if ((state.getValue(UPSIDE_DOWN) ? Direction.UP : Direction.DOWN) == delta)
@@ -143,14 +135,10 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
 
         return false;
     }
-
-    @Override
     public boolean canFaceBeOccluded(BlockState state, Direction face) {
         return state.getValue(FACING)
             .getOpposite() == face;
     }
-
-    @Override
     public boolean shouldFaceAlwaysRender(BlockState state, Direction face) {
         if (state.getValue(FACING) == face)
             return true;
@@ -174,8 +162,8 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
         BlockState otherMaterial = getMaterial(level, otherPos);
 
         // should hopefully never happen, but just in case
-        if (material == null) material = AllBlocks.COPYCAT_BASE.getDefaultState();
-        if (otherMaterial == null) otherMaterial = AllBlocks.COPYCAT_BASE.getDefaultState();
+        if (material == null) material = net.minecraft.world.level.block.Blocks.ANDESITE.defaultBlockState();
+        if (otherMaterial == null) otherMaterial = net.minecraft.world.level.block.Blocks.ANDESITE.defaultBlockState();
 
         if (state.is(this) == neighborState.is(this)) {
             if (CopycatSpecialCases.isBarsMaterial(material)
@@ -188,8 +176,8 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             OcclusionTestLevel occlusionTestLevel = new OcclusionTestLevel(level);
             occlusionTestLevel.setBlock(pos, material);
             occlusionTestLevel.setBlock(otherPos, otherMaterial);
-            if (material.isSolidRender(occlusionTestLevel, pos) && otherMaterial.isSolidRender(occlusionTestLevel, otherPos))
-                if(!Block.shouldRenderFace(otherMaterial, occlusionTestLevel, pos, dir.getOpposite(), otherPos)) {
+            if (material.isSolidRender() && otherMaterial.isSolidRender())
+                if(!Block.shouldRenderFace(otherMaterial, material, dir.getOpposite())) {
                     occlusionTestLevel.clear();
                     return isOccluded(state, neighborState, dir.getOpposite());
                 }
@@ -215,8 +203,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             return pDirection == (upsideDown ? Direction.UP : Direction.DOWN);
         return pDirection.getAxis() != facing.getAxis() && pDirection.getAxis().isHorizontal();
     }
-
-    @Override
     public BlockEntityType<? extends CopycatBlockEntity> getBlockEntityType() {
         return CRBlockEntities.COPYCAT_HEADSTOCK.get();
     }
@@ -230,8 +216,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     public BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
-
-    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         // call the super method to only pop out the copycatted block, not cycling the style
         InteractionResult result = super.onWrenched(state, context);
@@ -255,7 +239,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     }
 
     // copied directly from {@link IWrenchable}, because java doesn't support IWrenchable.super if we're not directly implementing it...
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         InteractionResult result = IWrenchable$onWrenched(state, context);
         if (result.consumesAction()) return result;
@@ -285,7 +268,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state != null) {
@@ -302,7 +284,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return CRBlocks.HEADSTOCK.get().getShape(state, level, pos, context);
     }
@@ -310,8 +291,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     protected VoxelShape getHeadstockShape(BlockState state) {
         return CRShapes.HEADSTOCK_PLAIN.get(state.getValue(FACING));
     }
-
-    @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
                                  BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
@@ -323,7 +302,7 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             return InteractionResult.PASS;
         });
         if (result.consumesAction()) return result;
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return InteractionResult.PASS;
     }
 
     @Environment(EnvType.CLIENT)
@@ -333,15 +312,11 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
 
     @Environment(EnvType.CLIENT)
     public static class WrappedItemColor implements ItemColor {
-
-        @Override
         public int getColor(ItemStack itemStack, int i) {
             return GrassColor.get(0.5D, 1.0D);
         }
 
     }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return CRBlocks.COPYCAT_HEADSTOCK_GROUP.get(state.getValue(STYLE)).asStack();
     }

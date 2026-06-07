@@ -24,12 +24,12 @@ import com.railwayteam.railways.content.handcar.HandcarItem;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.AdventureUtils;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.BezierTrackPointLocation;
-import com.simibubi.create.content.trains.track.CurvedTrackInteraction;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackBlockOutline;
-import com.simibubi.create.content.trains.track.TrackBlockOutline.BezierPointSelection;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.content.trains.track.CurvedTrackInteraction;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import com.zurrtum.create.client.content.trains.track.TrackBlockOutline;
+import com.zurrtum.create.client.content.trains.track.TrackBlockOutline.BezierPointSelection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -75,7 +75,7 @@ public abstract class MixinCurvedTrackInteraction {
         }
 
         // allow encasing if no connection or not monorail
-        if (connection == null || connection.getMaterial().trackType != CRTrackMaterials.CRTrackType.MONORAIL) {
+        if (connection == null || CRTrackMaterials.getType(connection.getMaterial()) != CRTrackMaterials.CRTrackType.MONORAIL) {
             // if non-empty, must be a valid slab
             if (!held.isEmpty()) {
                 if (!(held.getItem() instanceof BlockItem block))

@@ -22,7 +22,7 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.buffer.TrackBuffer;
 import com.railwayteam.railways.content.coupling.coupler.TrackCoupler;
 import com.railwayteam.railways.content.switches.TrackSwitch;
-import com.simibubi.create.content.trains.graph.EdgePointType;
+import com.zurrtum.create.content.trains.graph.EdgePointType;
 
 public class CREdgePointTypes {
     public static final EdgePointType<TrackCoupler> COUPLER = EdgePointType.register(Railways.asResource("coupler"), TrackCoupler::new);

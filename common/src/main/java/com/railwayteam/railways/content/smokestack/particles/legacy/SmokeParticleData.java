@@ -23,7 +23,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.railwayteam.railways.registry.CRParticleTypes;
-import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
+import com.zurrtum.create.foundation.particle.ICustomParticleDataWithSprite;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -92,37 +92,25 @@ public class SmokeParticleData implements ParticleOptions, ICustomParticleDataWi
 		this.green = green;
 		this.blue = blue;
 	}
-
-	@Override
 	public ParticleType<?> getType() {
 		return CRParticleTypes.SMOKE.get();
 	}
-
-	@Override
 	public void writeToNetwork(FriendlyByteBuf buffer) {
 		buffer.writeBoolean(stationary);
 		buffer.writeFloat(red);
 		buffer.writeFloat(green);
 		buffer.writeFloat(blue);
 	}
-
-	@Override
 	public String writeToString() {
 		return String.format(Locale.ROOT, "%s %b %f %f %f", CRParticleTypes.SMOKE.parameter(), stationary, red, green, blue);
 	}
-
-	@Override
 	public Deserializer<SmokeParticleData> getDeserializer() {
 		return DESERIALIZER;
 	}
-
-	@Override
 	public Codec<SmokeParticleData> getCodec(ParticleType<SmokeParticleData> type) {
 		return CODEC;
 	}
-
-	@Override
-	public ParticleEngine.SpriteParticleRegistration<SmokeParticleData> getMetaFactory() {
-		return SmokeParticle.Factory::new;
+	public Object getMetaFactory() {
+		return null;
 	}
 }

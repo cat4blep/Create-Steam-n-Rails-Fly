@@ -19,13 +19,13 @@
 package com.railwayteam.railways.content.extended_sliding_doors;
 
 import com.railwayteam.railways.registry.CRIcons;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlock;
-import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
-import com.simibubi.create.foundation.gui.AllIcons;
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.math.AngleHelper;
-import net.createmod.catnip.math.VecHelper;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
+import com.zurrtum.create.client.foundation.gui.AllIcons;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -36,19 +36,16 @@ import net.minecraft.world.phys.Vec3;
 public enum SlidingDoorMode implements INamedIconOptions {
     NORMAL(CRIcons.I_DOOR_NORMAL), //shouldOpen -> noChange; shouldUpdate -> noChange; - default behaviour
     MANUAL(CRIcons.I_DOOR_MANUAL) { //shouldOpen -> noChange; shouldUpdate -> never; // done block redstone operation
-        @Override
         public boolean canOpenSpecially() {
             return false;
         }
     },
     SPECIAL(CRIcons.I_DOOR_SPECIAL) { //shouldOpen -> &= at right station; shouldUpdate -> noChange; // done block hand operation (shift-use works on trains/contraptions though)
-        @Override
         public boolean canOpenManually() {
             return false;
         }
     },
     SPECIAL_INVERTED(CRIcons.I_DOOR_SPECIAL_INVERTED) { //shouldOpen -> &= at right station; shouldUpdate -> !shouldUpdate; // done block hand operation (shift-use works on trains/contraptions though)
-        @Override
         public boolean canOpenManually() {
             return false;
         }
@@ -73,13 +70,9 @@ public enum SlidingDoorMode implements INamedIconOptions {
     public boolean canOpenSpecially() {
         return true;
     }
-
-    @Override
     public AllIcons getIcon() {
         return icon;
     }
-
-    @Override
     public String getTranslationKey() {
         return translationKey;
     }
@@ -87,7 +80,7 @@ public enum SlidingDoorMode implements INamedIconOptions {
     public static SlidingDoorMode fromNbt(CompoundTag nbt) {
         if (nbt == null)
             return SlidingDoorMode.NORMAL;
-        return SlidingDoorMode.values()[Math.min(2, Math.max(0, nbt.getInt("ScrollValue")))];
+        return SlidingDoorMode.values()[Math.min(2, Math.max(0, nbt.getInt("ScrollValue").orElse(0)))];
     }
 
     public static class SlidingDoorValueBoxTransform extends CenteredSideValueBoxTransform {
@@ -98,13 +91,9 @@ public enum SlidingDoorMode implements INamedIconOptions {
                 return showAtAll && (d == facing || d == facing.getOpposite());
             });
         }
-
-        @Override
         protected Vec3 getSouthLocation() {
             return VecHelper.voxelSpace(8, 8, 16); // z is depth
         }
-
-        @Override
         public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
             Vec3 location = VecHelper.voxelSpace(8, 8, state.getValue(SlidingDoorBlock.FACING) == direction ? 3 : 16);
             location = VecHelper.rotateCentered(location, AngleHelper.horizontalAngle(getSide()), Direction.Axis.Y);

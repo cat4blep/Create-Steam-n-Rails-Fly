@@ -18,15 +18,16 @@
 
 package com.railwayteam.railways.content.buffer.headstock;
 
+import com.mojang.serialization.MapCodec;
 import com.railwayteam.railways.content.buffer.BlockStateBlockItemGroup;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRShapes;
 import com.railwayteam.railways.util.AdventureUtils;
-import com.simibubi.create.AllShapes;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -58,6 +59,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class HeadstockBlock extends HorizontalDirectionalBlock implements IBE<HeadstockBlockEntity>, IWrenchable, ProperWaterloggedBlock, BlockStateBlockItemGroup.GroupedBlock {
+    public static final MapCodec<HeadstockBlock> CODEC = simpleCodec(HeadstockBlock::new);
     public static final EnumProperty<HeadstockStyle> STYLE = EnumProperty.create("style", HeadstockStyle.class);
     public static final BooleanProperty UPSIDE_DOWN = BooleanProperty.create("upside_down");
 
@@ -70,27 +72,26 @@ public class HeadstockBlock extends HorizontalDirectionalBlock implements IBE<He
             .setValue(UPSIDE_DOWN, false)
         );
     }
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
+    }
 
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(FACING, WATERLOGGED, STYLE, UPSIDE_DOWN));
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onRemove(@NotNull BlockState state, @NotNull Level worldIn,
                          @NotNull BlockPos pos, @NotNull BlockState newState, boolean isMoving) {
-        IBE.onRemove(state, worldIn, pos, newState);
+        if (!state.is(newState.getBlock()))
+            worldIn.removeBlockEntity(pos);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public FluidState getFluidState(BlockState state) {
         return fluidState(state);
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state != null) {
@@ -107,7 +108,6 @@ public class HeadstockBlock extends HorizontalDirectionalBlock implements IBE<He
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Direction dir = state.getValue(FACING);
         VoxelShape shape = (switch (state.getValue(STYLE)) {
@@ -129,14 +129,12 @@ public class HeadstockBlock extends HorizontalDirectionalBlock implements IBE<He
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, state, currentPos);
+        updateWater(level, level, state, currentPos);
         return state;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
                                  BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
@@ -145,18 +143,12 @@ public class HeadstockBlock extends HorizontalDirectionalBlock implements IBE<He
         if (result.consumesAction()) return result;
         return onBlockEntityUse(pLevel, pPos, be -> be.applyDyeIfValid(pPlayer.getItemInHand(pHand)));
     }
-
-    @Override
     public Class<HeadstockBlockEntity> getBlockEntityClass() {
         return HeadstockBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends HeadstockBlockEntity> getBlockEntityType() {
         return CRBlockEntities.HEADSTOCK.get();
     }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return CRBlocks.HEADSTOCK_GROUP.get(state.getValue(STYLE)).asStack();
     }

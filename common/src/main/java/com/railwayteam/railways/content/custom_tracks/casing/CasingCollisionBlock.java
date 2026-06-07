@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.custom_tracks.casing;
 
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRShapes;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -62,49 +62,39 @@ public abstract class CasingCollisionBlock extends Block implements EntityBlock,
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return Shapes.empty();
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return CRShapes.BOTTOM_SLAB;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         super.createBlockStateDefinition(pBuilder.add(WATERLOGGED));
     }
-
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         return withWater(super.getStateForPlacement(pContext), pContext);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public @NotNull BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState,
                                            LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
-        updateWater(pLevel, pState, pCurrentPos);
+        updateWater(pLevel, pLevel, pState, pCurrentPos);
         return pState;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public FluidState getFluidState(BlockState pState) {
         return fluidState(pState);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pLevel.getBlockEntity(pPos) instanceof CasingCollisionBlockEntity be)
             be.randomTick();
@@ -114,8 +104,6 @@ public abstract class CasingCollisionBlock extends Block implements EntityBlock,
         if (level.getBlockEntity(pos) instanceof CasingCollisionBlockEntity be)
             be.keepAlive();
     }
-
-    @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return CRBlockEntities.CASING_COLLISION.create(pPos, pState);
     }

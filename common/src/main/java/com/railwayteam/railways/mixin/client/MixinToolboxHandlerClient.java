@@ -20,7 +20,7 @@ package com.railwayteam.railways.mixin.client;
 
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.util.EntityUtils;
-import com.simibubi.create.content.equipment.toolbox.ToolboxHandlerClient;
+import com.zurrtum.create.client.content.equipment.toolbox.ToolboxHandlerClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -42,7 +42,7 @@ public class MixinToolboxHandlerClient {
   private static ConductorEntity railways$getConductorForSlot(int slot) {
     Minecraft mc = Minecraft.getInstance();
     LocalPlayer player = mc.player;
-    CompoundTag toolboxData = EntityUtils.getPersistentData(player).getCompound("CreateToolboxData");
+    CompoundTag toolboxData = EntityUtils.getPersistentData(player).getCompound("CreateToolboxData").orElse(new CompoundTag());
     String slotKey = String.valueOf(slot);
 
     CompoundTag data = toolboxData.getCompound(slotKey);

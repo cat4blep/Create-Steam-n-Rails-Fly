@@ -22,11 +22,11 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -60,8 +60,6 @@ public class ConductorSecondaryHeadLayer<T extends ConductorEntity, M extends En
         this.skullModels = SkullBlockRenderer.createSkullRenderers(skullModels);
         this.itemInHandRenderer = itemInHandRenderer;
     }
-
-    @Override
     public void render(@NotNull PoseStack matrixStack, @NotNull MultiBufferSource buffer, int packedLight,
                        @NotNull T conductor, float limbSwing, float limbSwingAmount, float partialTicks,
                        float ageInTicks, float netHeadYaw, float headPitch) {
@@ -83,7 +81,7 @@ public class ConductorSecondaryHeadLayer<T extends ConductorEntity, M extends En
             matrixStack.scale(1.1875f, -1.1875f, -1.1875f);
             GameProfile gameProfile = null;
             if (itemStack.hasTag() && (compoundTag = itemStack.getTag()).contains("SkullOwner", 10)) {
-                gameProfile = NbtUtils.readGameProfile(compoundTag.getCompound("SkullOwner"));
+                gameProfile = NbtUtils.readGameProfile(compoundTag.getCompound("SkullOwner").orElse(new CompoundTag()));
             }
             matrixStack.translate(-0.5, 0.0, -0.5);
             SkullBlock.Type type = ((AbstractSkullBlock)((BlockItem)item).getBlock()).getType();

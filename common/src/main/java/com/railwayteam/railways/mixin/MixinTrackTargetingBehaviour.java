@@ -19,10 +19,10 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.mixin_interfaces.IPreAssembleCallback;
-import com.simibubi.create.content.trains.signal.TrackEdgePoint;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,10 +36,8 @@ public abstract class MixinTrackTargetingBehaviour<T extends TrackEdgePoint> ext
     }
 
     @Shadow public abstract Direction.AxisDirection getTargetDirection();
-
-    @Override
     public void railways$preAssemble() {
-        if (edgePoint != null && !getWorld().isClientSide)
+        if (edgePoint != null && !getWorld().isClientSide())
             edgePoint.blockEntityRemoved(getPos(), getTargetDirection() == Direction.AxisDirection.POSITIVE);
     }
 }

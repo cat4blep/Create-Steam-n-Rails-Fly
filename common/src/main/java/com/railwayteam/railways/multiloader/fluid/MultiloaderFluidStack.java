@@ -19,7 +19,7 @@
 package com.railwayteam.railways.multiloader.fluid;
 
 import com.mojang.serialization.Codec;
-import com.simibubi.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

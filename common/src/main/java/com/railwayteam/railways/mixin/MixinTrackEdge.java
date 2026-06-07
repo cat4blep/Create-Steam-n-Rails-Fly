@@ -20,7 +20,7 @@ package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.mixin_interfaces.ISwitchDisabledEdge;
 import com.railwayteam.railways.util.MixinVariables;
-import com.simibubi.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -44,7 +44,7 @@ public class MixinTrackEdge {
     @Inject(method = "canTravelTo", at = @At("HEAD"), cancellable = true)
     private void travelThroughSwitches(TrackEdge other, CallbackInfoReturnable<Boolean> cir) {
         //String className = Thread.currentThread().getStackTrace()[3].getClassName();
-        if (MixinVariables.signalPropagatorCallDepth > 0)//(className.equals("com.simibubi.create.content.trains.signal.SignalPropagator"))
+        if (MixinVariables.signalPropagatorCallDepth > 0)//(className.equals("com.zurrtum.create.content.trains.signal.SignalPropagator"))
             return;
         if (MixinVariables.temporarilySkipSwitches)
             return;

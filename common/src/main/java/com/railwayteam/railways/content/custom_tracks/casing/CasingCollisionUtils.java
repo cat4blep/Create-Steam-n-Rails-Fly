@@ -20,12 +20,13 @@ package com.railwayteam.railways.content.custom_tracks.casing;
 
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.registry.CRBlocks;
+import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import net.minecraft.resources.Identifier;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -40,12 +41,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class CasingCollisionUtils {
-    private static final Map<TrackType, Map<TrackShape, Set<BlockPos>>> OFFSETS = new HashMap<>();
+    private static final Map<Identifier, Map<TrackShape, Set<BlockPos>>> OFFSETS = new HashMap<>();
 
     private static class SuperBuilder {
-        private final TrackType trackType;
+        private final Identifier trackType;
 
-        private SuperBuilder(TrackType trackType) {
+        private SuperBuilder(Identifier trackType) {
             this.trackType = trackType;
         }
 
@@ -56,11 +57,11 @@ public class CasingCollisionUtils {
 
     private static class Builder {
         private final Set<BlockPos> offsets = new HashSet<>();
-        private final TrackType trackType;
+        private final Identifier trackType;
         private final TrackShape shape;
         private SuperBuilder superBuilder;
 
-        private Builder(TrackType trackType, TrackShape shape) {
+        private Builder(Identifier trackType, TrackShape shape) {
             this.trackType = trackType;
             this.shape = shape;
         }
@@ -95,11 +96,11 @@ public class CasingCollisionUtils {
     }
 
     @Contract("_ -> new")
-    private static SuperBuilder b(@NotNull TrackType trackType) {
+    private static SuperBuilder b(@NotNull Identifier trackType) {
         return new SuperBuilder(trackType);
     }
 
-    private static void registerStandard(TrackType trackType) {
+    private static void registerStandard(Identifier trackType) {
         b(trackType)
             .s(TrackShape.XO)
             .o(0, 1)
@@ -161,7 +162,7 @@ public class CasingCollisionUtils {
         ;
     }
 
-    private static void registerWide(TrackType trackType) {
+    private static void registerWide(Identifier trackType) {
         Builder cr_o = b(trackType)
             .s(TrackShape.XO)
             .o(0, 2)
@@ -254,7 +255,7 @@ public class CasingCollisionUtils {
 
     public static void register() {
         OFFSETS.clear();
-        registerStandard(TrackType.STANDARD);
+        registerStandard(CRTrackMaterials.CRTrackType.STANDARD);
         registerStandard(CRTrackType.UNIVERSAL);
         registerStandard(CRTrackType.NARROW_GAUGE);
         registerWide(CRTrackType.WIDE_GAUGE);
@@ -264,7 +265,7 @@ public class CasingCollisionUtils {
         TrackShape shape = state.getValue(TrackBlock.SHAPE);
         if (((IHasTrackCasing) be).railways$isAlternate() || ((IHasTrackCasing) be).railways$getTrackCasing() == null)
             return false;
-        TrackType trackType = ((TrackBlock) state.getBlock()).getMaterial().trackType;
+        Identifier trackType = CRTrackMaterials.getType(((TrackBlock) state.getBlock()).getMaterial());
         if (!OFFSETS.containsKey(trackType))
             return false;
         Map<TrackShape, Set<BlockPos>> shapeMap = OFFSETS.get(trackType);
@@ -273,7 +274,7 @@ public class CasingCollisionUtils {
 
     public static void manageTracks(TrackBlockEntity be, boolean remove) {
         TrackShape shape = be.getBlockState().getValue(TrackBlock.SHAPE);
-        TrackType trackType = ((TrackBlock) be.getBlockState().getBlock()).getMaterial().trackType;
+        Identifier trackType = CRTrackMaterials.getType(((TrackBlock) be.getBlockState().getBlock()).getMaterial());
         if (!OFFSETS.containsKey(trackType))
             return;
         Map<TrackShape, Set<BlockPos>> shapeMap = OFFSETS.get(trackType);

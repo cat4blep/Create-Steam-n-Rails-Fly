@@ -25,7 +25,7 @@ import com.railwayteam.railways.mixin_interfaces.IPotentiallyInvisibleSpriteCont
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.metadata.animation.AnimationMetadataSection;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +42,7 @@ public abstract class MixinSpriteContents implements IPotentiallyInvisibleSprite
     @Shadow @Final @Nullable private SpriteContents.AnimatedTexture animatedTexture;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void railways$onInit(ResourceLocation name, FrameSize frameSize, NativeImage originalImage, AnimationMetadataSection metadata, CallbackInfo ci) {
+    private void railways$onInit(Identifier name, FrameSize frameSize, NativeImage originalImage, AnimationMetadataSection metadata, CallbackInfo ci) {
         if (PhantomSpriteManager.register((SpriteContents) (Object) this))
             railways$shouldDoInvisibility = true;
     }
@@ -51,8 +51,6 @@ public abstract class MixinSpriteContents implements IPotentiallyInvisibleSprite
     private boolean railways$visible = true;
     @Unique
     private boolean railways$shouldDoInvisibility = false;
-
-    @Override
     public void railways$uploadFrame(boolean visible) {
         this.railways$visible = visible;
         this.railways$shouldDoInvisibility = true;
@@ -93,8 +91,6 @@ public abstract class MixinSpriteContents implements IPotentiallyInvisibleSprite
             if (!((IPotentiallyInvisibleSpriteContents) field_28469).railways$shouldDoInvisibility()) return frameIndex;
             return ((IPotentiallyInvisibleSpriteContents) field_28469).railways$isVisible() ? 0 : 1;
         }
-
-        @Override
         public void railways$uploadWithVisibility() {
             if (!((IPotentiallyInvisibleSpriteContents) field_28469).railways$shouldDoInvisibility()) return;
             uploadFrame(railways$uploadX, railways$uploadY, ((IPotentiallyInvisibleSpriteContents) field_28469).railways$isVisible() ? 0 : 1);

@@ -21,10 +21,10 @@ package com.railwayteam.railways.content.custom_bogeys.blocks.narrow;
 import com.railwayteam.railways.content.custom_bogeys.blocks.base.CRBogeyBlock;
 import com.railwayteam.railways.registry.CRBogeyStyles;
 import com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.bogey.BogeySizes.BogeySize;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
+import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
+import com.zurrtum.create.content.trains.bogey.BogeySize;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import net.minecraft.resources.Identifier;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import net.minecraft.world.phys.Vec3;
 
@@ -42,29 +42,23 @@ public class NarrowGaugeBogeyBlock extends CRBogeyBlock {
         super(props, style.style.get(), style.size.get());
         this.style = style;
     }
-
-    @Override
-    public TrackType getTrackType(BogeyStyle style) {
+    public Identifier getTrackType(BogeyStyle style) {
         return CRTrackType.NARROW_GAUGE;
     }
-
-    @Override
     public Vec3 getConnectorAnchorOffset() {
         return switch (style) {
             case SMALL, SCOTCH_YOKE -> new Vec3(0, 7 / 32f, 32 / 32f);
             case DOUBLE_SCOTCH_YOKE -> new Vec3(0, 7 / 32f, 38 / 32f);
         };
     }
-
-    @Override
     public double getWheelRadius() {
-        return (size == BogeySizes.LARGE ? 8.75 : 6.5) / 16d;
+        return (size == AllBogeySizes.LARGE ? 8.75 : 6.5) / 16d;
     }
 
     public enum NarrowGaugeStandardStyle {
-        SMALL(() -> CRBogeyStyles.NARROW_DEFAULT, () -> BogeySizes.SMALL),
-        SCOTCH_YOKE(() -> CRBogeyStyles.NARROW_DEFAULT, () -> BogeySizes.LARGE),
-        DOUBLE_SCOTCH_YOKE(() -> CRBogeyStyles.NARROW_DOUBLE_SCOTCH, () -> BogeySizes.LARGE)
+        SMALL(() -> CRBogeyStyles.NARROW_DEFAULT, () -> AllBogeySizes.SMALL),
+        SCOTCH_YOKE(() -> CRBogeyStyles.NARROW_DEFAULT, () -> AllBogeySizes.LARGE),
+        DOUBLE_SCOTCH_YOKE(() -> CRBogeyStyles.NARROW_DOUBLE_SCOTCH, () -> AllBogeySizes.LARGE)
         ;
         public final Supplier<BogeyStyle> style;
         public final Supplier<BogeySize> size;

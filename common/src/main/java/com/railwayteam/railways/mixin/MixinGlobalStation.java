@@ -19,9 +19,9 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.mixin_interfaces.ILimitedGlobalStation;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
-import com.simibubi.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.station.GlobalStation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,32 +39,22 @@ public abstract class MixinGlobalStation implements ILimitedGlobalStation {
     @Shadow @Nullable public abstract Train getImminentTrain();
 
     private boolean limitEnabled;
-
-    @Override
     public boolean isStationEnabled() {
         return !limitEnabled || (getNearestTrain()) == null;
     }
-
-    @Override
     public Train getDisablingTrain() {
         if (!limitEnabled)
             return null;
         return (getNearestTrain());
     }
-
-    @Override
     public Train orDisablingTrain(Train before, Train except) {
         if (before == null || before == except)
             before = getDisablingTrain();
         return before;
     }
-
-    @Override
     public void setLimitEnabled(boolean limitEnabled) {
         this.limitEnabled = limitEnabled;
     }
-
-    @Override
     public boolean isLimitEnabled() {
         return limitEnabled;
     }

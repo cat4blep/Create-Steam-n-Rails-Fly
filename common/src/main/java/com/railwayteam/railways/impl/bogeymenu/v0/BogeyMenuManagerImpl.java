@@ -21,12 +21,12 @@ package com.railwayteam.railways.impl.bogeymenu.v0;
 import com.railwayteam.railways.api.bogeymenu.v0.BogeyMenuManager;
 import com.railwayteam.railways.api.bogeymenu.v0.entry.BogeyEntry;
 import com.railwayteam.railways.api.bogeymenu.v0.entry.CategoryEntry;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
-import com.simibubi.create.content.trains.bogey.BogeySizes.BogeySize;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
+import com.zurrtum.create.content.trains.bogey.BogeySize;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,36 +48,26 @@ public class BogeyMenuManagerImpl implements BogeyMenuManager {
     }
 
     public static final float defaultScale = 23;
-
-    @Override
-    public CategoryEntry registerCategory(@NotNull Component name, @NotNull ResourceLocation id) {
+    public CategoryEntry registerCategory(@NotNull Component name, @NotNull Identifier id) {
         CategoryEntry entry = new CategoryEntry(name, id);
         // maintain favorites category at the end
         CATEGORIES.add(CATEGORIES.size() - 1, entry);
         return entry;
     }
-
-    @Override
-    public @Nullable CategoryEntry getCategoryById(@NotNull ResourceLocation id) {
+    public @Nullable CategoryEntry getCategoryById(@NotNull Identifier id) {
         for (CategoryEntry categoryEntry : CATEGORIES) {
             if (categoryEntry.getId().equals(id))
                 return categoryEntry;
         }
         return null;
     }
-
-    @Override
-    public BogeyEntry addToCategory(@NotNull CategoryEntry categoryEntry, @NotNull BogeyStyle bogeyStyle, @Nullable ResourceLocation iconLocation) {
+    public BogeyEntry addToCategory(@NotNull CategoryEntry categoryEntry, @NotNull BogeyStyle bogeyStyle, @Nullable Identifier iconLocation) {
         return addToCategory(categoryEntry, bogeyStyle, iconLocation, defaultScale);
     }
-
-    @Override
-    public BogeyEntry addToCategory(@NotNull CategoryEntry categoryEntry, @NotNull BogeyStyle bogeyStyle, @Nullable ResourceLocation iconLocation, float scale) {
+    public BogeyEntry addToCategory(@NotNull CategoryEntry categoryEntry, @NotNull BogeyStyle bogeyStyle, @Nullable Identifier iconLocation, float scale) {
         return BogeyEntry.getOrCreate(categoryEntry, bogeyStyle, iconLocation, scale);
     }
-
-    @Override
-    public void setScalesForBogeySizes(BogeyStyle style, BogeySizes.BogeySize size, float scale) {
+    public void setScalesForBogeySizes(BogeyStyle style, BogeySize size, float scale) {
         SIZES_TO_SCALE.put(Pair.of(style, size), scale);
     }
 }

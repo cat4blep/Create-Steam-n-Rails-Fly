@@ -19,17 +19,17 @@
 package com.railwayteam.railways.content.conductor.whistle;
 
 import com.railwayteam.railways.content.conductor.ConductorEntity;
-import com.simibubi.create.Create;
-import com.simibubi.create.api.contraption.transformable.TransformableBlockEntity;
-import com.simibubi.create.content.contraptions.StructureTransform;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.graph.EdgePointType;
-import com.simibubi.create.content.trains.schedule.Schedule;
-import com.simibubi.create.content.trains.schedule.destination.DestinationInstruction;
-import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
+import com.zurrtum.create.content.contraptions.StructureTransform;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.graph.EdgePointType;
+import com.zurrtum.create.content.trains.schedule.Schedule;
+import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
+import com.zurrtum.create.content.trains.station.GlobalStation;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.DyeColor;
@@ -58,11 +58,9 @@ public class ConductorWhistleFlagBlockEntity extends SmartBlockEntity implements
     DyeColor getColor() {
         return color;
     }
-
-    @Override
     public void lazyTick() {
         super.lazyTick();
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
 
         if (station.getEdgePoint() == null)
@@ -92,27 +90,21 @@ public class ConductorWhistleFlagBlockEntity extends SmartBlockEntity implements
             tickedOnce = true;
         }
     }
-
-    @Override
     public void transform(BlockEntity blockEntity, StructureTransform transform) {
         station.transform(blockEntity, transform);
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         station = new TrackTargetingBehaviour<>(this, EdgePointType.STATION);
         behaviours.add(station);
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         tag.putByte("SelectedColor", ConductorEntity.idFrom(color));
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
-        color = ConductorEntity.colorFrom(tag.getByte("SelectedColor"));
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
+        color = ConductorEntity.colorFrom(tag.getByte("SelectedColor").orElse((byte) 0));
     }
 }

@@ -74,21 +74,15 @@ public class EnumFilledList<E extends Enum<E>, T> implements Iterable<T> {
         System.arraycopy(values, 0, array, 0, values.length);
         return array;
     }
-
-    @Override
     public @NotNull Iterator<T> iterator() {
         return new EnumFilledListIterator();
     }
 
     private class EnumFilledListIterator implements Iterator<T> {
         private int index = 0;
-
-        @Override
         public boolean hasNext() {
             return index + 1 < clazz.getEnumConstants().length;
         }
-
-        @Override
         public T next() {
             if (!hasNext())
                 throw new IndexOutOfBoundsException();

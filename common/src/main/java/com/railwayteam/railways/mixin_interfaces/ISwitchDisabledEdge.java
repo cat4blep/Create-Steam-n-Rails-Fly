@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.mixin_interfaces;
 
-import com.simibubi.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
 
 public interface ISwitchDisabledEdge {
     void setEnabled(boolean enabled);

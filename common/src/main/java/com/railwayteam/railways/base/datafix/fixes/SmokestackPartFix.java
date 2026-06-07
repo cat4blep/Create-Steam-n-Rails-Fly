@@ -39,8 +39,6 @@ public class SmokestackPartFix extends DataFix {
         this.blockId = blockId;
         this.defaultPart = defaultPart;
     }
-
-    @Override
     protected TypeRewriteRule makeRule() {
         return this.fixTypeEverywhereTyped(
             this.name,

@@ -18,9 +18,9 @@
 
 package com.railwayteam.railways.mixin.client;
 
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 @Mixin(PartialModel.class)
 public interface AccessorPartialModel {
 	@Accessor(value = "ALL", remap = false)
-	static ConcurrentMap<ResourceLocation, PartialModel> railways$getALL() {
+	static ConcurrentMap<Identifier, PartialModel> railways$getALL() {
 		throw new AssertionError();
 	}
 

@@ -36,37 +36,27 @@ public class IterableUtils {
     }
 
     private record ArrayIterable<T>(T[] array) implements Iterable<T> {
-        @Override
         public @NotNull Iterator<T> iterator() {
             return Arrays.stream(array).iterator();
         }
-
-        @Override
         public void forEach(Consumer<? super T> action) {
             for (T t : array) {
                 action.accept(t);
             }
         }
-
-        @Override
         public Spliterator<T> spliterator() {
             return Arrays.stream(array).spliterator();
         }
     }
 
     private record NullAndIterable<T>(Iterable<T> wrapped) implements Iterable<@Nullable T> {
-        @Override
         public @NotNull Iterator<@Nullable T> iterator() {
             return new NullAndIterator<>(wrapped.iterator());
         }
-
-        @Override
         public void forEach(Consumer<? super @Nullable T> action) {
             action.accept(null);
             wrapped.forEach(action);
         }
-
-        @Override
         public Spliterator<@Nullable T> spliterator() {
             return new NullAndSpliterator<>(wrapped.spliterator());
         }
@@ -79,13 +69,9 @@ public class IterableUtils {
         private NullAndIterator(Iterator<T> wrapped) {
             this.wrapped = wrapped;
         }
-
-        @Override
         public boolean hasNext() {
             return !nullConsumed || wrapped.hasNext();
         }
-
-        @Override
         public @Nullable T next() {
             if (!nullConsumed) {
                 nullConsumed = true;
@@ -102,8 +88,6 @@ public class IterableUtils {
         private NullAndSpliterator(Spliterator<T> wrapped) {
             this.wrapped = wrapped;
         }
-
-        @Override
         public boolean tryAdvance(Consumer<? super @Nullable T> consumer) {
             if (!nullConsumed) {
                 consumer.accept(null);
@@ -112,18 +96,12 @@ public class IterableUtils {
             }
             return wrapped.tryAdvance(consumer);
         }
-
-        @Override
         public Spliterator<@Nullable T> trySplit() {
             return wrapped.trySplit();
         }
-
-        @Override
         public long estimateSize() {
             return wrapped.estimateSize() + 1;
         }
-
-        @Override
         public int characteristics() {
             return wrapped.characteristics() & ~Spliterator.NONNULL;
         }

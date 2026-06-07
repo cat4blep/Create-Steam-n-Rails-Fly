@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.content.palettes;
 
-import com.simibubi.create.content.decoration.MetalLadderBlock;
+import com.zurrtum.create.content.decoration.MetalLadderBlock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
@@ -32,8 +32,6 @@ public class FloatingMetalLadderBlock extends MetalLadderBlock {
     public FloatingMetalLadderBlock(Properties properties) {
         super(properties);
     }
-
-    @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return true;
     }

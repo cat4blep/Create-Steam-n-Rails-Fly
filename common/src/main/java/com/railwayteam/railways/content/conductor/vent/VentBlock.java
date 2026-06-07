@@ -21,8 +21,8 @@ package com.railwayteam.railways.content.conductor.vent;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.registry.CRShapes;
-import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
@@ -56,8 +57,6 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(CONDUCTOR_VISIBLE, false));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(CONDUCTOR_VISIBLE));
     }
@@ -68,12 +67,9 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
     }
 
 /*    @Nullable
-    @Override
     public BlockState getConnectiveMaterial(BlockAndTintGetter reader, BlockState otherState, Direction face, BlockPos fromPos, BlockPos toPos) {
         return getMaterial(reader, toPos);
     }*/
-
-    @Override
     public boolean canFaceBeOccluded(BlockState state, Direction face) {
         return true;
     }
@@ -82,8 +78,6 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
     public boolean isUnblockableConnectivitySide(BlockAndTintGetter reader, BlockState state, Direction face, BlockPos fromPos, BlockPos toPos) {
         return true;
     }*/
-
-    @Override
     public boolean canConnectTexturesToward(BlockAndTintGetter reader, BlockPos fromPos, BlockPos toPos, BlockState state) {
         return true;
     }
@@ -158,7 +152,7 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
     protected boolean teleportConductorInternal(Level level, BlockPos start, ConductorEntity conductor, @Nullable Direction prevDirection) {
         if (prevDirection == null) {
             BlockPos normal = conductor.blockPosition().subtract(start);
-            prevDirection = Direction.fromDelta(normal.getX(), normal.getY(), normal.getZ());
+            prevDirection = Direction.getNearest(normal, Direction.NORTH);
             if (prevDirection == null)
                 prevDirection = Direction.NORTH;
             else
@@ -174,8 +168,6 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
         }
         return false;
     }
-
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (player instanceof ServerPlayer serverPlayer && level instanceof ServerLevel serverLevel && ConductorEntity.isPlayerDisguised(player)) {
             Direction direction = hit.getDirection().getOpposite();
@@ -186,23 +178,20 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
                 if (!level.getBlockState(end.above()).isAir())
                     end = end.below();
                 //serverPlayer.connection.teleport(end.getX(), end.getY(), end.getZ(), serverPlayer.getYRot(), serverPlayer.getXRot());
-                serverPlayer.teleportTo(serverLevel, end.getX() + 0.5, end.getY() + 0.0, end.getZ() + 0.5, serverPlayer.getYRot(), serverPlayer.getXRot());
+                serverPlayer.teleportTo(serverLevel, end.getX() + 0.5, end.getY() + 0.0, end.getZ() + 0.5, Set.<Relative>of(), serverPlayer.getYRot(), serverPlayer.getXRot(), false);
                 //conductor.teleportToForce(end.getX() + 0.5, end.getY() + 0.0, end.getZ() + 0.5);
                 return InteractionResult.SUCCESS;
             }
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return InteractionResult.PASS;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
-        super.entityInside(state, level, pos, entity);
         teleportConductor(level, pos, entity, null);
     }
 
     public void teleportConductor(@NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity, @Nullable Direction direction) {
-        if (level.isClientSide)
+        if (level.isClientSide())
             return;
         if (entity instanceof ConductorEntity conductor) {// && conductor.isPossessed()) {
             if (direction != null || conductor.ventCooldown <= 0)
@@ -213,8 +202,6 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
 
     public static final VoxelShape COLLISION_SHAPE = Block.box(1.0, 1.0, 1.0, 15.0, 15.0, 15.0);
     public static final VoxelShape OUTLINE_SHAPE = CRShapes.BLOCK;
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state, @NotNull BlockGetter level,
                                                  @NotNull BlockPos pos, @NotNull CollisionContext context) {
@@ -222,8 +209,6 @@ public abstract class VentBlock extends CopycatBlock implements IWrenchable {
             return COLLISION_SHAPE;
         return OUTLINE_SHAPE;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos,
                                         @NotNull CollisionContext context) {

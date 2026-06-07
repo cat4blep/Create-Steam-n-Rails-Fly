@@ -18,13 +18,14 @@
 
 package com.railwayteam.railways.content.buffer.single_deco;
 
+import com.mojang.serialization.MapCodec;
 import com.railwayteam.railways.content.buffer.DyeableBlockEntity;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.util.AdventureUtils;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
-import net.createmod.catnip.math.VoxelShaper;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.catnip.math.VoxelShaper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,6 +53,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirectionalBlock implements IBE<DyeableBlockEntity>, IWrenchable, ProperWaterloggedBlock {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return (MapCodec) Block.CODEC;
+    }
 
     public AbstractDyeableSingleBufferBlock(Properties properties) {
         super(properties);
@@ -59,22 +64,17 @@ public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirecti
             .setValue(FACING, Direction.NORTH)
             .setValue(WATERLOGGED, false));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(FACING, WATERLOGGED));
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onRemove(@NotNull BlockState state, @NotNull Level worldIn,
                          @NotNull BlockPos pos, @NotNull BlockState newState, boolean isMoving) {
-        IBE.onRemove(state, worldIn, pos, newState);
+        if (!state.is(newState.getBlock()))
+            worldIn.removeBlockEntity(pos);
     }
 
     protected abstract BlockState cycleStyle(BlockState originalState, Direction targetedFace);
-
-    @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         if (targetedFace.getAxis().isVertical()) {
             return IWrenchable.super.getRotatedBlockState(originalState, targetedFace);
@@ -84,13 +84,11 @@ public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirecti
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public FluidState getFluidState(BlockState state) {
         return fluidState(state);
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state != null) {
@@ -106,33 +104,26 @@ public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirecti
     protected abstract VoxelShaper getShaper(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context);
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShaper(state, level, pos, context).get(state.getValue(FACING));
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, state, currentPos);
+        updateWater(level, level, state, currentPos);
         return state;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
                                  BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
             return InteractionResult.PASS;
         return onBlockEntityUse(pLevel, pPos, be -> be.applyDyeIfValid(pPlayer.getItemInHand(pHand)));
     }
-
-    @Override
     public Class<DyeableBlockEntity> getBlockEntityClass() {
         return DyeableBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends DyeableBlockEntity> getBlockEntityType() {
         return CRBlockEntities.DYEABLE.get();
     }

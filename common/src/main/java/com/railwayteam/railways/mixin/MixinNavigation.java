@@ -30,24 +30,24 @@ import com.railwayteam.railways.content.switches.TrackSwitchBlock.SwitchState;
 import com.railwayteam.railways.mixin_interfaces.*;
 import com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType;
 import com.railwayteam.railways.util.MixinVariables;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.Navigation;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TravellingPoint;
-import com.simibubi.create.content.trains.graph.EdgeData;
-import com.simibubi.create.content.trains.graph.TrackEdge;
-import com.simibubi.create.content.trains.graph.TrackGraph;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.signal.SignalBoundary;
-import com.simibubi.create.content.trains.signal.SignalEdgeGroup;
-import com.simibubi.create.content.trains.signal.TrackEdgePoint;
-import com.simibubi.create.content.trains.station.GlobalStation;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.Navigation;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.TravellingPoint;
+import com.zurrtum.create.content.trains.graph.EdgeData;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackGraph;
+import com.zurrtum.create.content.trains.graph.TrackNode;
+import com.zurrtum.create.content.trains.signal.SignalBoundary;
+import com.zurrtum.create.content.trains.signal.SignalEdgeGroup;
+import com.zurrtum.create.content.trains.signal.TrackEdgePoint;
+import com.zurrtum.create.content.trains.station.GlobalStation;
+import net.minecraft.resources.Identifier;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableDouble;
@@ -78,8 +78,6 @@ public abstract class MixinNavigation implements IWaypointableNavigation, IGener
     @Shadow private TravellingPoint signalScout;
 
     @Shadow public abstract TravellingPoint.ITrackSelector controlSignalScout();
-
-    @Override
     public boolean railways$isWaypointMode() {
         try {
             return !train.manualTick && !train.runtime.paused && !train.runtime.completed && train.runtime.getSchedule() != null && train.runtime.currentEntry < train.runtime.getSchedule().entries.size() &&
@@ -127,17 +125,13 @@ public abstract class MixinNavigation implements IWaypointableNavigation, IGener
     @ModifyExpressionValue(method = "search(DDZLjava/util/ArrayList;Lcom/simibubi/create/content/trains/entity/Navigation$StationTest;)V",
         at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"))
     private boolean isNavigationIncompatible(boolean original, @Local Map.Entry<TrackNode, TrackEdge> target) {
-        if (target.getValue().getTrackMaterial().trackType == CRTrackType.UNIVERSAL)
+        if (CRTrackMaterials.getType(target.getValue().getTrackMaterial()) == CRTrackType.UNIVERSAL)
             return true;
         return original;
     }
-
-    @Override
     public void railways$searchGeneral(double maxDistance, boolean forward, PointTest pointTest) {
         railways$searchGeneral(maxDistance, -1, forward, pointTest);
     }
-
-    @Override
     public void railways$searchGeneral(double maxDistance, double maxCost, boolean forward, PointTest pointTest) {
         TrackGraph graph = train.graph;
         if (graph == null)
@@ -154,7 +148,7 @@ public abstract class MixinNavigation implements IWaypointableNavigation, IGener
 
         // Cache the list of track types that the train can travel on
         boolean skipValidCheck = false;
-        Set<TrackType> validTypes = new HashSet<>();
+        Set<Identifier> validTypes = new HashSet<>();
         for (int i = 0; i < train.carriages.size(); i++) {
             Carriage carriage = train.carriages.get(i);
             AbstractBogeyBlock<?> leadingType = ((AccessorCarriageBogey) carriage.leadingBogey()).getType();
@@ -307,7 +301,7 @@ public abstract class MixinNavigation implements IWaypointableNavigation, IGener
                 continue;
 
             for (Map.Entry<TrackNode, TrackEdge> target : validTargets) {
-                if (!(skipValidCheck || validTypes.contains(target.getValue().getTrackMaterial().trackType) || target.getValue().getTrackMaterial().trackType == CRTrackType.UNIVERSAL))
+                if (!(skipValidCheck || validTypes.contains(CRTrackMaterials.getType(target.getValue().getTrackMaterial())) || CRTrackMaterials.getType(target.getValue().getTrackMaterial()) == CRTrackType.UNIVERSAL))
                     continue;
                 TrackNode newNode = target.getKey();
                 TrackEdge newEdge = target.getValue();
@@ -318,8 +312,6 @@ public abstract class MixinNavigation implements IWaypointableNavigation, IGener
             }
         }
     }
-
-    @Override
     public Pair<TrackSwitch, Pair<Boolean, Optional<SwitchState>>> railways$findNearestApproachableSwitch(boolean forward) {
         TrackGraph graph = train.graph;
         if (graph == null)

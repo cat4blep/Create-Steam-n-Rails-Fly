@@ -18,11 +18,11 @@
 
 package com.railwayteam.railways.content.distant_signals;
 
-import com.simibubi.create.api.behaviour.display.DisplayTarget;
-import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
-import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.api.behaviour.display.DisplayTarget;
+import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -32,7 +32,6 @@ import java.util.Optional;
 import static com.railwayteam.railways.content.distant_signals.SignalDisplaySource.getSignalState;
 
 public class SemaphoreDisplayTarget extends DisplayTarget {
-    @Override
     public void acceptText(int line, List<MutableComponent> text, DisplayLinkContext context) {
         Pair<SignalBlockEntity.SignalState, Optional<SignalBlockEntity>> state = getSignalState(context, text.get(0));
         if (context.getTargetBlockEntity() instanceof IOverridableSignal overridableSignal) {
@@ -44,13 +43,9 @@ public class SemaphoreDisplayTarget extends DisplayTarget {
             );
         }
     }
-
-    @Override
     public DisplayTargetStats provideStats(DisplayLinkContext context) {
         return new DisplayTargetStats(2, 2, this);
     }
-
-    @Override
     public Component getLineOptionText(int line) {
         return Component.translatable("railways.display_target.semaphore."+(line != 0 ? "distant" : "normal"));
     }

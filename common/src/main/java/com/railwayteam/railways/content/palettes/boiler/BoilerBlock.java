@@ -22,16 +22,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.railwayteam.railways.mixin_interfaces.IHasCustomOutline;
 import com.railwayteam.railways.registry.CRShapes;
-import com.simibubi.create.content.equipment.extendoGrip.ExtendoGripItem;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IHaveBigOutline;
-import com.simibubi.create.foundation.placement.PoleHelper;
-import com.simibubi.create.infrastructure.config.AllConfigs;
+import com.zurrtum.create.content.equipment.extendoGrip.ExtendoGripItem;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IHaveBigOutline;
+import com.zurrtum.create.foundation.placement.PoleHelper;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.placement.IPlacementHelper;
-import net.createmod.catnip.placement.PlacementHelpers;
-import net.createmod.catnip.placement.PlacementOffset;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.placement.IPlacementHelper;
+import com.zurrtum.create.catnip.placement.PlacementHelpers;
+import com.zurrtum.create.catnip.placement.PlacementOffset;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -81,8 +81,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
                 .setValue(RAISED, false)
         );
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(STYLE, HORIZONTAL_AXIS, RAISED);
     }
@@ -92,8 +90,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
         return IWrenchable.super.updateAfterWrenched(newState, context)
             .cycle(STYLE);
     }*/
-
-    @Override
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         if (targetedFace.getAxis() == originalState.getValue(HORIZONTAL_AXIS))
             return originalState.cycle(STYLE);
@@ -101,7 +97,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public boolean skipRendering(@NotNull BlockState state, BlockState adjacentBlockState, @NotNull Direction direction) {
         return adjacentBlockState.is(this)
                 && adjacentBlockState.getValue(HORIZONTAL_AXIS) == state.getValue(HORIZONTAL_AXIS)
@@ -109,19 +104,16 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos) {
         return Shapes.empty();
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public float getShadeBrightness(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos) {
         return 1.0f;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public @NotNull BlockState rotate(@NotNull BlockState state, Rotation rotation) {
         return switch (rotation) {
             case COUNTERCLOCKWISE_90, CLOCKWISE_90 -> state.cycle(HORIZONTAL_AXIS);
@@ -130,7 +122,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         boolean raised = context.getPlayer() != null && context.getPlayer().isShiftKeyDown();
         Axis axis = context.getClickedFace().getAxis();
@@ -140,8 +131,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
                 .setValue(HORIZONTAL_AXIS, axis)
                 .setValue(RAISED, raised);
     }
-
-    @Override
     public @NotNull InteractionResult use(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos,
                                           Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
         if (player.isShiftKeyDown() || !player.mayBuild())
@@ -152,24 +141,18 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
         IPlacementHelper helper = PlacementHelpers.get(placementHelperId);
         if (helper.matchesItem(heldItem))
             return helper.getOffset(player, level, state, pos, hit)
-                    .placeInWorld(level, (BlockItem) heldItem.getItem(), player, hand, hit);
+                    .placeInWorld(level, (BlockItem) heldItem.getItem(), player, hand);
 
         return InteractionResult.PASS;
     }
-
-    @Override
     public @NotNull VoxelShape getShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos,
                                         @NotNull CollisionContext context) {
         return getShapeForState(state);
     }
-
-    @Override
     public @NotNull VoxelShape getCollisionShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos,
                                                  @NotNull CollisionContext context) {
         return getShapeForState(state);
     }
-
-    @Override
     public @NotNull VoxelShape getInteractionShape(BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos) {
         return getShapeForState(state);
     }
@@ -179,8 +162,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
             return CRShapes.BOILER_RAISED.get(state.getValue(HORIZONTAL_AXIS));
         return CRShapes.BOILER.get(state.getValue(HORIZONTAL_AXIS));
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public void customOutline(PoseStack poseStack, VertexConsumer consumer, BlockState state) {
         double offset = state.getValue(RAISED) ? 8 : 0;
@@ -216,8 +197,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
         drawLineWithAxisOffset(consumer, poseStack, 24, 1.37258, 0, 24, 1.37258, 16, offset, Axis.Y);
         drawLineWithAxisOffset(consumer, poseStack, 14.6274, -8, 0, 14.6274, -8, 16, offset, Axis.Y);
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public void matrixRotation(PoseStack poseStack, BlockState state) {
         if (state.getValue(HORIZONTAL_AXIS) == Axis.X)
@@ -234,8 +213,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
         Style(String texture) {
             this.texture = texture;
         }
-
-        @Override
         public @NotNull String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
@@ -252,18 +229,12 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
             super(state -> state.getBlock() instanceof BoilerBlock,
                     state -> state.getValue(HORIZONTAL_AXIS), HORIZONTAL_AXIS);
         }
-
-        @Override
         public Predicate<ItemStack> getItemPredicate() {
             return i -> i.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof BoilerBlock;
         }
-
-        @Override
         public Predicate<BlockState> getStatePredicate() {
             return state -> state.getBlock() instanceof BoilerBlock;
         }
-
-        @Override
         public PlacementOffset getOffset(Player player, Level level, BlockState state, BlockPos pos,
                                          BlockHitResult ray) {
             PlacementOffset offset = PlacementOffset.fail();
@@ -272,11 +243,6 @@ public class BoilerBlock extends Block implements IWrenchable, IHasCustomOutline
             for (Direction dir : directions) {
                 dir = dir.getOpposite();
                 int range = AllConfigs.server().equipment.placementAssistRange.get();
-                if (player != null) {
-                    AttributeInstance reach = player.getAttribute(getAttribute());
-                    if (reach != null && reach.hasModifier(ExtendoGripItem.singleRangeAttributeModifier))
-                        range += 4;
-                }
                 int poles = attachedPoles(level, pos, dir);
                 if (poles >= range)
                     continue;

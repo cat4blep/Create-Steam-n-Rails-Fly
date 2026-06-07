@@ -28,29 +28,28 @@ import com.railwayteam.railways.registry.CREdgePointTypes;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.util.MinRespectingScrollValueBehaviour;
 import com.railwayteam.railways.util.packet.TrackCouplerClientInfoPacket;
-import com.simibubi.create.Create;
-import com.simibubi.create.api.contraption.transformable.TransformableBlockEntity;
-import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.content.contraptions.StructureTransform;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.CarriageBogey;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TravellingPoint;
-import com.simibubi.create.content.trains.graph.TrackGraphLocation;
-import com.simibubi.create.content.trains.graph.TrackNodeLocation;
-import com.simibubi.create.content.trains.signal.SignalBlock;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.math.VecHelper;
-import net.createmod.catnip.nbt.NBTHelper;
+import com.zurrtum.create.Create;
+import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
+import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
+import com.zurrtum.create.content.contraptions.StructureTransform;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.CarriageBogey;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.TravellingPoint;
+import com.zurrtum.create.content.trains.graph.TrackGraphLocation;
+import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+import com.zurrtum.create.content.trains.signal.SignalBlock;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.CenteredSideValueBoxTransform;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.client.catnip.lang.LangBuilder;
+import com.zurrtum.create.catnip.math.VecHelper;
+import com.zurrtum.create.catnip.nbt.NBTHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -87,7 +86,7 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
 
     public TrackTargetingBehaviour<TrackCoupler> edgePoint;
     public TrackTargetingBehaviour<TrackCoupler> secondEdgePoint;
-    protected ScrollValueBehaviour edgeSpacingScroll;
+    protected MinRespectingScrollValueBehaviour edgeSpacingScroll;
 
     protected int cachedEffectiveEdgeSpacing = 5;
 
@@ -95,9 +94,8 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
         super(type, pos, state);
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         tag.putBoolean("EdgePointsOk", edgePointsOk);
         tag.putBoolean("Power", lastReportedPower);
         tag.putInt("AnalogOutput", lastAnalogOutput);
@@ -107,26 +105,22 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
         //    tag.put("ClientInfo", clientInfo.write());
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
-        edgePointsOk = tag.getBoolean("EdgePointsOk");
-        lastReportedPower = tag.getBoolean("Power");
-        lastAnalogOutput = tag.getInt("AnalogOutput");
-        edgeSpacing = tag.getInt("EdgeSpacing");
-        lastEdgeSpacing = tag.getInt("LastEdgeSpacing");
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
+        edgePointsOk = tag.getBoolean("EdgePointsOk").orElse(false);
+        lastReportedPower = tag.getBoolean("Power").orElse(false);
+        lastAnalogOutput = tag.getInt("AnalogOutput").orElse(0);
+        edgeSpacing = tag.getInt("EdgeSpacing").orElse(0);
+        lastEdgeSpacing = tag.getInt("LastEdgeSpacing").orElse(0);
         edgeSpacingScroll.setValue(edgeSpacing);
         //if (clientPacket)
-        //    clientInfo = new ClientInfo(tag.getCompound("ClientInfo"));
+        //    clientInfo = new ClientInfo(tag.getCompound("ClientInfo").orElse(new CompoundTag()));
         invalidateRenderBoundingBox();
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, CREdgePointTypes.COUPLER));
         behaviours.add(secondEdgePoint = new SecondaryTrackTargetingBehaviour<>(this, CREdgePointTypes.COUPLER));
         edgeSpacingScroll = new MinRespectingScrollValueBehaviour(Component.translatable("railways.coupler.edge_spacing"), this, new TrackCouplerValueBoxTransform(true)) {
-            @Override
             public String getClipboardKey() {
                 return "Coupler";
             }
@@ -138,8 +132,6 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
         edgeSpacingScroll.requiresWrench();
         behaviours.add(edgeSpacingScroll);
     }
-
-    @Override
     public void tick() {
         super.tick();
 
@@ -167,7 +159,7 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
     }
 
     protected void onPowered() {
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide())
             return;
 //        this.getSecondaryCoupler().blockEntityAdded(this, false); //FIX_ME remove this
         OperationInfo info = getOperationInfo();
@@ -214,7 +206,7 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
 
     private @Nullable
     BlockState getSecondaryTrackState() {
-        return getDesiredSecondaryEdgePos().map(pos -> edgePoint.getWorld().getBlockState(pos.offset(this.getBlockPos()))).orElse(null);
+        return getDesiredSecondaryEdgePos().map(pos -> level.getBlockState(pos.offset(this.getBlockPos()))).orElse(null);
     }
 
     private void setError(Component component) {
@@ -235,11 +227,9 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
 
     private final int lazierTickRate = 6;
     private int lazierTickCounter = 0;
-
-    @Override
     public void lazyTick() {
         super.lazyTick();
-        if (level == null || level.isClientSide)
+        if (level == null || level.isClientSide())
             return;
         BlockState trackState = edgePoint.getTrackBlockState();
         BlockState secondaryTrackState = getSecondaryTrackState();
@@ -255,7 +245,7 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
                 if (point != null && secondEdgePoint.hasValidTrack()) { // don't want to try anything if not on an actual track
                     TrackGraphLocation location = secondEdgePoint.determineGraphLocation();
                     if (location != null && location.graph != null) {
-                        location.graph.removePoint(CREdgePointTypes.COUPLER, point.id);
+                        location.graph.removePoint(level.getServer(), CREdgePointTypes.COUPLER, point.id);
                         Create.RAILWAYS.trains.forEach((uuid, train) -> {
                             ((IOccupiedCouplers) train).railways$getOccupiedCouplers().remove(point.id);
                             if (uuid == point.getCurrentTrain() || train.graph == location.graph) {
@@ -334,7 +324,7 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
     }
 
     public boolean areEdgePointsOk() {
-        return (level != null && level.isClientSide && clientInfo != null) ? clientInfo.edgePointsOk : edgePointsOk;
+        return (level != null && level.isClientSide() && clientInfo != null) ? clientInfo.edgePointsOk : edgePointsOk;
     }
 
     @Nullable
@@ -492,8 +482,6 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
             this.canCouple = canCouple;
             this.canDecouple = canDecouple;
         }
-
-        @Override
         public @NotNull String getSerializedName() {
             return this.name().toLowerCase(Locale.ROOT);
         }
@@ -517,15 +505,11 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
             out += 8;
         return out;
     }
-
-    @Override
     protected AABB createRenderBoundingBox() {
-        return new AABB(worldPosition, edgePoint.getGlobalPosition())
-                .minmax(new AABB(worldPosition, secondEdgePoint.getGlobalPosition()))
+        return new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(edgePoint.getGlobalPosition()))
+                .minmax(new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(secondEdgePoint.getGlobalPosition())))
                 .inflate(2);
     }
-
-    @Override
     public void transform(BlockEntity blockEntity, StructureTransform structureTransform) {
         edgePoint.transform(blockEntity, structureTransform);
         secondEdgePoint.transform(blockEntity, structureTransform);
@@ -536,8 +520,6 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
         public TrackCouplerValueBoxTransform(boolean vertical) {
             super((state, d) -> d.getAxis().isVertical() == vertical);
         }
-
-        @Override
         protected Vec3 getSouthLocation() {
             return VecHelper.voxelSpace(8, 8, 16);
         }
@@ -587,11 +569,11 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
 
         public ClientInfo(CompoundTag tag) {
             mode = NBTHelper.readEnum(tag, "mode", OperationMode.class);
-            trainName1 = tag.getString("trainName1");
-            trainName2 = tag.getString("trainName2");
-            edgePointsOk = tag.getBoolean("edgePointsOk");
-            error = tag.contains("error") ? Component.Serializer.fromJson(tag.getString("error")) : null;
-            error2 = tag.contains("error2") ? Component.Serializer.fromJson(tag.getString("error2")) : null;
+            trainName1 = tag.getString("trainName1").orElse("");
+            trainName2 = tag.getString("trainName2").orElse("");
+            edgePointsOk = tag.getBoolean("edgePointsOk").orElse(false);
+            error = null;
+            error2 = null;
         }
 
         public CompoundTag write() {
@@ -600,10 +582,6 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
             tag.putString("trainName1", trainName1);
             tag.putString("trainName2", trainName2);
             tag.putBoolean("edgePointsOk", edgePointsOk);
-            if (error != null)
-                tag.putString("error", Component.Serializer.toJson(error));
-            if (error2 != null)
-                tag.putString("error2", Component.Serializer.toJson(error2));
             return tag;
         }
     }
@@ -621,7 +599,6 @@ public class TrackCouplerBlockEntity extends SmartBlockEntity implements Transfo
      * @return {@code true} if the tooltip creation was successful and should be
      * displayed, or {@code false} if the overlay should not be displayed
      */
-    @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         b().translate("tooltip.coupler.header").forGoggles(tooltip);
         b().translate("tooltip.coupler.mode")

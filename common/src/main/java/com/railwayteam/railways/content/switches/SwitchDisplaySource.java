@@ -18,27 +18,22 @@
 
 package com.railwayteam.railways.content.switches;
 
-import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
-import com.simibubi.create.content.redstone.displayLink.source.SingleLineDisplaySource;
-import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
+import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
+import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
 public class SwitchDisplaySource extends SingleLineDisplaySource {
-    @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         if (context.getSourceBlockEntity() instanceof TrackSwitchBlockEntity sw) {
             return Component.translatable("railways.display_source.switch."+sw.getState().getSerializedName());
         }
         return Component.empty();
     }
-
-    @Override
-    protected boolean allowsLabeling(DisplayLinkContext context) {
+    public boolean allowsLabeling(DisplayLinkContext context) {
         return true;
     }
-
-    @Override
     public int getPassiveRefreshTicks() {
         return 40;
     }

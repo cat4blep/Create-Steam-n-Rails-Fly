@@ -20,8 +20,8 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard.medium;
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
-import com.simibubi.create.AllPartialModels;
-import dev.engine_room.flywheel.lib.transform.Affine;
+import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 
@@ -38,8 +38,6 @@ public class Medium808TenderDisplay implements BogeyDisplay {
         wheels = prov.create(MEDIUM_SHARED_WHEELS, 4);
         secondaryShafts = prov.create(AllPartialModels.SHAFT, 4);
     }
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle) {
         for (int side = 0; side < 4; side++) {
             secondaryShafts[side]

@@ -21,9 +21,9 @@ package com.railwayteam.railways.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.railwayteam.railways.config.CRConfigs;
-import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
-import com.simibubi.create.content.contraptions.ContraptionHandlerClient;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.content.contraptions.AbstractContraptionEntity;
+import com.zurrtum.create.content.contraptions.ContraptionHandlerClient;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -53,7 +53,7 @@ public class MixinContraptionHandlerClient {
 
         ItemStack stack = player.getItemInHand(interactionHand);
         CompoundTag tag = stack.getTag();
-        if (tag == null || !tag.getBoolean("ShadowHammer")) {
+        if (tag == null || !tag.getBoolean("ShadowHammer").orElse(false)) {
             if (!(player.isCreative() && CRConfigs.client().universalShadowWrench.get()))
                 return original.call(vec3, entity);
         }

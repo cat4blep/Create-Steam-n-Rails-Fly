@@ -22,8 +22,8 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.content.conductor.toolbox.MountedToolbox;
 import com.railwayteam.railways.util.EntityUtils;
-import com.simibubi.create.content.equipment.toolbox.ToolboxBlockEntity;
-import com.simibubi.create.content.equipment.toolbox.ToolboxHandler;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -98,7 +98,7 @@ public abstract class MixinToolboxHandler {
                                                          Player player, int hotbarSlot, boolean keepItems) {
     if (!(player.level instanceof ServerLevel level))
       return be;
-    CompoundTag toolboxData = EntityUtils.getPersistentData(player).getCompound("CreateToolboxData");
+    CompoundTag toolboxData = EntityUtils.getPersistentData(player).getCompound("CreateToolboxData").orElse(new CompoundTag());
     String key = String.valueOf(hotbarSlot);
     CompoundTag data = toolboxData.getCompound(key);
     if (!data.hasUUID("EntityUUID"))

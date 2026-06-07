@@ -22,9 +22,9 @@ import com.railwayteam.railways.content.buffer.BlockStateBlockItemGroup;
 import com.railwayteam.railways.content.smokestack.RotationType;
 import com.railwayteam.railways.content.smokestack.SmokestackStyle;
 import com.railwayteam.railways.util.ShapeWrapper;
-import com.simibubi.create.api.equipment.goggles.IProxyHoveringInformation;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.api.equipment.goggles.IProxyHoveringInformation;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -94,13 +94,9 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
             .setValue(STYLE, SmokestackStyle.STEEL)
             .setValue(partProperty, defaultPart));
     }
-
-    @Override
     public EnumProperty<VariableStackPart> partProperty() {
         return partProperty;
     }
-
-    @Override
     public VariableStackPart defaultPart() {
         return defaultPart;
     }
@@ -116,44 +112,30 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
     protected EnumProperty<VariableStackPart> getConstructSafePartProperty() {
         return partProperty != null ? partProperty : definitionPartProperty.get();
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(WATERLOGGED, STYLE, getConstructSafePartProperty()));
         getConstructSafeRotationType().createBlockStateDefinition(builder);
     }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return cycleGroup.get().get(state.getValue(STYLE)).asStack();
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public FluidState getFluidState(BlockState state) {
         return fluidState(state);
     }
-
-    @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = rotationType.getStateForPlacement(context, defaultBlockState());
 
         return withWater(state, context);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState rotate(BlockState state, Rotation rotation) {
         return rotationType.rotate(state, rotation);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState mirror(BlockState state, Mirror mirror) {
         return rotationType.mirror(state, mirror);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return rotationType.getShape(state, shape.get(state.getValue(partProperty)));
@@ -170,8 +152,6 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
             return currentPos;
         }
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         BlockPos rootPos = findRoot(level, pos);
@@ -186,18 +166,14 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
 
         return InteractionResult.PASS;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState below = level.getBlockState(pos.below());
         return (below.is(this) || below.is(baseBlock())) && below.getValue(partProperty).isFullHeight();
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, state, currentPos);
+        updateWater(level, level, state, currentPos);
 
         if (direction.getAxis() != Axis.Y)
             return state;
@@ -218,27 +194,19 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
         BlockState below = level.getBlockState(currentPos.below());
         return rotationType.cloneRotation(state.setValue(STYLE, below.getValue(STYLE)), below);
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (oldState.getBlock() != this || oldState.getValue(partProperty) != state.getValue(partProperty))
             VariableSmokeStackBlock.queueHeightUpdate(level, findRoot(level, pos));
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (newState.getBlock() != this)
             VariableSmokeStackBlock.queueHeightUpdate(level, findRoot(level, pos));
     }
-
-    @Override
     public BlockPos getInformationSource(Level level, BlockPos pos, BlockState state) {
         return findRoot(level, pos);
     }
-
-    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
@@ -260,8 +228,6 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
         return new UseOnContext(context.getPlayer(), context.getHand(),
             new BlockHitResult(context.getClickLocation(), context.getClickedFace(), target, context.isInside()));
     }
-
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level level = context.getLevel();
         BlockPos rootPos = findRoot(level, context.getClickedPos());

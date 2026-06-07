@@ -22,14 +22,14 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingChecker;
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import net.createmod.catnip.data.Couple;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -56,25 +56,17 @@ public abstract class MixinBezierConnection implements IHasTrackCasing {
     protected Block railways$trackCasing;
     @Unique
     protected boolean railways$isShiftedDown;
-
-    @Override
     public @Nullable Block railways$getTrackCasing() {
         return railways$trackCasing;
     }
-
-    @Override
     public void railways$setTrackCasing(@Nullable Block trackCasing) {
         if (trackCasing != null && !CasingChecker.isValid(trackCasing)) //sanity check
             return;
         this.railways$trackCasing = trackCasing;
     }
-
-    @Override
     public boolean railways$isAlternate() {
         return railways$isShiftedDown;
     }
-
-    @Override
     public void railways$setAlternate(boolean alternate) {
         this.railways$isShiftedDown = alternate;
     }
@@ -115,14 +107,14 @@ public abstract class MixinBezierConnection implements IHasTrackCasing {
 
   @Inject(method = "<init>(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/core/BlockPos;)V", at = @At("RETURN"), remap = true)
   private void nbtConstructor(CompoundTag compound, BlockPos localTo, CallbackInfo ci) {
-    if (compound.contains("Casing", Tag.TAG_STRING)) {
+    if (compound.contains("Casing")) {
       if (compound.getString("Casing").equals("minecraft:block")) {
 		  Railways.LOGGER.error("NBTCtor trackCasing was minecraft:block!!! for BezierConnection: primary={}, secondary={}", bePositions.getFirst(), bePositions.getSecond());
             }
             //Railways.LOGGER.warn("NBTCtor: Casing="+compound.getString("Casing"));
-            railways$setTrackCasing(BuiltInRegistries.BLOCK.get(ResourceLocation.of(compound.getString("Casing"), ':')));
+            railways$setTrackCasing(BuiltInRegistries.BLOCK.get(Identifier.of(compound.getString("Casing"), ':')));
         }
-        if (compound.contains("ShiftDown", Tag.TAG_BYTE)) {
+        if (compound.contains("ShiftDown")) {
             railways$setAlternate(compound.getBoolean("ShiftDown"));
         } else {
             railways$setAlternate(false);

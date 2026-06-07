@@ -22,12 +22,12 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.base.data.compat.emi.EmiRecipeDefaultsGen;
 import com.railwayteam.railways.base.data.recipe.EnumRecipeList.PalettesRecipeList;
 import com.railwayteam.railways.registry.CRPalettes.Styles;
-import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeBuilder;
+import com.zurrtum.create.api.data.recipe.MechanicalCraftingRecipeBuilder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
-import net.createmod.catnip.platform.CatnipServices;
+import com.zurrtum.create.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
@@ -124,11 +124,11 @@ public abstract class RailwaysMechanicalCraftingRecipeGen extends RailwaysRecipe
             return this;
         }
 
-        private static ResourceLocation clean(ResourceLocation loc) {
+        private static Identifier clean(Identifier loc) {
             String path = loc.getPath();
             while (path.contains("//"))
                 path = path.replaceAll("//", "/");
-            return new ResourceLocation(loc.getNamespace(), path);
+            return new Identifier(loc.getNamespace(), path);
         }
 
 
@@ -137,7 +137,7 @@ public abstract class RailwaysMechanicalCraftingRecipeGen extends RailwaysRecipe
             return register(consumer -> {
                 MechanicalCraftingRecipeBuilder b =
                     builder.apply(MechanicalCraftingRecipeBuilder.shapedRecipe(result.get(), amount));
-                ResourceLocation location = clean(Railways.asResource("mechanical_crafting/" + CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
+                Identifier location = clean(Railways.asResource("mechanical_crafting/" + CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
                         .asItem())
                     .getPath() + suffix));
                 if (addToEmiDefaults) {
@@ -152,8 +152,6 @@ public abstract class RailwaysMechanicalCraftingRecipeGen extends RailwaysRecipe
     public static RecipeProvider create(PackOutput gen) {
         throw new AssertionError();
     }
-
-    @Override
     public @NotNull String getName() {
         return "Steam 'n' Rails Mechanical Crafting Recipes";
     }

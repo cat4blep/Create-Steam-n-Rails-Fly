@@ -23,17 +23,17 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.util.client.ClientTextUtils;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackRenderer;
-import com.simibubi.create.content.trains.track.TrackShape;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import net.createmod.catnip.render.CachedBuffers;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.client.content.trains.track.TrackRenderer;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -66,9 +66,9 @@ public class MixinTrackRenderer {
                     }
                 }
 
-                TrackMaterial.TrackType trackType = null;
+                Identifier trackType = null;
                 if (te.getBlockState().getBlock() instanceof TrackBlock trackBlock)
-                    trackType = trackBlock.getMaterial().trackType;
+                    trackType = CRTrackMaterials.getType(trackBlock.getMaterial());
 
                 CRBlockPartials.TrackCasingSpec spec = CRBlockPartials.TRACK_CASINGS.get(shape);
                 if (((IHasTrackCasing) te).railways$isAlternate())

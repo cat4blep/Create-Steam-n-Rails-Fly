@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ClientResourceReloadListener implements ResourceManagerReloadListener {
     public static final ClientResourceReloadListener INSTANCE = new ClientResourceReloadListener();
-    @Override
     public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
         RailwaysClient.invalidateRenderers();
     }

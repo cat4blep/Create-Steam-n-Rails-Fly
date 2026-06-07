@@ -24,15 +24,15 @@ import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.BezierTrackPointLocation;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockEntity;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.Affine;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
+import net.minecraft.resources.Identifier;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.AxisDirection;
 import net.minecraft.world.level.BlockGetter;
@@ -55,7 +55,7 @@ public class MixinTrackBlockClient {
     ) // Yeah, it's nice to shift the overlays up, but don't crash the game for it.
     private <Self extends Affine<Self>> void bezierShiftTrackOverlay(Affine<Self> affine, BlockGetter world, BlockPos pos, BlockState state, BezierTrackPointLocation bezierPoint, AxisDirection direction, RenderedTrackOverlayType type, CallbackInfoReturnable<PartialModel> cir, @Local BezierConnection bc) {
         IHasTrackCasing casingBc = (IHasTrackCasing) bc;
-        if (bc.getMaterial().trackType == CRTrackType.MONORAIL) {
+        if (CRTrackMaterials.getType(bc.getMaterial()) == CRTrackType.MONORAIL) {
             affine.translate(0, 14/16f, 0);
             return;
         }
@@ -71,7 +71,7 @@ public class MixinTrackBlockClient {
 
     @Inject(method = "prepareTrackOverlay", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/trains/track/TrackRenderer;getModelAngles(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;", remap = true), remap = true)
     private <Self extends Affine<Self>> void blockShiftTrackOverlay(Affine<Self> affine, BlockGetter world, BlockPos pos, BlockState state, BezierTrackPointLocation bezierPoint, AxisDirection direction, RenderedTrackOverlayType type, CallbackInfoReturnable<PartialModel> cir) {
-        if (bezierPoint == null && state.getBlock() instanceof TrackBlock trackBlock && trackBlock.getMaterial().trackType == CRTrackMaterials.CRTrackType.MONORAIL) {
+        if (bezierPoint == null && state.getBlock() instanceof TrackBlock trackBlock && CRTrackMaterials.getType(trackBlock.getMaterial()) == CRTrackMaterials.CRTrackType.MONORAIL) {
             affine.translate(0, 14/16f, 0);
             return;
         }
@@ -80,7 +80,7 @@ public class MixinTrackBlockClient {
             TrackShape shape = state.getValue(TrackBlock.SHAPE);
             if (casingTE.railways$getTrackCasing() != null) {
                 CRBlockPartials.TrackCasingSpec spec = CRBlockPartials.TRACK_CASINGS.get(shape);
-                TrackType trackType = trackBlock.getMaterial().trackType;
+                Identifier trackType = CRTrackMaterials.getType(trackBlock.getMaterial());
                 if (spec != null)
                     affine.translate(
                         spec.getXShift(trackType),

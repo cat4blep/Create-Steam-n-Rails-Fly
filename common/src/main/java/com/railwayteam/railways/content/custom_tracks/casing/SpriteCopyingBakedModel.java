@@ -19,7 +19,7 @@
 package com.railwayteam.railways.content.custom_tracks.casing;
 
 import com.railwayteam.railways.Railways;
-import com.simibubi.create.foundation.model.BakedQuadHelper;
+import com.zurrtum.create.foundation.model.BakedQuadHelper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.createmod.catnip.render.SpriteShiftEntry.getUnInterpolatedU;
-import static net.createmod.catnip.render.SpriteShiftEntry.getUnInterpolatedV;
+import static com.zurrtum.create.client.catnip.render.SpriteShiftEntry.getUnInterpolatedU;
+import static com.zurrtum.create.client.catnip.render.SpriteShiftEntry.getUnInterpolatedV;
 
 public class SpriteCopyingBakedModel implements BakedModel {
 
@@ -45,8 +45,6 @@ public class SpriteCopyingBakedModel implements BakedModel {
         this.baseModel = baseModel;
         this.spriteSourceModel = spriteSourceModel;
     }
-
-    @Override
     public List<BakedQuad> getQuads(@Nullable BlockState pState, @Nullable Direction pSide, RandomSource pRand) {
         ArrayList<BakedQuad> quads = new ArrayList<>();
         TextureAtlasSprite overrideSprite = spriteSourceModel.getParticleIcon();
@@ -84,38 +82,24 @@ public class SpriteCopyingBakedModel implements BakedModel {
         }
         return newVertices;
     }
-
-    @Override
     public boolean useAmbientOcclusion() {
         return spriteSourceModel.useAmbientOcclusion();
     }
-
-    @Override
     public boolean isGui3d() {
         return spriteSourceModel.isGui3d();
     }
-
-    @Override
     public boolean usesBlockLight() {
         return spriteSourceModel.usesBlockLight();
     }
-
-    @Override
     public boolean isCustomRenderer() {
         return baseModel.isCustomRenderer();
     }
-
-    @Override
     public TextureAtlasSprite getParticleIcon() {
         return spriteSourceModel.getParticleIcon();
     }
-
-    @Override
     public ItemTransforms getTransforms() {
         return ItemTransforms.NO_TRANSFORMS;
     }
-
-    @Override
     public ItemOverrides getOverrides() {
         return baseModel.getOverrides();
     }

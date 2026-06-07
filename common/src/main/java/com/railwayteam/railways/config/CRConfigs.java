@@ -18,21 +18,14 @@
 
 package com.railwayteam.railways.config;
 
-import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.io.ParsingException;
-import com.electronwill.nightconfig.toml.TomlParser;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.util.Utils;
-import net.createmod.catnip.config.ConfigBase;
-import net.minecraftforge.common.ForgeConfigSpec;
+import com.zurrtum.create.catnip.config.Builder;
+import com.zurrtum.create.catnip.config.ConfigBase;
 import net.minecraftforge.fml.config.ModConfig;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -67,14 +60,7 @@ public class CRConfigs {
     }
 
     private static <T extends ConfigBase> T register(Supplier<T> factory, ModConfig.Type side) {
-        Pair<T, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(builder -> {
-            T config = factory.get();
-            config.registerAll(builder);
-            return config;
-        });
-
-        T config = specPair.getLeft();
-        config.specification = specPair.getRight();
+        T config = Builder.create(factory, Railways.MOD_ID, side.name().toLowerCase());
         CONFIGS.put(side, config);
         return config;
     }
@@ -87,17 +73,9 @@ public class CRConfigs {
     }
 
     public static void onLoad(ModConfig modConfig) {
-        for (ConfigBase config : CONFIGS.values())
-            if (config.specification == modConfig
-                .getSpec())
-                config.onLoad();
     }
 
     public static void onReload(ModConfig modConfig) {
-        for (ConfigBase config : CONFIGS.values())
-            if (config.specification == modConfig
-                .getSpec())
-                config.onReload();
     }
 
     public static String migrateClient(String contents) {
@@ -220,22 +198,8 @@ public class CRConfigs {
     }
 
     private static void preloadValues() {
-        Path configDir = Utils.configDir();
-        Path commonConfig = configDir.resolve(Railways.MOD_ID +"-common.toml");
-        try (Reader reader = new FileReader(commonConfig.toFile())) {
-            CommentedConfig config = new TomlParser().parse(reader);
-            cachedDisableDatafixer = config.<Boolean>getRaw("disableDatafixer");
-            cachedRegisterMissingTracks = config.<Boolean>getRaw("registerMissingTracks");
-        } catch (IOException | ParsingException e) {
-            cachedDisableDatafixer = null;
-            cachedRegisterMissingTracks = null;
-        }
-
-        if (cachedDisableDatafixer == null)
-            cachedDisableDatafixer = false;
-
-        if (cachedRegisterMissingTracks == null)
-            cachedRegisterMissingTracks = false;
+        cachedDisableDatafixer = false;
+        cachedRegisterMissingTracks = false;
     }
 
 

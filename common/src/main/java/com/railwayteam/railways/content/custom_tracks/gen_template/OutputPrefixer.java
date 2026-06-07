@@ -18,12 +18,13 @@
 
 package com.railwayteam.railways.content.custom_tracks.gen_template;
 
-import com.simibubi.create.content.trains.track.TrackMaterial;
+import com.railwayteam.railways.registry.CRTrackMaterials;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 
 @FunctionalInterface
 public interface OutputPrefixer {
     String getOutputPrefix(TrackMaterial material);
 
-    OutputPrefixer DEFAULT = material -> "block/track/" + material.resourceName() + "/";
-    OutputPrefixer COMPAT = material -> "block/track/compat/" + material.id.getNamespace() + "/" + material.resourceName() + "/";
+    OutputPrefixer DEFAULT = material -> "block/track/" + material.getId().getPath() + "/";
+    OutputPrefixer COMPAT = material -> "block/track/compat/" + CRTrackMaterials.id(material).getNamespace() + "/" + material.getId().getPath() + "/";
 }

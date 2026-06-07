@@ -21,9 +21,9 @@ package com.railwayteam.railways.api.bogeymenu.v0.entry;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.bogey_menu.handler.BogeyMenuHandlerClient;
 import com.railwayteam.railways.impl.bogeymenu.v0.BogeyMenuManagerImpl;
-import com.simibubi.create.content.trains.bogey.BogeyStyle;
+import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,10 +33,10 @@ import java.util.List;
 
 public class CategoryEntry {
     private final @NotNull Component name;
-    private final @NotNull ResourceLocation id;
+    private final @NotNull Identifier id;
     private final @NotNull List<BogeyEntry> bogeyEntryList = new ArrayList<>();
 
-    public CategoryEntry(@NotNull Component name, @NotNull ResourceLocation id) {
+    public CategoryEntry(@NotNull Component name, @NotNull Identifier id) {
         this.name = name;
         this.id = id;
     }
@@ -45,7 +45,7 @@ public class CategoryEntry {
         return name;
     }
 
-    public @NotNull ResourceLocation getId() {
+    public @NotNull Identifier getId() {
         return id;
     }
 
@@ -68,8 +68,6 @@ public class CategoryEntry {
         private FavoritesCategory() {
             super(Component.translatable("railways.gui.bogey_menu.category.favorites"), Railways.asResource("favorites"));
         }
-
-        @Override
         public @NotNull List<BogeyEntry> getBogeyEntryList() {
             int version = BogeyMenuHandlerClient.getFavorites().hashCode();
             if (cachedEntryList == null || cachedVersion != version) {
@@ -86,8 +84,6 @@ public class CategoryEntry {
             }
             return cachedEntryList;
         }
-
-        @Override
         void addToBogeyEntryList(BogeyEntry entry) {
             // no-op
         }

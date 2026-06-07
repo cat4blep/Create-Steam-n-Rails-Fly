@@ -18,34 +18,21 @@
 
 package com.railwayteam.railways.util.packet;
 
-import com.railwayteam.railways.content.shadow_realm.ShadowRealm;
-import com.railwayteam.railways.mixin.AccessorTrainPacket;
-import com.railwayteam.railways.mixin.AccessorTrainRelocator;
 import com.railwayteam.railways.multiloader.S2CPacket;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TrainPacket;
+import com.zurrtum.create.content.trains.entity.Train;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ShadowTrainRestorePacket(Train train) implements S2CPacket {
     public ShadowTrainRestorePacket(FriendlyByteBuf buf) {
-        this(((AccessorTrainPacket) new TrainPacket(buf)).railways$getTrain());
+        this((Train) null);
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
-        new TrainPacket(train, true).write(buffer);
+        // TODO: Rebuild shadow train restore sync on top of Create Fly's AddTrainPacket codec.
     }
-
-    @Override
     public void handle(Minecraft mc) {
         mc.execute(() -> {
-            if (mc.player == null) return;
-
-            AccessorTrainRelocator.railways$setRelocatingTrain(ShadowRealm.MARKER);
-            AccessorTrainRelocator.railways$setRelocatingOrigin(mc.player.position());
-            AccessorTrainRelocator.railways$setRelocatingEntityId(-1);
-            ShadowRealm.clientShadowRestoringTrain = train;
+            // TODO: Restore once TrainRelocator accessors are ported to Create Fly.
         });
     }
 }

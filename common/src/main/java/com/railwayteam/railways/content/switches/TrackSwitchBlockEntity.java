@@ -25,27 +25,27 @@ import com.railwayteam.railways.content.switches.TrackSwitchBlock.SwitchState;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.registry.CREdgePointTypes;
 import com.railwayteam.railways.registry.CRIcons;
-import com.simibubi.create.api.contraption.transformable.TransformableBlockEntity;
-import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.content.contraptions.StructureTransform;
-import com.simibubi.create.content.trains.graph.TrackEdge;
-import com.simibubi.create.content.trains.graph.TrackGraph;
-import com.simibubi.create.content.trains.graph.TrackGraphLocation;
-import com.simibubi.create.content.trains.graph.TrackNodeLocation;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
-import com.simibubi.create.foundation.gui.AllIcons;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
-import net.createmod.catnip.animation.LerpedFloat;
-import net.createmod.catnip.lang.Lang;
-import net.createmod.catnip.lang.LangBuilder;
-import net.createmod.catnip.math.AngleHelper;
-import net.createmod.catnip.math.VecHelper;
+import com.zurrtum.create.api.contraption.transformable.TransformableBlockEntity;
+import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
+import com.zurrtum.create.content.contraptions.StructureTransform;
+import com.zurrtum.create.content.trains.graph.TrackEdge;
+import com.zurrtum.create.content.trains.graph.TrackGraph;
+import com.zurrtum.create.content.trains.graph.TrackGraphLocation;
+import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.INamedIconOptions;
+import com.zurrtum.create.client.foundation.blockEntity.behaviour.scrollValue.ScrollOptionBehaviour;
+import com.zurrtum.create.client.foundation.gui.AllIcons;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import com.zurrtum.create.client.catnip.lang.LangBuilder;
+import com.zurrtum.create.catnip.math.AngleHelper;
+import com.zurrtum.create.catnip.math.VecHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -119,13 +119,9 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
             this.icon = icon;
             this.translationKey = "railways.switch.auto_mode." + Lang.asId(name());
         }
-
-        @Override
         public AllIcons getIcon() {
             return icon;
         }
-
-        @Override
         public String getTranslationKey() {
             return translationKey;
         }
@@ -141,47 +137,9 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
     public TrackSwitchBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         behaviours.add(edgePoint = new TrackTargetingBehaviour<>(this, CREdgePointTypes.SWITCH));
-        if (isAutomatic()) {
-            autoMode = new ScrollOptionBehaviour<>(AutoMode.class, Component.translatable("railways.switch.auto_mode"),
-                    this, new ValueBoxTransform() {
-                @Override
-                public Vec3 getLocalOffset(LevelAccessor levelAccessor, BlockPos blockPos, BlockState blockState) {
-                    Vec3 base = new Vec3(12 / 16.0, 4.5 / 16.0, 4 / 16.0);
-                    base = VecHelper.rotateCentered(base, AngleHelper.horizontalAngle(blockState.getValue(FACING)), Direction.Axis.Y);
-                    return base;
-                }
-
-                @Override
-                public void rotate(LevelAccessor levelAccessor, BlockPos blockPos, BlockState blockState, PoseStack ms) {
-                    TransformStack.of(ms)
-                            .rotateY(AngleHelper.horizontalAngle(blockState.getValue(FACING)) - 90)
-                            .rotateX(90);
-                }
-
-                @Override
-                public boolean testHit(LevelAccessor level, BlockPos pos, BlockState state, Vec3 localHit) {
-                    Vec3 offset = getLocalOffset(level, pos, state);
-                    if (offset == null)
-                        return false;
-                    return localHit.distanceTo(offset) < scale / 3;
-                }
-            });
-            autoMode.withCallback(ordinal -> {
-                AutoMode mode = AutoMode.values()[ordinal];
-                TrackSwitch sw = getSwitch();
-                if (sw != null)
-                    sw.setAutoTrainsSwitch(mode == AutoMode.AUTO);
-            });
-            autoMode.requiresWrench();
-            behaviours.add(autoMode);
-        }
     }
-
-    @Override
     public void transform(BlockEntity blockEntity, StructureTransform structureTransform) {
         edgePoint.transform(blockEntity, structureTransform);
     }
@@ -302,8 +260,6 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
     private static LangBuilder b() {
         return Lang.builder(Railways.MOD_ID);
     }
-
-    @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         b().translate("tooltip.switch.header").forGoggles(tooltip);
         b().translate("tooltip.switch.state")
@@ -318,8 +274,6 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
 
     private final int clientLazyTickRate = 10;
     private int clientLazyTickCounter = 0;
-
-    @Override
     public void tick() {
         super.tick();
 
@@ -328,7 +282,7 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
             if (sw != null) {
                 sw.setLocked(isLocked());
             }
-            if (level.isClientSide) {
+            if (level.isClientSide()) {
                 if (sw != null) {
                     sw.setSwitchState(state);
                     exitCount = sw.getExits().size();
@@ -371,7 +325,7 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
     /*protected void onStateChange() {
         if (level != null) {
             level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
-            if (level.isClientSide)
+            if (level.isClientSide())
                 clientLazyTick();
         }
     }*/
@@ -498,20 +452,14 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
             sw.setEdgesActive(loc.graph);
         } catch (ClassCastException ignored) {} // if we are targeting air, catch the crash
     }
-
-    @Override
     public void remove() {
         super.remove();
         restoreEdges();
     }
-
-    @Override
     public void destroy() {
         restoreEdges();
         super.destroy();
     }
-
-    @Override
     public void lazyTick() {
         super.lazyTick();
         TrackSwitch sw = getSwitch();
@@ -520,9 +468,8 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
         }
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         if (clientPacket)
             tag.putString("SwitchState", (state == null ? SwitchState.NORMAL : state).getSerializedName());
         tag.putInt("AnalogOutput", lastAnalogOutput);
@@ -533,19 +480,18 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
         tag.putByte("PreviousPowerState", previousPowerState);
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
         if (clientPacket) {
-            String switchState = tag.getString("SwitchState").toUpperCase(Locale.ROOT);
+            String switchState = tag.getString("SwitchState").orElse("").toUpperCase(Locale.ROOT);
             try {
                 state = SwitchState.valueOf(switchState);
             } catch (IllegalArgumentException e) {
                 Railways.LOGGER.error("Failed to read SwitchState", e);
             }
         }
-        lastAnalogOutput = tag.getInt("AnalogOutput");
-        byte previousPowerState = tag.getByte("PreviousPowerState");
+        lastAnalogOutput = tag.getInt("AnalogOutput").orElse(0);
+        byte previousPowerState = tag.getByte("PreviousPowerState").orElse((byte) 0);
         for (int i = 0; i < 6; i++) {
             previousPower[i] = (previousPowerState & (1 << i)) != 0;
         }
@@ -560,10 +506,8 @@ public class TrackSwitchBlockEntity extends SmartBlockEntity implements Transfor
             case REVERSE_RIGHT -> 2;
         };
     }
-
-    @Override
     protected AABB createRenderBoundingBox() {
-        return new AABB(worldPosition, edgePoint.getGlobalPosition())
-            .inflate(2);
+        return new AABB(Vec3.atLowerCornerOf(worldPosition), Vec3.atLowerCornerOf(edgePoint.getGlobalPosition()))
+                .inflate(2);
     }
 }

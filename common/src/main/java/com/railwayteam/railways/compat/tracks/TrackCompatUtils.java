@@ -19,28 +19,26 @@
 package com.railwayteam.railways.compat.tracks;
 
 import com.google.common.collect.ImmutableSet;
-import com.railwayteam.railways.content.custom_tracks.CustomTrackBlockStateGenerator;
-import com.railwayteam.railways.content.custom_tracks.gen_template.OutputPrefixer;
-import com.railwayteam.railways.content.custom_tracks.gen_template.TextureMaps;
-import com.railwayteam.railways.content.custom_tracks.gen_template.TrackGenTemplate;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.compat.Mods;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.mixin.AccessorTrackMaterialFactory;
 import com.railwayteam.railways.multiloader.CommonTags;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.AllTags;
-import com.simibubi.create.content.trains.track.*;
-import com.simibubi.create.foundation.data.CreateRegistrate;
-import com.simibubi.create.foundation.data.SharedProperties;
+import com.zurrtum.create.AllTags;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlockItem;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackMaterialFactory;
+import com.zurrtum.create.foundation.data.CreateRegistrate;
+import com.zurrtum.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
@@ -80,10 +78,10 @@ public abstract class TrackCompatUtils {
     }
 
     @ApiStatus.Internal
-    public static boolean mixinSkipLootLoading(ResourceLocation resourceLocation) {
-        if (resourceLocation.getNamespace().equals(Railways.MOD_ID)) {
+    public static boolean mixinSkipLootLoading(Identifier Identifier) {
+        if (Identifier.getNamespace().equals(Railways.MOD_ID)) {
             for (String compatMod : TRACK_COMPAT_MODS) {
-                if (resourceLocation.getPath().startsWith("blocks/track_"+compatMod)) {
+                if (Identifier.getPath().startsWith("blocks/track_"+compatMod)) {
                     return !GenericTrackCompat.get(compatMod).shouldRegisterMissing();
                 }
             }
@@ -94,19 +92,11 @@ public abstract class TrackCompatUtils {
     private static final CreateRegistrate REGISTRATE = Railways.registrate();
 
     public static BlockEntry<TrackBlock> makeTrack(TrackMaterial material) {
-        return makeTrack(material, CustomTrackBlockStateGenerator.create(
-            OutputPrefixer.COMPAT,
-            TrackGenTemplate.DEFAULT,
-            TextureMaps.STANDARD.map
-        )::generate);
+        return makeTrack(material, (ctx, prov) -> {});
     }
 
     public static BlockEntry<TrackBlock> makeTrack(TrackMaterial material, boolean hideInCreativeTabs) {
-        return makeTrack(material, CustomTrackBlockStateGenerator.create(
-            OutputPrefixer.COMPAT,
-            TrackGenTemplate.DEFAULT,
-            TextureMaps.STANDARD.map
-        )::generate, (t) -> {}, (p) -> p, hideInCreativeTabs);
+        return makeTrack(material, (ctx, prov) -> {}, (t) -> {}, (p) -> p, hideInCreativeTabs);
     }
 
     public static BlockEntry<TrackBlock> makeTrack(TrackMaterial material, NonNullBiConsumer<DataGenContext<Block, TrackBlock>, RegistrateBlockstateProvider> blockstateGen) {
@@ -126,50 +116,31 @@ public abstract class TrackCompatUtils {
     }
 
     public static BlockEntry<TrackBlock> makeTrack(TrackMaterial material, NonNullBiConsumer<DataGenContext<Block, TrackBlock>, RegistrateBlockstateProvider> blockstateGen, NonNullConsumer<? super TrackBlock> onRegister, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> collectProperties, boolean hideInCreativeTabs) {
-        String owningMod = material.id.getNamespace();
-        String name = "track_" + owningMod + "_" + material.resourceName();
+        String owningMod = CRTrackMaterials.id(material).getNamespace();
+        String name = "track_" + owningMod + "_" + material.getId().getPath();
 
         addOptionalTag(Railways.asResource(name), AllTags.AllBlockTags.TRACKS.tag,
                 CommonTags.RELOCATION_NOT_SUPPORTED.forge, CommonTags.RELOCATION_NOT_SUPPORTED.fabric,
                 BlockTags.MINEABLE_WITH_PICKAXE); // pickaxe-mineable tag is moved here as Registrate cannot add optional tag in BlockBuilder
-        if (material.trackType != CRTrackMaterials.CRTrackType.MONORAIL)
+        if (CRTrackMaterials.getType(material) != CRTrackMaterials.CRTrackType.MONORAIL)
             addOptionalTag(Railways.asResource(name), AllTags.AllBlockTags.GIRDABLE_TRACKS.tag);
 
-        return REGISTRATE.block(name, material::createBlock)
+        return REGISTRATE.block(name, p -> new TrackBlock(p, material))
             .initialProperties(SharedProperties::stone)
             .properties(p -> collectProperties.apply(p)
                 .mapColor(MapColor.METAL)
                 .strength(0.8F)
                 .sound(SoundType.METAL)
                 .noOcclusion())
-            .addLayer(() -> RenderType::cutoutMipped)
-            .blockstate(blockstateGen)
-            .lang(material.langName + " Train Track")
+            .lang(CRTrackMaterials.langName(material) + " Train Track")
             .onRegister(onRegister)
-            .onRegister(CreateRegistrate.blockModel(() -> TrackModel::new))
-            .onRegister(CRTrackMaterials::addToBlockEntityType)
             .item(TrackBlockItem::new)
             .removeTab(hideInCreativeTabs ? null : CreativeModeTabs.SEARCH)
-            .model((c, p) -> p.generated(c, new ResourceLocation(owningMod, "item/track/track_"+material.resourceName())))
             .build()
             .register();
     }
 
     public static TrackMaterial buildCompatModels(GenericTrackCompat trackCompat, TrackMaterialFactory factory) {
-        String namespace = ((AccessorTrackMaterialFactory)factory).getId().getNamespace();
-        String path = ((AccessorTrackMaterialFactory)factory).getId().getPath();
-        String prefix = "block/track/compat/" + namespace + "/" + path + "/";
-
-        TrackMaterialFactory materialFactory = factory.customModels(
-                () -> () -> PartialModel.of(Railways.asResource(prefix + "tie")),
-                () -> () -> PartialModel.of(Railways.asResource(prefix + "segment_left")),
-                () -> () -> PartialModel.of(Railways.asResource(prefix + "segment_right"))
-        );
-
-        String customLang = trackCompat.getLang(path);
-        if (!path.equals(customLang))
-            materialFactory.lang(customLang);
-
-        return materialFactory.build();
+        return factory.build();
     }
 }

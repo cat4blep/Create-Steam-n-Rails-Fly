@@ -41,14 +41,10 @@ public class TrackCouplerClientInfoPacket implements S2CPacket {
         blockPos = buf.readBlockPos();
         info = new TrackCouplerBlockEntity.ClientInfo(buf.readNbt());
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(blockPos);
         buffer.writeNbt(info.write());
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public void handle(Minecraft mc) {
         Level level = mc.level;

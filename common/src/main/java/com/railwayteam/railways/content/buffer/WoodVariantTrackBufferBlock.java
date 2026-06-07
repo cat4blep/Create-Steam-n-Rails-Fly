@@ -38,19 +38,14 @@ public abstract class WoodVariantTrackBufferBlock extends TrackBufferBlock<WoodV
     protected WoodVariantTrackBufferBlock(Properties pProperties) {
         super(pProperties);
     }
-
-    @Override
     public Class<WoodVariantTrackBufferBlockEntity> getBlockEntityClass() {
         return WoodVariantTrackBufferBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends WoodVariantTrackBufferBlockEntity> getBlockEntityType() {
         return CRBlockEntities.TRACK_BUFFER_WOOD_VARIANT.get();
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
                                  BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
@@ -58,6 +53,6 @@ public abstract class WoodVariantTrackBufferBlock extends TrackBufferBlock<WoodV
         InteractionResult result = onBlockEntityUse(pLevel, pPos, be -> be.applyMaterialIfValid(pPlayer.getItemInHand(pHand)));
         if (result.consumesAction())
             return result;
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return InteractionResult.PASS;
     }
 }

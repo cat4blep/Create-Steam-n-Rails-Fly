@@ -22,7 +22,7 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.custom_bogeys.special.monobogey.MonoBogeyBlock;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -45,18 +45,12 @@ public class MonoTrackBufferBlock extends WoodVariantTrackBufferBlock {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(STYLE, Style.STANDARD).setValue(UPSIDE_DOWN, false));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(STYLE, UPSIDE_DOWN));
     }
-
-    @Override
     protected BlockState getCycledStyle(BlockState originalState, Direction targetedFace) {
         return originalState.cycle(STYLE);
     }
-
-    @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
         if (state == null) return null;
@@ -76,11 +70,9 @@ public class MonoTrackBufferBlock extends WoodVariantTrackBufferBlock {
             this.model = model;
         }
 
-        public ResourceLocation getModel() {
+        public Identifier getModel() {
             return Railways.asResource("block/buffer/" + model);
         }
-
-        @Override
         public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }

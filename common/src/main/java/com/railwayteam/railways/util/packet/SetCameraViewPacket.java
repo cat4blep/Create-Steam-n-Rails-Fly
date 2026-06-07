@@ -35,12 +35,9 @@ public class SetCameraViewPacket implements S2CPacket {
     public SetCameraViewPacket(FriendlyByteBuf buf) {
         id = buf.readVarInt();
     }
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeVarInt(id);
     }
-
-    @Override
     public void handle(Minecraft mc) {
         Entity entity = mc.level.getEntity(id);
         boolean isCamera = entity instanceof ConductorEntity;

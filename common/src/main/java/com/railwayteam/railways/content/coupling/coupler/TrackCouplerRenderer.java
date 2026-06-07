@@ -21,11 +21,11 @@ package com.railwayteam.railways.content.coupling.coupler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.util.CustomTrackOverlayRendering;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour;
-import com.simibubi.create.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.TransformStack;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour;
+import com.railwayteam.railways.util.compat.SmartBlockEntityRenderer;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context;
 import net.minecraft.core.BlockPos;
@@ -52,8 +52,6 @@ public class TrackCouplerRenderer extends SmartBlockEntityRenderer<TrackCouplerB
         }
         return null;
     }
-
-    @Override
     protected void renderSafe(TrackCouplerBlockEntity te, float partialTicks, PoseStack ms, MultiBufferSource buffer,
                               int light, int overlay) {
         super.renderSafe(te, partialTicks, ms, buffer, light, overlay);

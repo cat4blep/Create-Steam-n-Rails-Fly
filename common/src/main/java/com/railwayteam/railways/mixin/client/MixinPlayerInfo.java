@@ -24,7 +24,7 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.annotation.mixin.DevEnvMixin;
 import com.railwayteam.railways.util.DevCapeUtils;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,16 +41,16 @@ import java.util.Objects;
 @Mixin(PlayerInfo.class)
 public class MixinPlayerInfo {
     @Shadow @Final private GameProfile profile;
-    @Shadow @Final private Map<MinecraftProfileTexture.Type, ResourceLocation> textureLocations;
+    @Shadow @Final private Map<MinecraftProfileTexture.Type, Identifier> textureLocations;
     @Shadow private @Nullable String skinModel;
 
     @Unique private boolean railways$texturesLoaded;
-    @Unique private static final ResourceLocation DEV_CAPE = Railways.asResource("textures/misc/dev_cape.png");
+    @Unique private static final Identifier DEV_CAPE = Railways.asResource("textures/misc/dev_cape.png");
 
     // Replaces skin inside the dev env with the conductor skin
     @DevEnvMixin
     @Inject(method = "getSkinLocation", at = @At("HEAD"))
-    private void registerSkinTextures(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void registerSkinTextures(CallbackInfoReturnable<Identifier> cir) {
         this.textureLocations.put(
                 MinecraftProfileTexture.Type.SKIN,
                 Railways.asResource("textures/misc/devenv_skin.png")
@@ -58,7 +58,7 @@ public class MixinPlayerInfo {
     }
 
     @Inject(method = "getCapeLocation", at = @At("HEAD"))
-    private void registerCapeTextures(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void registerCapeTextures(CallbackInfoReturnable<Identifier> cir) {
         if (!railways$texturesLoaded && DevCapeUtils.INSTANCE.useDevCape(profile.getId())) {
             railways$texturesLoaded = true;
             this.textureLocations.put(MinecraftProfileTexture.Type.CAPE, DEV_CAPE);
@@ -66,7 +66,7 @@ public class MixinPlayerInfo {
     }
 
     @Inject(method = "getCapeLocation", at = @At("RETURN"), cancellable = true)
-    private void skipCapeIfNeeded(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void skipCapeIfNeeded(CallbackInfoReturnable<Identifier> cir) {
         if (Objects.equals(DEV_CAPE, cir.getReturnValue()) && !DevCapeUtils.INSTANCE.useDevCape(profile.getId())) {
             cir.setReturnValue(null);
         }

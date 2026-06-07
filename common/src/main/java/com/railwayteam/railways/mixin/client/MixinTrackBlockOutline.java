@@ -22,11 +22,12 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.railwayteam.railways.content.custom_tracks.generic_crossing.GenericCrossingBlock;
 import com.railwayteam.railways.content.custom_tracks.monorail.CustomTrackBlockOutline;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.trains.track.BezierConnection;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlockOutline;
-import com.simibubi.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllTrackMaterials;
+import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.client.content.trains.track.TrackBlockOutline;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -88,7 +89,7 @@ public abstract class MixinTrackBlockOutline {
             )
     )
     private static BlockState railways$grabMonorailState(BlockState state) {
-        railways$walkingMaterial = state.getBlock() instanceof TrackBlock trackBlock ? trackBlock.getMaterial() : TrackMaterial.ANDESITE;
+        railways$walkingMaterial = state.getBlock() instanceof TrackBlock trackBlock ? trackBlock.getMaterial() : AllTrackMaterials.ANDESITE;
         return state;
     }
 

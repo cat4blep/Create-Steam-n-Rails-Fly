@@ -23,7 +23,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.railwayteam.railways.registry.CRParticleTypes;
-import com.simibubi.create.foundation.particle.ICustomParticleDataWithSprite;
+import com.zurrtum.create.foundation.particle.ICustomParticleDataWithSprite;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -107,34 +107,23 @@ public abstract class ChimneyPushParticleData<T extends ChimneyPushParticleData<
 	}
 
 	protected abstract @NotNull CRParticleTypes getParticleType();
-
-	@Override
 	public @NotNull ParticleType<?> getType() {
 		return getParticleType().get();
 	}
-
-	@Override
 	public void writeToNetwork(FriendlyByteBuf buffer) {
 		buffer.writeBoolean(leadOnly);
 		buffer.writeFloat(red);
 		buffer.writeFloat(green);
 		buffer.writeFloat(blue);
 	}
-
-	@Override
 	public @NotNull String writeToString() {
 		return String.format(Locale.ROOT, "%s %b %f %f %f", getParticleType().parameter(), leadOnly, red, green, blue);
 	}
 
 	@SuppressWarnings("deprecation")
-	@Override
 	public abstract Deserializer<T> getDeserializer();
-
-	@Override
 	public abstract Codec<T> getCodec(ParticleType<T> type);
-
-	@Override
-	public abstract ParticleEngine.SpriteParticleRegistration<T> getMetaFactory();
+	public abstract Object getMetaFactory();
 
 	public abstract float getQuadSize();
 
@@ -182,29 +171,20 @@ public abstract class ChimneyPushParticleData<T extends ChimneyPushParticleData<
 		public Small(boolean leadOnly, float red, float green, float blue) {
 			super(leadOnly, red, green, blue);
 		}
-
-		@Override
 		protected @NotNull CRParticleTypes getParticleType() {
 			return CRParticleTypes.CHIMNEYPUSH_SMALL;
 		}
 
 		@SuppressWarnings("deprecation")
-		@Override
 		public Deserializer<Small> getDeserializer() {
 			return DESERIALIZER;
 		}
-
-		@Override
 		public Codec<Small> getCodec(ParticleType<Small> type) {
 			return CODEC;
 		}
-
-		@Override
-		public ParticleEngine.SpriteParticleRegistration<Small> getMetaFactory() {
-			return ChimneyPushParticle.Factory::new;
+		public Object getMetaFactory() {
+			return null;
 		}
-
-		@Override
 		public float getQuadSize() {
 			return 0.5f;
 		}
@@ -233,29 +213,20 @@ public abstract class ChimneyPushParticleData<T extends ChimneyPushParticleData<
 		public Medium(boolean leadOnly, float red, float green, float blue) {
 			super(leadOnly, red, green, blue);
 		}
-
-		@Override
 		protected @NotNull CRParticleTypes getParticleType() {
 			return CRParticleTypes.CHIMNEYPUSH_MEDIUM;
 		}
 
 		@SuppressWarnings("deprecation")
-		@Override
 		public Deserializer<Medium> getDeserializer() {
 			return DESERIALIZER;
 		}
-
-		@Override
 		public Codec<Medium> getCodec(ParticleType<Medium> type) {
 			return CODEC;
 		}
-
-		@Override
-		public ParticleEngine.SpriteParticleRegistration<Medium> getMetaFactory() {
-			return ChimneyPushParticle.Factory::new;
+		public Object getMetaFactory() {
+			return null;
 		}
-
-		@Override
 		public float getQuadSize() {
 			return 1.25f;
 		}

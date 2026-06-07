@@ -21,18 +21,18 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.wide;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ScrollHandle;
-import com.simibubi.create.AllPartialModels;
-import com.simibubi.create.AllSpriteShifts;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.data.Pair;
-import net.createmod.catnip.math.AngleHelper;
+import com.zurrtum.create.client.AllPartialModels;
+import com.zurrtum.create.client.AllSpriteShifts;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.data.Pair;
+import com.zurrtum.create.catnip.math.AngleHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 
 import static com.railwayteam.railways.registry.CRBlockPartials.*;
-import static com.simibubi.create.content.trains.bogey.StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE;
+import static com.zurrtum.create.client.content.trains.bogey.StandardBogeyRenderer.Large.BELT_RADIUS_IN_UV_SPACE;
 
 // fixme animated belts
 public class WideScotchYokeBogeyDisplay implements BogeyDisplay {
@@ -52,8 +52,6 @@ public class WideScotchYokeBogeyDisplay implements BogeyDisplay {
         pistons = prov.create(WIDE_SCOTCH_PISTONS);
         prov.create(AllPartialModels.SHAFT, primaryShafts, secondaryShafts);
     }
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle) {
         for (int i : Iterate.zeroAndOne) {
             primaryShafts[i]

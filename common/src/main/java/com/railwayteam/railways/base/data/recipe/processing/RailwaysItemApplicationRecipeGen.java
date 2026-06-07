@@ -22,15 +22,15 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.base.data.compat.emi.EmiRecipeDefaultsGen;
 import com.railwayteam.railways.base.data.recipe.EnumRecipeList.PalettesRecipeList;
 import com.railwayteam.railways.registry.CRPalettes.Styles;
-import com.simibubi.create.AllRecipeTypes;
+import com.zurrtum.create.AllRecipeTypes;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class RailwaysItemApplicationRecipeGen extends RailwaysProcessingRecipeGen {
     @SuppressWarnings("unused")
     PalettesRecipeList FLYWHEELS = new PalettesRecipeList(color -> createWithDeferredId(
         () -> {
-            ResourceLocation loc = Railways.asResource("palettes/flywheels/" + color.getSerializedName());
+            Identifier loc = Railways.asResource("palettes/flywheels/" + color.getSerializedName());
             EmiRecipeDefaultsGen.DEFAULT_RECIPES.add(Railways.asResource(getRecipeType().getId().getPath() + "/" + loc.getPath()));
             return loc;
         },
@@ -43,8 +43,6 @@ public class RailwaysItemApplicationRecipeGen extends RailwaysProcessingRecipeGe
     public RailwaysItemApplicationRecipeGen(PackOutput generator) {
         super(generator);
     }
-
-    @Override
     protected AllRecipeTypes getRecipeType() {
         return AllRecipeTypes.ITEM_APPLICATION;
     }

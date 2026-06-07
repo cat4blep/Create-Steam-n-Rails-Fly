@@ -31,8 +31,6 @@ public class StreamlinedSmokeStackFacingFix extends AxisToFacingFix {
     public StreamlinedSmokeStackFacingFix(Schema outputSchema, String name) {
         super(outputSchema, name);
     }
-
-    @Override
     protected boolean applyToBlockState(String blockId) {
         return blockId.equals("railways:smokestack_streamlined");
     }

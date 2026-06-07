@@ -35,30 +35,18 @@ public class NoOpDataFixesInternals extends DataFixesInternals {
     public NoOpDataFixesInternals() {
         schema = new EmptySchema(0);
     }
-
-    @Override
     public void registerFixer(@Range(from = 0, to = Integer.MAX_VALUE) int currentVersion, @NotNull DataFixer dataFixer) {}
-
-    @Override
     public @Nullable DataFixerEntry getFixerEntry() {
         return null;
     }
-
-    @Override
     public @NotNull Schema createBaseSchema(@NotNull BiFunction<Integer, Schema, Schema> factory) {
         return schema;
     }
-
-    @Override
     public @NotNull <T> Dynamic<T> updateWithAllFixers(@NotNull DataFixTypes dataFixTypes, @NotNull Dynamic<T> dynamic) {
         return dynamic;
     }
-
-    @Override
     public @NotNull <T> Dynamic<T> updateWithAllFixers(@NotNull TypeReference rootType, @NotNull Dynamic<T> dynamic) {
         return dynamic;
     }
-
-    @Override
     public void addModDataVersions(@NotNull CompoundTag compound) {}
 }

@@ -32,16 +32,11 @@ public class FirstSchema extends Schema {
     }
 
     // all of these methods refer to this.parent without checking if its null
-    @Override
     public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes,
                               Map<String, Supplier<TypeTemplate>> blockEntityTypes) {}
-
-    @Override
     public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {
         return Map.of();
     }
-
-    @Override
     public Map<String, Supplier<TypeTemplate>> registerBlockEntities(Schema schema) {
         return Map.of();
     }

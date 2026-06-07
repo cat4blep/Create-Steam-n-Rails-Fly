@@ -20,12 +20,12 @@ package com.railwayteam.railways.content.smokestack.block.diesel;
 
 import com.railwayteam.railways.content.smokestack.ISpeedNotifiable;
 import com.railwayteam.railways.content.smokestack.block.SmokeStackBlock;
-import com.simibubi.create.content.contraptions.ContraptionWorld;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.virtualWorld.VirtualRenderWorld;
-import net.createmod.catnip.animation.AnimationTickHolder;
-import net.createmod.catnip.animation.LerpedFloat;
+import com.zurrtum.create.content.contraptions.ContraptionWorld;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.foundation.virtualWorld.VirtualRenderWorld;
+import com.zurrtum.create.client.catnip.animation.AnimationTickHolder;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,9 +42,7 @@ public class DieselSmokeStackBlockEntity extends SmartBlockEntity implements ISp
     public DieselSmokeStackBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {}
 
     public double getRpm(float partialTicks) {
         boolean enabled = getBlockState().getValue(SmokeStackBlock.ENABLED);
@@ -57,8 +55,6 @@ public class DieselSmokeStackBlockEntity extends SmartBlockEntity implements ISp
             speed = notifiedSpeed;
         return speed * rpmLimiter.getValue(partialTicks);
     }
-
-    @Override
     public void tick() {
         super.tick();
         if (rpmLimiter != null)
@@ -78,8 +74,6 @@ public class DieselSmokeStackBlockEntity extends SmartBlockEntity implements ISp
             fanRotation += 360;
         return fanRotation;
     }
-
-    @Override
     public void notifySpeed(double speed) {
         this.notifiedSpeed = 112 / (1 + Math.pow(2, -16 * speed + 10)) + 48;
     }

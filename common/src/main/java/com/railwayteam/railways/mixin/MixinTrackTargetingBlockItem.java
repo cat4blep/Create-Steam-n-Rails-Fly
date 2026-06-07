@@ -20,12 +20,12 @@ package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.registry.CREdgePointTypes;
-import com.simibubi.create.content.trains.graph.EdgePointType;
-import com.simibubi.create.content.trains.graph.TrackGraphLocation;
-import com.simibubi.create.content.trains.track.BezierTrackPointLocation;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.content.trains.track.TrackTargetingBlockItem;
+import com.zurrtum.create.content.trains.graph.EdgePointType;
+import com.zurrtum.create.content.trains.graph.TrackGraphLocation;
+import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;

@@ -39,8 +39,6 @@ public class FusedSupplier<T> implements Supplier<T> {
 
         this.value = value;
     }
-
-    @Override
     @SuppressWarnings("unchecked")
     public T get() {
         if (supplier != null) {

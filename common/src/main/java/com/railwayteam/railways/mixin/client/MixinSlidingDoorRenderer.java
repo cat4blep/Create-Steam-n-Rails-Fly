@@ -23,7 +23,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.railwayteam.railways.content.palettes.doors.PalettesSlidingDoorBlock;
 import com.railwayteam.railways.registry.CRBlockPartials;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorRenderer;
+import com.zurrtum.create.client.content.decoration.slidingDoor.SlidingDoorRenderer;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

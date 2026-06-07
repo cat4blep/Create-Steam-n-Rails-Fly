@@ -19,8 +19,8 @@
 package com.railwayteam.railways.mixin;
 
 import com.railwayteam.railways.content.extended_sliding_doors.SlidingDoorMode;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlock;
-import com.simibubi.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
+import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

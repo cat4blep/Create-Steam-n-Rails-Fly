@@ -21,26 +21,26 @@ package com.railwayteam.railways.content.custom_tracks.generic_crossing;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.AllShapes;
-import com.simibubi.create.api.schematic.requirement.SpecialBlockItemRequirement;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.schematics.requirement.ItemRequirement;
-import com.simibubi.create.content.schematics.requirement.ItemRequirement.ItemUseType;
-import com.simibubi.create.content.trains.graph.TrackNodeLocation;
-import com.simibubi.create.content.trains.track.BezierTrackPointLocation;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackPropagator;
-import com.simibubi.create.content.trains.track.TrackShape;
-import com.simibubi.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.block.ProperWaterloggedBlock;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.math.VecHelper;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.AllShapes;
+import com.zurrtum.create.api.schematic.requirement.SpecialBlockItemRequirement;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
+import com.zurrtum.create.content.schematics.requirement.ItemRequirement.ItemUseType;
+import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
+import com.zurrtum.create.infrastructure.component.BezierTrackPointLocation;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import com.zurrtum.create.content.trains.track.TrackBlock;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackPropagator;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.content.trains.track.TrackTargetingBehaviour.RenderedTrackOverlayType;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.math.VecHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -79,14 +79,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.simibubi.create.AllShapes.TRACK_ASC;
-import static com.simibubi.create.AllShapes.TRACK_CROSS;
-import static com.simibubi.create.AllShapes.TRACK_CROSS_DIAG;
-import static com.simibubi.create.AllShapes.TRACK_CROSS_DIAG_ORTHO;
-import static com.simibubi.create.AllShapes.TRACK_CROSS_ORTHO_DIAG;
-import static com.simibubi.create.AllShapes.TRACK_DIAG;
-import static com.simibubi.create.AllShapes.TRACK_ORTHO;
-import static com.simibubi.create.AllShapes.TRACK_ORTHO_LONG;
+import static com.zurrtum.create.AllShapes.TRACK_ASC;
+import static com.zurrtum.create.AllShapes.TRACK_CROSS;
+import static com.zurrtum.create.AllShapes.TRACK_CROSS_DIAG;
+import static com.zurrtum.create.AllShapes.TRACK_CROSS_DIAG_ORTHO;
+import static com.zurrtum.create.AllShapes.TRACK_CROSS_ORTHO_DIAG;
+import static com.zurrtum.create.AllShapes.TRACK_DIAG;
+import static com.zurrtum.create.AllShapes.TRACK_ORTHO;
+import static com.zurrtum.create.AllShapes.TRACK_ORTHO_LONG;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -98,50 +98,37 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
         super(properties);
         registerDefaultState(defaultBlockState().setValue(SHAPE, TrackShape.CR_O).setValue(WATERLOGGED, false));
     }
-
-    @Override
     protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         builder.add(SHAPE, WATERLOGGED);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public FluidState getFluidState(BlockState state) {
         return fluidState(state);
     }
 
     @Nullable
-    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return withWater(super.getStateForPlacement(context), context);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, state, currentPos);
+        updateWater(level, level, state, currentPos);
         return state;
     }
-
-    @Override
     public Vec3 getUpNormal(BlockGetter world, BlockPos pos, BlockState state) {
         return state.getValue(SHAPE).getNormal();
     }
-
-    @Override
     public List<Vec3> getTrackAxes(BlockGetter world, BlockPos pos, BlockState state) {
         return state.getValue(SHAPE).getAxes();
     }
-
-    @Override
     public Vec3 getCurveStart(BlockGetter world, BlockPos pos, BlockState state, Vec3 axis) {
         boolean vertical = axis.y != 0;
         return VecHelper.getCenterOf(pos)
             .add(0, (vertical ? 0 : -.5f), 0)
             .add(axis.scale(.5));
     }
-
-    @Override
     public BlockState getBogeyAnchor(BlockGetter world, BlockPos pos, BlockState state) {
         return Blocks.AIR.defaultBlockState();
     }
@@ -150,53 +137,37 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
     public boolean trackEquals(BlockState state1, BlockState state2) {
         return false;
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public <Self extends Affine<Self>> PartialModel prepareTrackOverlay(Affine<Self> affine, BlockGetter blockGetter, BlockPos blockPos, BlockState blockState, BezierTrackPointLocation bezierTrackPointLocation, AxisDirection axisDirection, RenderedTrackOverlayType renderedTrackOverlayType) {
-        return AllBlocks.TRACK.get().prepareTrackOverlay(affine, blockGetter, blockPos, blockState, bezierTrackPointLocation, axisDirection, renderedTrackOverlayType);
+        return null;
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public PartialModel prepareAssemblyOverlay(BlockGetter world, BlockPos pos, BlockState state, Direction direction, PoseStack ms) {
-        return AllBlocks.TRACK.get().prepareAssemblyOverlay(world, pos, state, direction, ms);
+        return null;
     }
-
-    @Override
     public TrackMaterial getMaterial() {
         return CRTrackMaterials.PHANTOM;
     }
-
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         return InteractionResult.SUCCESS;
     }
-
-    @Override
     public ItemRequirement getRequiredItems(BlockState state, BlockEntity be) {
         List<ItemStack> stacks = new ArrayList<>();
         return new ItemRequirement(ItemUseType.CONSUME, stacks);
     }
-
-    @Override
     public Class<GenericCrossingBlockEntity> getBlockEntityClass() {
         return GenericCrossingBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends GenericCrossingBlockEntity> getBlockEntityType() {
         return CRBlockEntities.GENERIC_CROSSING.get();
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getShape(BlockState state, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_) {
         return getFullShape(state);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getInteractionShape(BlockState state, BlockGetter pLevel, BlockPos pPos) {
         return getFullShape(state);
     }
@@ -246,7 +217,6 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public VoxelShape getCollisionShape(BlockState pState, BlockGetter pLevel, BlockPos pPos,
                                         CollisionContext pContext) {
         return switch (pState.getValue(SHAPE)) {
@@ -256,24 +226,20 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource p_60465_) {
         TrackPropagator.onRailAdded(level, pos, state);
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         if (pOldState.getBlock() == this)
             return;
-        if (pLevel.isClientSide)
+        if (pLevel.isClientSide())
             return;
         LevelTickAccess<Block> blockTicks = pLevel.getBlockTicks();
         if (!blockTicks.hasScheduledTick(pPos, this))
             pLevel.scheduleTick(pPos, this, 1);
     }
-
-    @Override
     public Collection<TrackNodeLocation.DiscoveredLocation> getConnected(BlockGetter worldIn, BlockPos pos, BlockState state,
                                                                          boolean linear, TrackNodeLocation connectedTo) {
         Collection<TrackNodeLocation.DiscoveredLocation> list;
@@ -297,24 +263,21 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
 
         return list;
     }
-
-    @Override
-    public void playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
-        super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
+    public BlockState playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
+        BlockState destroyedState = super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
         if (pLevel.isClientSide())
-            return;
+            return destroyedState;
         if (!pPlayer.isCreative())
-            return;
+            return destroyedState;
         withBlockEntityDo(pLevel, pPos, be -> {
             be.cancelDrops = true;
         });
+        return destroyedState;
     }
-
-    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         Player player = context.getPlayer();
         Level level = context.getLevel();
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
             if (blockEntity instanceof GenericCrossingBlockEntity crossingBE) {
                 crossingBE.cancelDrops = true;
@@ -331,7 +294,6 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
     }
 
     @SuppressWarnings("deprecation")
-    @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -343,7 +305,7 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
             }
 
             TrackPropagator.onRailRemoved(level, pos, state);
-            super.onRemove(state, level, pos, newState, isMoving);
+            level.removeBlockEntity(pos);
         }
     }
 }

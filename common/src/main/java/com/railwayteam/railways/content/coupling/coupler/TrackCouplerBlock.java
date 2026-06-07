@@ -19,8 +19,8 @@
 package com.railwayteam.railways.content.coupling.coupler;
 
 import com.railwayteam.railways.registry.CRBlockEntities;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.foundation.block.IBE;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -54,14 +54,11 @@ public abstract class TrackCouplerBlock extends Block implements IBE<TrackCouple
 	public static TrackCouplerBlock create(Properties properties) {
 		throw new AssertionError();
 	}
-
-	@Override
 	protected void createBlockStateDefinition(Builder<Block, BlockState> pBuilder) {
 		super.createBlockStateDefinition(pBuilder.add(POWERED).add(MODE));
 	}
 
 	@Nullable
-	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext pContext) {
 		return this.defaultBlockState().setValue(POWERED, pContext.getLevel().hasNeighborSignal(pContext.getClickedPos()));
 	}
@@ -73,7 +70,6 @@ public abstract class TrackCouplerBlock extends Block implements IBE<TrackCouple
 	 */
 	@SuppressWarnings("deprecation")
 	@Deprecated
-	@Override
 	public boolean hasAnalogOutputSignal(@NotNull BlockState state) {
 		return true;
 	}
@@ -85,32 +81,24 @@ public abstract class TrackCouplerBlock extends Block implements IBE<TrackCouple
 	 */
 	@SuppressWarnings("deprecation")
 	@Deprecated
-    @Override
 	public int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos) {
 		if (level.getBlockEntity(pos) instanceof TrackCouplerBlockEntity te)
 			return te.getTargetAnalogOutput();
 		return 0;
 	}
-
-	@Override
 	public Class<TrackCouplerBlockEntity> getBlockEntityClass() {
 		return TrackCouplerBlockEntity.class;
 	}
-
-	@Override
 	public BlockEntityType<? extends TrackCouplerBlockEntity> getBlockEntityType() {
 		return CRBlockEntities.TRACK_COUPLER.get();
 	}
-
-	@Override
 	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		IBE.onRemove(state, worldIn, pos, newState);
+		if (!state.is(newState.getBlock()))
+			worldIn.removeBlockEntity(pos);
 	}
-
-	@Override
 	public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pBlock, BlockPos pFromPos,
 								boolean pIsMoving) {
-		if (pLevel.isClientSide)
+		if (pLevel.isClientSide())
 			return;
 		boolean powered = pState.getValue(POWERED);
 		if (powered == pLevel.hasNeighborSignal(pPos))
@@ -121,17 +109,13 @@ public abstract class TrackCouplerBlock extends Block implements IBE<TrackCouple
 			pLevel.setBlock(pPos, pState.cycle(POWERED), 2);
 		}
 	}
-
-	@Override
 	public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRand) {
 		if (pState.getValue(POWERED) && !pLevel.hasNeighborSignal(pPos))
 			pLevel.setBlock(pPos, pState.cycle(POWERED), 2);
 	}
-
-	@Override
 	public InteractionResult onWrenched(BlockState state, UseOnContext context) {
 		Level level = context.getLevel();
-		if (level.isClientSide)
+		if (level.isClientSide())
 			return InteractionResult.SUCCESS;
 		BlockPos pos = context.getClickedPos();
 		BlockState newState = state.cycle(MODE);

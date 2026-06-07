@@ -18,13 +18,13 @@
 
 package com.railwayteam.railways.mixin;
 
-import com.simibubi.create.content.trains.track.TrackMaterialFactory;
-import net.minecraft.resources.ResourceLocation;
+import com.zurrtum.create.content.trains.track.TrackMaterialFactory;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(value = TrackMaterialFactory.class, remap = false)
 public interface AccessorTrackMaterialFactory {
     @Accessor
-    ResourceLocation getId();
+    Identifier getId();
 }

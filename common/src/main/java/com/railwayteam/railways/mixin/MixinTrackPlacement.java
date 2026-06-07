@@ -28,12 +28,12 @@ import com.railwayteam.railways.content.custom_tracks.generic_crossing.TrackShap
 import com.railwayteam.railways.content.custom_tracks.generic_crossing.TrackShapeLookup.GenericCrossingData;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRTrackMaterials;
-import com.simibubi.create.content.trains.track.ITrackBlock;
-import com.simibubi.create.content.trains.track.TrackMaterial;
-import com.simibubi.create.content.trains.track.TrackPlacement;
-import com.simibubi.create.content.trains.track.TrackShape;
-import net.createmod.catnip.data.Iterate;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.content.trains.track.ITrackBlock;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
+import com.zurrtum.create.content.trains.track.TrackPlacement;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.catnip.data.Iterate;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +45,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static com.simibubi.create.content.trains.track.TrackBlock.SHAPE;
+import static com.zurrtum.create.content.trains.track.TrackBlock.SHAPE;
 
 @Mixin(value = TrackPlacement.class)
 public class MixinTrackPlacement {
@@ -56,11 +56,11 @@ public class MixinTrackPlacement {
     })
     private static double modifiedCurvesForGauges(double value, Level level, Player player, BlockPos pos2, BlockState state2, ItemStack stack) {
         // Wide Gauge
-        if (TrackMaterial.fromItem(stack.getItem()).trackType == CRTrackMaterials.CRTrackType.WIDE_GAUGE)
+        if (CRTrackMaterials.getType(TrackMaterial.fromItem(stack.getItem())) == CRTrackMaterials.CRTrackType.WIDE_GAUGE)
             return value * 2;
         // Narrow Gauge and Phantom Tracks
-        else if (TrackMaterial.fromItem(stack.getItem()).trackType == CRTrackMaterials.CRTrackType.NARROW_GAUGE ||
-                TrackMaterial.fromItem(stack.getItem()).trackType == CRTrackMaterials.CRTrackType.UNIVERSAL)
+        else if (CRTrackMaterials.getType(TrackMaterial.fromItem(stack.getItem())) == CRTrackMaterials.CRTrackType.NARROW_GAUGE ||
+                CRTrackMaterials.getType(TrackMaterial.fromItem(stack.getItem())) == CRTrackMaterials.CRTrackType.UNIVERSAL)
             return value * 0.5;
 
         return value;

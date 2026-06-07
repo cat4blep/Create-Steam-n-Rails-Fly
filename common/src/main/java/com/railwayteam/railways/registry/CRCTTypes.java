@@ -19,16 +19,15 @@
 package com.railwayteam.railways.registry;
 
 import com.railwayteam.railways.Railways;
-import com.simibubi.create.foundation.block.connected.CTType;
-import com.simibubi.create.foundation.block.connected.CTTypeRegistry;
-import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour;
-import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour.ContextRequirement;
-import net.createmod.catnip.lang.Lang;
-import net.minecraft.resources.ResourceLocation;
+import com.zurrtum.create.client.foundation.block.connected.CTType;
+import com.zurrtum.create.client.foundation.block.connected.CTTypeRegistry;
+import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
+import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour.ContextRequirement;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import net.minecraft.resources.Identifier;
 
 public enum CRCTTypes implements CTType {
     VERTICAL_PINKMACHINE(2, ContextRequirement.builder().vertical().build()) {
-        @Override
         public int getTextureIndex(ConnectedTextureBehaviour.CTContext context) {
             return !context.up && !context.down
                 ? 0 // single
@@ -41,7 +40,7 @@ public enum CRCTTypes implements CTType {
     }
     ;
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final int sheetSize;
     private final ContextRequirement contextRequirement;
 
@@ -52,18 +51,12 @@ public enum CRCTTypes implements CTType {
 
         CTTypeRegistry.register(this);
     }
-
-    @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return id;
     }
-
-    @Override
     public int getSheetSize() {
         return sheetSize;
     }
-
-    @Override
     public ContextRequirement getContextRequirement() {
         return contextRequirement;
     }

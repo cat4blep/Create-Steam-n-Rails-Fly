@@ -22,12 +22,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplayHolder;
-import com.simibubi.create.content.trains.bogey.BogeyRenderer;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.render.CachedBuffers;
-import net.createmod.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.content.trains.bogey.BogeyRenderer;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.client.catnip.render.CachedBuffers;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
@@ -50,8 +50,6 @@ public class UnifiedBogeyRenderer implements BogeyRenderer, BogeyDisplayHolder {
         this.renderers = Couple.createWithContext(inContraption -> Renderer.create(factory, inContraption));
         this.customRenderer = factory.createCustomRenderer();
     }
-
-    @Override
     public void runWithDisplay(Consumer<BogeyDisplay> consumer) {
         consumer.accept(renderers.getFirst().display);
         consumer.accept(renderers.getSecond().display);
@@ -60,8 +58,6 @@ public class UnifiedBogeyRenderer implements BogeyRenderer, BogeyDisplayHolder {
             customDisplayHolder.runWithDisplay(consumer);
         }
     }
-
-    @Override
     public void render(CompoundTag bogeyData, float wheelAngle, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, boolean inContraption) {
         final VertexConsumer buffer = bufferSource.getBuffer(RenderType.cutoutMipped());
         final BlockState air = Blocks.AIR.defaultBlockState();

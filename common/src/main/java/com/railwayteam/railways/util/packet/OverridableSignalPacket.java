@@ -20,7 +20,7 @@ package com.railwayteam.railways.util.packet;
 
 import com.railwayteam.railways.content.distant_signals.IOverridableSignal;
 import com.railwayteam.railways.multiloader.S2CPacket;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -59,8 +59,6 @@ public class OverridableSignalPacket implements S2CPacket {
         ticks = buf.readInt();
         distantSignal = buf.readBoolean();
     }
-
-    @Override
     public void write(FriendlyByteBuf buffer) {
         buffer.writeBlockPos(blockPos);
         buffer.writeBoolean(signalPos != null);
@@ -70,8 +68,6 @@ public class OverridableSignalPacket implements S2CPacket {
         buffer.writeInt(ticks);
         buffer.writeBoolean(distantSignal);
     }
-
-    @Override
     @Environment(EnvType.CLIENT)
     public void handle(Minecraft mc) {
         Level level = mc.level;

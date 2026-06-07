@@ -18,15 +18,18 @@
 
 package com.railwayteam.railways.registry;
 
-import com.railwayteam.railways.mixin.AccessorBlockSetType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.BlockSetType.PressurePlateSensitivity;
 
 public class CRBlockSetTypes {
     public static final BlockSetType LOCOMETAL = register(new BlockSetType(
         "railways:locometal",
         true,
+        true,
+        false,
+        PressurePlateSensitivity.EVERYTHING,
         SoundType.METAL,
         SoundEvents.IRON_DOOR_CLOSE,
         SoundEvents.IRON_DOOR_OPEN,
@@ -39,7 +42,7 @@ public class CRBlockSetTypes {
     ));
 
     private static BlockSetType register(BlockSetType value) {
-        return AccessorBlockSetType.invokeRegister(value);
+        return value;
     }
 
     public static void register() {}

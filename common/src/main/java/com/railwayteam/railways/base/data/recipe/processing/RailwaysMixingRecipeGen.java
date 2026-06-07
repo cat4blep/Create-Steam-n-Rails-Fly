@@ -30,14 +30,14 @@ import com.railwayteam.railways.registry.CRFluids;
 import com.railwayteam.railways.registry.CRPalettes;
 import com.railwayteam.railways.registry.CRPalettes.StyledList;
 import com.railwayteam.railways.util.FluidUtils;
-import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.content.decoration.palettes.AllPaletteStoneTypes;
-import com.simibubi.create.content.processing.recipe.HeatCondition;
-import com.simibubi.create.foundation.fluid.FluidIngredient;
-import net.createmod.catnip.platform.CatnipServices;
+import com.zurrtum.create.AllRecipeTypes;
+import com.zurrtum.create.content.decoration.palettes.AllPaletteStoneTypes;
+import com.zurrtum.create.content.processing.recipe.HeatCondition;
+import com.zurrtum.create.foundation.fluid.FluidIngredient;
+import com.zurrtum.create.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 
 import java.util.function.Supplier;
@@ -47,7 +47,7 @@ public class RailwaysMixingRecipeGen extends RailwaysProcessingRecipeGen {
     StyledList<DyedOnlyPalettesRecipeList> LOCOMETAL_DYEING = new StyledList<>(style -> new DyedOnlyPalettesRecipeList(
         color -> createWithDeferredId(
             () -> {
-                ResourceLocation loc = Railways.asResource("palettes/dyeing/" + CatnipServices.REGISTRIES.getKeyOrThrow(style.get(color).asItem()).getPath());
+                Identifier loc = Railways.asResource("palettes/dyeing/" + CatnipServices.REGISTRIES.getKeyOrThrow(style.get(color).asItem()).getPath());
                 if (style != CRPalettes.Styles.FLYWHEEL) {
                     EmiRecipeDefaultsGen.DEFAULT_RECIPES.add(Railways.asResource(getRecipeType().getId().getPath() + "/" + loc.getPath()));
                 }
@@ -110,15 +110,13 @@ public class RailwaysMixingRecipeGen extends RailwaysProcessingRecipeGen {
     public RailwaysMixingRecipeGen(PackOutput output) {
         super(output);
     }
-
-    @Override
     protected AllRecipeTypes getRecipeType() {
         return AllRecipeTypes.MIXING;
     }
 
-    private Supplier<ResourceLocation> paintLoc(PalettesColor color) {
+    private Supplier<Identifier> paintLoc(PalettesColor color) {
         return () -> {
-            ResourceLocation loc = Railways.asResource("palettes/dye/" + color.getSerializedName());
+            Identifier loc = Railways.asResource("palettes/dye/" + color.getSerializedName());
             EmiRecipeDefaultsGen.DEFAULT_RECIPES.add(Railways.asResource(getRecipeType().getId().getPath() + "/" + loc.getPath()));
             return loc;
         };
@@ -141,7 +139,7 @@ public class RailwaysMixingRecipeGen extends RailwaysProcessingRecipeGen {
     private GeneratedRecipe paintMix(PalettesColor result, PalettesColor colorA, PalettesColor colorB, boolean makeDefault) {
         return createWithDeferredId(
             () -> {
-                ResourceLocation loc = Railways.asResource(
+                Identifier loc = Railways.asResource(
                     "palettes/dye/"
                         + result.getSerializedName()
                         + "_from_"

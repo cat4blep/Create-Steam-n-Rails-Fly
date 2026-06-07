@@ -22,9 +22,9 @@ import com.railwayteam.railways.content.distant_signals.IOverridableSignal;
 import com.railwayteam.railways.multiloader.PlayerSelection;
 import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.util.packet.OverridableSignalPacket;
-import com.simibubi.create.content.redstone.nixieTube.NixieTubeBlockEntity;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -69,21 +69,17 @@ public abstract class MixinNixieTubeBlockEntity extends SmartBlockEntity impleme
             signalState = null;
         }
     }
-
-    @Override
     public void railways$refresh(@Nullable SignalBlockEntity signalBE, SignalBlockEntity.SignalState state, int ticks, boolean distantSignal) {
         if (level == null) return;
         cachedSignalTE = new WeakReference<>(signalBE);
         signalState = state;
         overrideLastingTicks = ticks;
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             CRPackets.PACKETS.sendTo(PlayerSelection.tracking(this),
                 new OverridableSignalPacket(getBlockPos(),signalBE == null ? null : signalBE.getBlockPos(),
                     state, ticks, distantSignal));
         }
     }
-
-    @Override
     public Optional<SignalBlockEntity.SignalState> railways$getOverriddenState() {
         if (overrideLastingTicks > 0 && signalState != null)
             return Optional.of(signalState);

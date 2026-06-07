@@ -19,16 +19,16 @@
 package com.railwayteam.railways.content.distant_signals;
 
 import com.railwayteam.railways.content.semaphore.SemaphoreBlockEntity;
-import com.simibubi.create.api.behaviour.display.DisplaySource;
-import com.simibubi.create.content.redstone.displayLink.DisplayLinkBlockEntity;
-import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
-import com.simibubi.create.content.redstone.displayLink.source.NixieTubeDisplaySource;
-import com.simibubi.create.content.redstone.displayLink.source.SingleLineDisplaySource;
-import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
-import com.simibubi.create.content.redstone.nixieTube.NixieTubeBlockEntity;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity;
-import com.simibubi.create.content.trains.signal.SignalBlockEntity.SignalState;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.api.behaviour.display.DisplaySource;
+import com.zurrtum.create.content.redstone.displayLink.DisplayLinkBlockEntity;
+import com.zurrtum.create.content.redstone.displayLink.DisplayLinkContext;
+import com.zurrtum.create.content.redstone.displayLink.source.NixieTubeDisplaySource;
+import com.zurrtum.create.content.redstone.displayLink.source.SingleLineDisplaySource;
+import com.zurrtum.create.content.redstone.displayLink.target.DisplayTargetStats;
+import com.zurrtum.create.content.redstone.nixieTube.NixieTubeBlockEntity;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity;
+import com.zurrtum.create.content.trains.signal.SignalBlockEntity.SignalState;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -36,7 +36,6 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class SignalDisplaySource extends SingleLineDisplaySource {
-    @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         SignalState state = SignalState.INVALID;
         if (context.getSourceBlockEntity() instanceof SignalBlockEntity signalBE) {
@@ -47,9 +46,7 @@ public class SignalDisplaySource extends SingleLineDisplaySource {
         }
         return Component.translatable("railways.display_source.signal." + state.name().toLowerCase(Locale.ROOT));
     }
-
-    @Override
-    protected boolean allowsLabeling(DisplayLinkContext context) {
+    public boolean allowsLabeling(DisplayLinkContext context) {
         return !isSignalTarget(context);
     }
 
@@ -61,8 +58,6 @@ public class SignalDisplaySource extends SingleLineDisplaySource {
     public void updateState(DisplayLinkBlockEntity be) {
         be.updateGatheredData();
     }
-
-    @Override
     public int getPassiveRefreshTicks() {
         return 40;
     }

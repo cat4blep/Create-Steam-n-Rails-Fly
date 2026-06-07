@@ -32,12 +32,12 @@ import com.railwayteam.railways.registry.CRPackets;
 import com.railwayteam.railways.util.BlockPosUtils;
 import com.railwayteam.railways.util.MixinVariables;
 import com.railwayteam.railways.util.packet.SwitchDataUpdatePacket;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.contraptions.OrientedContraptionEntity;
-import com.simibubi.create.content.contraptions.actors.trainControls.ControlsBlock;
-import com.simibubi.create.content.trains.bogey.AbstractBogeyBlock;
-import com.simibubi.create.content.trains.entity.*;
-import net.createmod.catnip.data.Pair;
+import com.zurrtum.create.AllItems;
+import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
+import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsBlock;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
+import com.zurrtum.create.content.trains.entity.*;
+import com.zurrtum.create.catnip.data.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -189,7 +189,7 @@ public abstract class MixinCarriageContraptionEntity extends OrientedContraption
     @Inject(method = "tickContraption", at = @At(value = "INVOKE", target = "Lcom/simibubi/create/content/trains/entity/CarriageContraptionEntity;tickActors()V"))
     private void setupBufferDistanceData(CallbackInfo ci) {
         ICarriageBufferDistanceTracker distanceTracker = (ICarriageBufferDistanceTracker) carriage;
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
 
         if (distanceTracker.railways$getLeadingDistance() != null && distanceTracker.railways$getTrailingDistance() != null) return;
 
@@ -258,8 +258,6 @@ public abstract class MixinCarriageContraptionEntity extends OrientedContraption
         original.call(instance, entity, distanceMoved);
         railways$distanceTravelled = distanceMoved;
     }
-
-    @Override
     public double railways$getDistanceTravelled() {
         return railways$distanceTravelled;
     }

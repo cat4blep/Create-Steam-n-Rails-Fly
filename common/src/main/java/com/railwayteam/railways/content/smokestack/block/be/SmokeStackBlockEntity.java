@@ -24,10 +24,10 @@ import com.railwayteam.railways.content.smokestack.block.SmokeStackBlock;
 import com.railwayteam.railways.content.smokestack.block.variable.SmokeStackExtenderBlock;
 import com.railwayteam.railways.content.smokestack.block.variable.VariableSmokeStackBlock;
 import com.railwayteam.railways.util.ColorUtils;
-import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import net.createmod.catnip.lang.Lang;
+import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.client.catnip.lang.Lang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -53,9 +53,7 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
     public SmokeStackBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {}
 
     public @Nullable DyeColor getColor() {
         return color;
@@ -79,23 +77,21 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
         notifyUpdate();
     }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        super.read(tag, clientPacket);
-        if (tag.contains("color", Tag.TAG_INT)) {
-            int colorOrdinal = tag.getInt("color");
+        protected void read(CompoundTag tag, boolean clientPacket) {
+        
+        if (tag.contains("color")) {
+            int colorOrdinal = tag.getInt("color").orElse(0);
             color = DyeColor.byId(colorOrdinal);
         } else {
             color = null;
         }
-        isSoul = tag.getBoolean("isSoul");
+        isSoul = tag.getBoolean("isSoul").orElse(false);
 
-        height = Math.max(0, tag.getInt("height"));
+        height = Math.max(0, tag.getInt("height").orElse(0));
     }
 
-    @Override
-    protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket);
+        protected void write(CompoundTag tag, boolean clientPacket) {
+        
         if (color != null) {
             tag.putInt("color", color.getId());
         }
@@ -105,8 +101,6 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
             tag.putInt("height", height);
         }
     }
-
-    @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if (isSoul) {
             Lang.builder(Railways.MOD_ID)
@@ -121,8 +115,6 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
 
         return true;
     }
-
-    @Override
     public ItemStack getIcon(boolean isPlayerSneaking) {
         if (color != null)
             return ColorUtils.getDyeColorDyeItem(color).getDefaultInstance();
@@ -186,7 +178,7 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
     }
 
     protected void animateTick() {
-        if (level == null || !level.isClientSide) return;
+        if (level == null || !level.isClientSide()) return;
 
         BlockState state = getBlockState();
         RandomSource random = level.getRandom();
@@ -211,8 +203,6 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
             }
         }
     }
-
-    @Override
     public void tick() {
         super.tick();
 

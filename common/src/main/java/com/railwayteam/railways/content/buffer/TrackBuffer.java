@@ -19,13 +19,12 @@
 package com.railwayteam.railways.content.buffer;
 
 import com.railwayteam.railways.mixin_interfaces.ICarriageBufferDistanceTracker;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.graph.TrackNode;
-import com.simibubi.create.content.trains.signal.SingleBlockEntityEdgePoint;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.graph.TrackNode;
+import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
 
 public class TrackBuffer extends SingleBlockEntityEdgePoint {
-    @Override
     public boolean canNavigateVia(TrackNode side) {
         return true;
     }

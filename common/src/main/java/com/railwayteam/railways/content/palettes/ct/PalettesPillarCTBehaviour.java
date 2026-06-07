@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.content.palettes.ct;
 
-import com.simibubi.create.foundation.block.connected.CTSpriteShiftEntry;
-import com.simibubi.create.foundation.block.connected.ConnectedTextureBehaviour;
+import com.zurrtum.create.client.foundation.block.connected.CTSpriteShiftEntry;
+import com.zurrtum.create.client.foundation.block.connected.ConnectedTextureBehaviour;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,8 +36,6 @@ public class PalettesPillarCTBehaviour extends ConnectedTextureBehaviour.Base {
 		super();
 		this.shift = shift;
 	}
-
-	@Override
 	protected Direction getUpDirection(BlockAndTintGetter reader, BlockPos pos, BlockState state, Direction face) {
 		if (state.hasProperty(BlockStateProperties.FACING)) {
 			return state.getValue(BlockStateProperties.FACING);
@@ -48,8 +46,6 @@ public class PalettesPillarCTBehaviour extends ConnectedTextureBehaviour.Base {
 		}
 		return super.getUpDirection(reader, pos, state, face);
 	}
-
-	@Override
 	protected Direction getRightDirection(BlockAndTintGetter reader, BlockPos pos, BlockState state, Direction face) {
 		Direction facing;
 		if (state.hasProperty(BlockStateProperties.FACING)) {
@@ -66,8 +62,6 @@ public class PalettesPillarCTBehaviour extends ConnectedTextureBehaviour.Base {
 			return facing.getClockWise();
 		}
 	}
-
-	@Override
 	@SuppressWarnings("RedundantIfStatement")
 	public boolean connectsTo(BlockState state, BlockState other, BlockAndTintGetter reader, BlockPos pos, BlockPos otherPos, Direction face) {
 		if (state.getBlock() != other.getBlock()) {
@@ -84,8 +78,6 @@ public class PalettesPillarCTBehaviour extends ConnectedTextureBehaviour.Base {
 		}
 		return true;
 	}
-
-	@Override
 	protected boolean reverseUVsVertically(BlockState state, Direction face) {
 		if (face != Direction.DOWN) {
 			return false;
@@ -98,8 +90,6 @@ public class PalettesPillarCTBehaviour extends ConnectedTextureBehaviour.Base {
 		}
 		return false;
 	}
-
-	@Override
 	public CTSpriteShiftEntry getShift(BlockState state, Direction direction, TextureAtlasSprite sprite) {
 		if (state.hasProperty(BlockStateProperties.FACING)) {
 			return state.getValue(BlockStateProperties.FACING).getAxis() != direction.getAxis() ? shift : null;

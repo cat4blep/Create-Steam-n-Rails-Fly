@@ -30,8 +30,6 @@ public class LocoMetalSmokeboxFacingFix extends AxisToFacingFix {
     public LocoMetalSmokeboxFacingFix(Schema outputSchema, String name) {
         super(outputSchema, name);
     }
-
-    @Override
     protected boolean applyToBlockState(String blockId) {
         return blockId.matches("railways:(.*)_locometal_smokebox");
     }

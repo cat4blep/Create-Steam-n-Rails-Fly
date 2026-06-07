@@ -22,11 +22,11 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.buffer.BlockStateBlockItemGroup;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRShapes;
-import net.createmod.catnip.math.VoxelShaper;
+import com.zurrtum.create.catnip.math.VoxelShaper;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -49,18 +49,12 @@ public class LinkPinBlock extends AbstractDyeableSingleBufferBlock implements Bl
         registerDefaultState(defaultBlockState()
             .setValue(STYLE, Style.LINK));
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(STYLE));
     }
-
-    @Override
     protected BlockState cycleStyle(BlockState originalState, Direction targetedFace) {
         return originalState.cycle(STYLE);
     }
-
-    @Override
     protected VoxelShaper getShaper(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(STYLE)) {
             case LINK, LINKLESS -> CRShapes.LINK_PIN;
@@ -84,33 +78,22 @@ public class LinkPinBlock extends AbstractDyeableSingleBufferBlock implements Bl
             this.langName = langName;
         }
 
-        public ResourceLocation getModel() {
+        public Identifier getModel() {
             return Railways.asResource("block/buffer/single_deco/" + model);
         }
-
-
-        @Override
-        public ResourceLocation getModel(Void context) {
+        public Identifier getModel(Void context) {
             return getModel();
         }
-
-        @Override
         public String getBlockId(Void context) {
             return model;
         }
-
-        @Override
         public String getLangName(Void context) {
             return langName;
         }
-
-        @Override
         public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
     }
-
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return CRBlocks.LINK_AND_PIN_GROUP.get(state.getValue(STYLE)).asStack();
     }

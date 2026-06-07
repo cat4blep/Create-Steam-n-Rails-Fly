@@ -32,8 +32,6 @@ public class V0 extends NamespacedSchema {
     public V0(int versionKey, Schema parent) {
         super(versionKey, parent);
     }
-
-    @Override
     public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
         super.registerTypes(schema, entityTypes, blockEntityTypes);
 
@@ -101,8 +99,6 @@ public class V0 extends NamespacedSchema {
             )
         );
     }
-
-    @Override
     public Map<String, Supplier<TypeTemplate>> registerEntities(Schema schema) {
         Map<String, Supplier<TypeTemplate>> map = super.registerEntities(schema);
 

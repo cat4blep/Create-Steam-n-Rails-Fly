@@ -20,20 +20,16 @@ package com.railwayteam.railways.content.custom_bogeys.blocks.standard;
 
 import com.railwayteam.railways.content.custom_bogeys.blocks.base.CRBogeyBlock;
 import com.railwayteam.railways.registry.CRBogeyStyles;
-import com.simibubi.create.content.trains.bogey.BogeySizes;
+import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
 import net.minecraft.world.phys.Vec3;
 
 public class SingleAxleBogeyBlock extends CRBogeyBlock {
     public SingleAxleBogeyBlock(Properties props) {
-        super(props, CRBogeyStyles.SINGLEAXLE, BogeySizes.SMALL);
+        super(props, CRBogeyStyles.SINGLEAXLE, AllBogeySizes.SMALL);
     }
-
-    @Override
     public Vec3 getConnectorAnchorOffset() {
         return new Vec3(0, 7 / 32f, 24 / 32f);
     }
-
-    @Override
     public double getWheelPointSpacing() {
         return 2; //needs to be even, otherwise station alignment is bad (was 1)
     }

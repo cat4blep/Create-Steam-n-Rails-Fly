@@ -21,7 +21,7 @@ package com.railwayteam.railways.content.fuel;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.multiloader.PlatformAbstractionHelper;
 import com.railwayteam.railways.util.FluidUtils;
-import com.simibubi.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
+import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.level.material.Fluid;
 

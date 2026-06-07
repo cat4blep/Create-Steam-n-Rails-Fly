@@ -27,15 +27,15 @@ import com.railwayteam.railways.mixin_interfaces.ICarriageBufferDistanceTracker;
 import com.railwayteam.railways.mixin_interfaces.ICarriageConductors;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.MixinVariables;
-import com.simibubi.create.content.trains.entity.Carriage;
-import com.simibubi.create.content.trains.entity.CarriageBogey;
-import com.simibubi.create.content.trains.entity.CarriageContraption;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
-import com.simibubi.create.content.trains.entity.Train;
-import com.simibubi.create.content.trains.entity.TravellingPoint;
-import com.simibubi.create.content.trains.graph.DimensionPalette;
-import com.simibubi.create.content.trains.graph.TrackGraph;
-import net.createmod.catnip.data.Couple;
+import com.zurrtum.create.content.trains.entity.Carriage;
+import com.zurrtum.create.content.trains.entity.CarriageBogey;
+import com.zurrtum.create.content.trains.entity.CarriageContraption;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.TravellingPoint;
+import com.zurrtum.create.content.trains.graph.DimensionPalette;
+import com.zurrtum.create.content.trains.graph.TrackGraph;
+import com.zurrtum.create.catnip.data.Couple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -69,8 +69,6 @@ public abstract class MixinCarriage implements ICarriageConductors, ICarriageBuf
     @Shadow public abstract TravellingPoint getTrailingPoint();
 
     private final List<UUID> railways$controllingConductors = new ArrayList<>();
-
-    @Override
     public List<UUID> railways$getControllingConductors() {
         return railways$controllingConductors;
     }
@@ -79,23 +77,15 @@ public abstract class MixinCarriage implements ICarriageConductors, ICarriageBuf
     private @Nullable Integer railways$leadingBufferDistance = null;
     @Unique
     private @Nullable Integer railways$trailingBufferDistance = null;
-
-    @Override
     public @Nullable Integer railways$getLeadingDistance() {
         return railways$leadingBufferDistance;
     }
-
-    @Override
     public @Nullable Integer railways$getTrailingDistance() {
         return railways$trailingBufferDistance;
     }
-
-    @Override
     public void railways$setLeadingDistance(int distance) {
         railways$leadingBufferDistance = distance;
     }
-
-    @Override
     public void railways$setTrailingDistance(int distance) {
         railways$trailingBufferDistance = distance;
     }
@@ -142,7 +132,7 @@ public abstract class MixinCarriage implements ICarriageConductors, ICarriageBuf
         Carriage carriage = cir.getReturnValue();
         List<UUID> controllingConductors = ((ICarriageConductors) carriage).railways$getControllingConductors();
         controllingConductors.clear();
-        if (tag.contains("ControllingConductors", Tag.TAG_LIST)) {
+        if (tag.contains("ControllingConductors")) {
             ListTag listTag = tag.getList("ControllingConductors", Tag.TAG_COMPOUND);
             for (Tag item : listTag) {
                 if (item instanceof CompoundTag uuidTag && uuidTag.hasUUID("UUID")) {
@@ -151,11 +141,11 @@ public abstract class MixinCarriage implements ICarriageConductors, ICarriageBuf
             }
         }
 
-        if (tag.contains("LeadingBufferDistance", Tag.TAG_INT))
-            ((ICarriageBufferDistanceTracker) carriage).railways$setLeadingDistance(tag.getInt("LeadingBufferDistance"));
+        if (tag.contains("LeadingBufferDistance"))
+            ((ICarriageBufferDistanceTracker) carriage).railways$setLeadingDistance(tag.getInt("LeadingBufferDistance").orElse(0));
 
-        if (tag.contains("TrailingBufferDistance", Tag.TAG_INT))
-            ((ICarriageBufferDistanceTracker) carriage).railways$setTrailingDistance(tag.getInt("TrailingBufferDistance"));
+        if (tag.contains("TrailingBufferDistance"))
+            ((ICarriageBufferDistanceTracker) carriage).railways$setTrailingDistance(tag.getInt("TrailingBufferDistance").orElse(0));
     }
 
     @Inject(method = "travel", at = @At("HEAD"))
@@ -187,7 +177,7 @@ public abstract class MixinCarriage implements ICarriageConductors, ICarriageBuf
         TravellingPoint point = leading ? getLeadingPoint() : getTrailingPoint();
         if (point.edge == null)
             return false;
-        if (point.edge.getTrackMaterial().trackType == CRTrackMaterials.CRTrackType.UNIVERSAL)
+        if (CRTrackMaterials.getType(point.edge.getTrackMaterial()) == CRTrackMaterials.CRTrackType.UNIVERSAL)
             return false;
         if (CarriageBogeyUtils.getType(bogey).getTrackType(bogey.getStyle()) == CRTrackMaterials.CRTrackType.UNIVERSAL)
             return false;

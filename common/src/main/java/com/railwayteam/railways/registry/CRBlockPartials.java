@@ -20,13 +20,11 @@ package com.railwayteam.railways.registry;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.registry.CRPalettes.PalettesColorList;
-import com.simibubi.create.Create;
-import com.simibubi.create.content.trains.track.TrackMaterial.TrackType;
-import com.simibubi.create.content.trains.track.TrackShape;
-import dev.engine_room.flywheel.lib.model.baked.PartialModel;
-import net.createmod.catnip.data.Couple;
-import net.createmod.catnip.lang.Lang;
-import net.minecraft.resources.ResourceLocation;
+import com.zurrtum.create.content.trains.track.TrackShape;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.catnip.data.Couple;
+import com.zurrtum.create.client.catnip.lang.Lang;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,9 +45,9 @@ public class CRBlockPartials {
     public static final Map<DyeColor, PartialModel> CONDUCTOR_WHISTLE_FLAGS = new EnumMap<>(DyeColor.class);
     public static final Map<String, PartialModel> CUSTOM_CONDUCTOR_CAPS = new HashMap<>();
     public static final Map<String, PartialModel> CUSTOM_CONDUCTOR_ONLY_CAPS = new HashMap<>();
-    public static final Map<String, ResourceLocation> CUSTOM_CONDUCTOR_SKINS = new HashMap<>();
+    public static final Map<String, Identifier> CUSTOM_CONDUCTOR_SKINS = new HashMap<>();
     public static final Set<String> NO_TILT_CAPS = new HashSet<>();
-    public static final Map<String, ResourceLocation> CUSTOM_CONDUCTOR_SKINS_FOR_NAME = new HashMap<>(); // for if a conductor is renamed, rather than the cap
+    public static final Map<String, Identifier> CUSTOM_CONDUCTOR_SKINS_FOR_NAME = new HashMap<>(); // for if a conductor is renamed, rather than the cap
 
     public static void registerCustomCap(String itemName, String modelLoc) {
         CUSTOM_CONDUCTOR_CAPS.put(itemName, PartialModel.of(Railways.asResource("item/dev_caps/"+modelLoc)));
@@ -119,7 +117,7 @@ public class CRBlockPartials {
         public final List<ModelTransform> additionalTransforms = new ArrayList<>();
 
         private TrackCasingSpec altSpec;
-        private final Map<TrackType, TrackCasingSpec> specsByTrackType = new HashMap<>();
+        private final Map<Identifier, TrackCasingSpec> specsByIdentifier = new HashMap<>();
         private final int topSurfacePixelHeight;
 
         private double xShift = 0; // for track pads
@@ -137,10 +135,10 @@ public class CRBlockPartials {
             this.topSurfacePixelHeight = topSurfacePixelHeight;
         }
 
-        public TrackCasingSpec getFor(@Nullable TrackType type) {
-            if (type == null || !specsByTrackType.containsKey(type))
+        public TrackCasingSpec getFor(@Nullable Identifier type) {
+            if (type == null || !specsByIdentifier.containsKey(type))
                 return this;
-            return specsByTrackType.get(type);
+            return specsByIdentifier.get(type);
         }
 
         public TrackCasingSpec addTransform(ModelTransform transform) {
@@ -166,26 +164,26 @@ public class CRBlockPartials {
         }
 
         @Nullable
-        public TrackCasingSpec getAltSpec(@Nullable TrackType type) {
+        public TrackCasingSpec getAltSpec(@Nullable Identifier type) {
             if (type == null) {
                 return getAltSpec();
-            } else if (altSpec != null && altSpec.specsByTrackType.containsKey(type)) {
-                return altSpec.specsByTrackType.get(type);
-            } else if (specsByTrackType.containsKey(type) && specsByTrackType.get(type).altSpec != null) {
-                return specsByTrackType.get(type).altSpec;
+            } else if (altSpec != null && altSpec.specsByIdentifier.containsKey(type)) {
+                return altSpec.specsByIdentifier.get(type);
+            } else if (specsByIdentifier.containsKey(type) && specsByIdentifier.get(type).altSpec != null) {
+                return specsByIdentifier.get(type).altSpec;
             } else {
                 return null;
             }
         }
 
-        public TrackCasingSpec getNonNullAltSpec(@Nullable TrackType type) {
+        public TrackCasingSpec getNonNullAltSpec(@Nullable Identifier type) {
             TrackCasingSpec spec = getAltSpec(type);
             if (spec == null)
                 spec = getAltSpec();
             return spec;
         }
 
-        public int getTopSurfacePixelHeight(@Nullable TrackType type, boolean alt) {
+        public int getTopSurfacePixelHeight(@Nullable Identifier type, boolean alt) {
             if (type == null)
                 return getTopSurfacePixelHeight(alt);
             TrackCasingSpec altSpec;
@@ -196,11 +194,11 @@ public class CRBlockPartials {
             }
         }
 
-        public TrackCasingSpec withTrackType(@NotNull TrackType type, @Nullable TrackCasingSpec spec) {
+        public TrackCasingSpec withTrackType(@NotNull Identifier type, @Nullable TrackCasingSpec spec) {
             if (spec == null) {
-                specsByTrackType.remove(type);
+                specsByIdentifier.remove(type);
             } else {
-                specsByTrackType.put(type, spec);
+                specsByIdentifier.put(type, spec);
             }
             return this;
         }
@@ -220,11 +218,11 @@ public class CRBlockPartials {
             return zShift;
         }
 
-        public double getXShift(@Nullable TrackType type) {
+        public double getXShift(@Nullable Identifier type) {
             return getFor(type).shiftSet ? getFor(type).getXShift() : getXShift();
         }
 
-        public double getZShift(@Nullable TrackType type) {
+        public double getZShift(@Nullable Identifier type) {
             return getFor(type).shiftSet ? getFor(type).getZShift() : getZShift();
         }
 
@@ -548,7 +546,7 @@ public class CRBlockPartials {
     );
 
     private static PartialModel createBlock(String path) {
-        return PartialModel.of(Create.asResource("block/" + path));
+        return PartialModel.of(Identifier.fromNamespaceAndPath("create", "block/" + path));
     }
 
     private static PartialModel block(String path) {

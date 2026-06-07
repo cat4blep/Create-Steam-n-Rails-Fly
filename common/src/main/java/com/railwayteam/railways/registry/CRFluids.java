@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.registry;
 
-import com.simibubi.create.content.fluids.VirtualFluid;
+import com.zurrtum.create.content.fluids.VirtualFluid;
 import com.tterrag.registrate.util.entry.FluidEntry;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.fabricmc.api.EnvType;

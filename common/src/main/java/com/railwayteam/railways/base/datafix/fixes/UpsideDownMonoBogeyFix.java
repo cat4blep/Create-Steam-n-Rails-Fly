@@ -35,8 +35,6 @@ public class UpsideDownMonoBogeyFix extends DataFix {
         super(outputSchema, false);
         this.name = name;
     }
-
-    @Override
     public TypeRewriteRule makeRule() {
         return this.fixTypeEverywhereTyped(this.name + " for block_state", this.getInputSchema().getType(References.BLOCK_STATE), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
             Optional<String> optional = dynamic.get("Name").asString().result();

@@ -24,14 +24,10 @@ import com.mojang.datafixers.DataFix;
 import com.mojang.datafixers.TypeRewriteRule;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import com.railwayteam.railways.mixin.MixinTrackMaterial;
 import net.minecraft.util.datafix.fixes.References;
 
 import java.util.Optional;
 
-/**
- * Also see railways$updateCherryCompatTracks inside {@link MixinTrackMaterial}
- */
 public class CompatCherryTrackFix extends DataFix {
     /*
      * List of modded cherry tracks that need to be fixed
@@ -58,8 +54,6 @@ public class CompatCherryTrackFix extends DataFix {
         super(outputSchema, false);
         this.name = name;
     }
-
-    @Override
     protected TypeRewriteRule makeRule() {
         return this.fixTypeEverywhereTyped(this.name + " for block_state", this.getInputSchema().getType(References.BLOCK_STATE), typed -> typed.update(DSL.remainderFinder(), dynamic -> {
             Optional<String> optional = dynamic.get("Name").asString().result();

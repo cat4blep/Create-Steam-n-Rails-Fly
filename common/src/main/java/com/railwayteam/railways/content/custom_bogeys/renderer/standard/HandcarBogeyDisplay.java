@@ -21,9 +21,9 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
 import com.railwayteam.railways.content.handcar.ik.DoubleArmIK;
-import com.simibubi.create.content.trains.entity.CarriageContraptionEntity;
-import dev.engine_room.flywheel.lib.transform.Affine;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
+import com.zurrtum.create.client.flywheel.lib.transform.Affine;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
@@ -53,8 +53,6 @@ public class HandcarBogeyDisplay implements BogeyDisplay.EntityAware {
         largeCog = prov.create(HANDCAR_LARGE_COG);
         smallCog = prov.create(HANDCAR_SMALL_COG);
     }
-
-    @Override
     public void entityUpdate(CarriageContraptionEntity cce) {
         firstPerson = false;
 
@@ -64,8 +62,6 @@ public class HandcarBogeyDisplay implements BogeyDisplay.EntityAware {
 
         firstPerson = player.getRootVehicle() == cce;
     }
-
-    @Override
     public void update(CompoundTag bogeyData, float wheelAngle) {
         wheelAngle *= 2;
 

@@ -29,8 +29,6 @@ public class ConductorElytraLayer<T extends ConductorEntity, M extends Conductor
     public ConductorElytraLayer(RenderLayerParent<T, M> renderer, EntityModelSet loader) {
         super(renderer, loader);
     }
-
-    @Override
     public void render(@NotNull PoseStack matrixStack, @NotNull MultiBufferSource buffer, int packedLight,
                        @NotNull T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks,
                        float ageInTicks, float netHeadYaw, float headPitch) {

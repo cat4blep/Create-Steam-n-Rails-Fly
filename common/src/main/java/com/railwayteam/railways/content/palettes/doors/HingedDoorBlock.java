@@ -20,8 +20,8 @@ package com.railwayteam.railways.content.palettes.doors;
 
 import com.railwayteam.railways.registry.CRBlockSetTypes;
 import com.railwayteam.railways.util.EntityUtils;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.AllItems;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,25 +48,10 @@ public class HingedDoorBlock extends DoorBlock implements IWrenchable {
     public static final BooleanProperty WINDOWED = BooleanProperty.create("windowed");
 
     public HingedDoorBlock(Properties properties) {
-        super(properties, CRBlockSetTypes.LOCOMETAL);
+        super(CRBlockSetTypes.LOCOMETAL, properties);
         registerDefaultState(defaultBlockState()
             .setValue(WINDOWED, false));
     }
-
-    @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        BlockState super$updateShape = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-        DoubleBlockHalf doubleBlockHalf = state.getValue(HALF);
-        if (direction.getAxis() != Direction.Axis.Y || doubleBlockHalf == DoubleBlockHalf.LOWER != (direction == Direction.UP)) {
-            return super$updateShape;
-        } else {
-            return neighborState.is(this) && neighborState.getValue(HALF) != doubleBlockHalf
-                ? super$updateShape.setValue(WINDOWED, neighborState.getValue(WINDOWED))
-                : Blocks.AIR.defaultBlockState();
-        }
-    }
-
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
@@ -74,16 +59,12 @@ public class HingedDoorBlock extends DoorBlock implements IWrenchable {
         world.setBlock(pos, newState, UPDATE_ALL);
         return InteractionResult.SUCCESS;
     }
-
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (EntityUtils.isHolding(player, AllItems.WRENCH::isIn)) {
+        if (EntityUtils.isHolding(player, stack -> stack.is(AllItems.WRENCH))) {
             return InteractionResult.PASS;
         }
-        return super.use(state, level, pos, player, hand, hit);
+        return InteractionResult.PASS;
     }
-
-    @Override
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         if (state.getValue(HALF) == DoubleBlockHalf.UPPER) {
             Level level = context.getLevel();
@@ -103,8 +84,6 @@ public class HingedDoorBlock extends DoorBlock implements IWrenchable {
         }
         return IWrenchable.super.onSneakWrenched(state, context);
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(WINDOWED));
     }

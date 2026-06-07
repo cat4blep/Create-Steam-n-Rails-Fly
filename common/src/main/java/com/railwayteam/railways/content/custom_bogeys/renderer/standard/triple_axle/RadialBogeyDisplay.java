@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.custom_bogeys.renderer.standard.triple_
 
 import com.railwayteam.railways.content.custom_bogeys.renderer.standard.triple_axle.base.TripleAxleBogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.ElementProvider;
-import com.simibubi.create.AllPartialModels;
+import com.zurrtum.create.client.AllPartialModels;
 
 import static com.railwayteam.railways.registry.CRBlockPartials.RADIAL_FRAME;
 
