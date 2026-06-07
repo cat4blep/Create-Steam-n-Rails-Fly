@@ -19,7 +19,7 @@
 package com.railwayteam.railways.content.fuel.tank;
 
 import com.railwayteam.railways.registry.fabric.CRBlockEntitiesImpl;
-import com.simibubi.create.api.connectivity.ConnectivityHandler;
+import com.zurrtum.create.api.connectivity.ConnectivityHandler;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,8 +49,6 @@ public class FuelTankItem extends BlockItem {
     public FuelTankItem(Block block, Properties properties) {
         super(block, properties);
     }
-
-    @Override
     public @NotNull InteractionResult place(@NotNull BlockPlaceContext ctx) {
         IS_PLACING_NBT = FuelTankItem.checkPlacingNbt(ctx);
         InteractionResult initialResult = super.place(ctx);
@@ -60,8 +58,6 @@ public class FuelTankItem extends BlockItem {
         tryMultiPlace(ctx);
         return initialResult;
     }
-
-    @Override
     protected boolean updateCustomBlockEntityTag(@NotNull BlockPos blockPos, Level level, Player player,
                                                  @NotNull ItemStack itemStack, @NotNull BlockState blockState) {
         MinecraftServer minecraftserver = level.getServer();
@@ -75,7 +71,7 @@ public class FuelTankItem extends BlockItem {
             nbt.remove("Controller");
             nbt.remove("LastKnownPos");
             if (nbt.contains("TankContent")) {
-                FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("TankContent"));
+                FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt.getCompound("TankContent").orElse(new CompoundTag()));
                 if (!fluid.isEmpty()) {
                     fluid.setAmount(Math.min(FuelTankBlockEntity.getCapacityMultiplier(), fluid.getAmount()));
                     nbt.put("TankContent", fluid.writeToNBT(new CompoundTag()));

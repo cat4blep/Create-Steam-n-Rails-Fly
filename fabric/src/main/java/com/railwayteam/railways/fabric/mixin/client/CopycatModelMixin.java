@@ -20,9 +20,9 @@ package com.railwayteam.railways.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import com.simibubi.create.content.decoration.copycat.CopycatModel;
-import com.simibubi.create.content.decoration.copycat.FilteredBlockAndTintGetter;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
+import com.zurrtum.create.client.infrastructure.model.CopycatModel;
+import com.zurrtum.create.content.decoration.copycat.FilteredBlockAndTintGetter;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;

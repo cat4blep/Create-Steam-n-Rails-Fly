@@ -19,7 +19,7 @@
 package com.railwayteam.railways.base.data.fabric;
 
 import com.railwayteam.railways.registry.CRPotatoProjectileTypes;
-import com.simibubi.create.api.registry.CreateRegistries;
+import com.zurrtum.create.api.registry.CreateRegistries;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 import net.minecraft.core.HolderLookup;
@@ -32,8 +32,6 @@ public class GeneratedEntriesProvider extends FabricDynamicRegistryProvider {
     public GeneratedEntriesProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
         super(output, registriesFuture);
     }
-
-    @Override
     protected void configure(HolderLookup.Provider registries, Entries entries) {
         entries.addAll(registries.lookupOrThrow(CreateRegistries.POTATO_PROJECTILE_TYPE));
     }
@@ -41,8 +39,6 @@ public class GeneratedEntriesProvider extends FabricDynamicRegistryProvider {
     public static RegistrySetBuilder addBootstraps(RegistrySetBuilder builder) {
         return builder.add(CreateRegistries.POTATO_PROJECTILE_TYPE, CRPotatoProjectileTypes::bootstrap);
     }
-
-    @Override
     public @NotNull String getName() {
         return "Railways' Generated Registry Entries";
     }

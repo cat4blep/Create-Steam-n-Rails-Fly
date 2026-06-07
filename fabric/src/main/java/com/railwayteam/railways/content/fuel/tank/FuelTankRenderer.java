@@ -19,11 +19,11 @@
 package com.railwayteam.railways.content.fuel.tank;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.simibubi.create.foundation.blockEntity.renderer.SafeBlockEntityRenderer;
+import com.railwayteam.railways.util.compat.SafeBlockEntityRenderer;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
-import net.createmod.catnip.animation.LerpedFloat;
-import net.createmod.catnip.platform.FabricCatnipServices;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
+import com.zurrtum.create.catnip.platform.FabricCatnipServices;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -31,8 +31,6 @@ import net.minecraft.util.Mth;
 
 public class FuelTankRenderer extends SafeBlockEntityRenderer<FuelTankBlockEntity> {
     public FuelTankRenderer(BlockEntityRendererProvider.Context context) {}
-
-    @Override
     protected void renderSafe(FuelTankBlockEntity be, float partialTicks, PoseStack ms, MultiBufferSource buffer,
                               int light, int overlay) {
         if (!be.isController())
@@ -81,8 +79,6 @@ public class FuelTankRenderer extends SafeBlockEntityRenderer<FuelTankBlockEntit
         FabricCatnipServices.FLUID_RENDERER.renderFluidBox(fluidStack, xMin, yMin, zMin, xMax, yMax, zMax, buffer, ms, light, false, false);
         ms.popPose();
     }
-
-    @Override
     public boolean shouldRenderOffScreen(FuelTankBlockEntity be) {
         return be.isController();
     }

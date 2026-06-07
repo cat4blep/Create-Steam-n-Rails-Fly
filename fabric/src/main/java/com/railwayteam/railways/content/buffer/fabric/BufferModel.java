@@ -22,7 +22,7 @@ import com.mojang.math.Axis;
 import com.railwayteam.railways.content.buffer.IDyedBuffer;
 import com.railwayteam.railways.content.buffer.IMaterialAdaptingBuffer;
 import com.railwayteam.railways.content.buffer.TrackBufferBlock;
-import com.simibubi.create.foundation.model.BakedModelHelper;
+import com.zurrtum.create.foundation.model.BakedModelHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
@@ -80,8 +80,6 @@ public class BufferModel extends ForwardingBakedModel {
         
         return true;
     };
-
-    @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
         boolean isDiagonal = false;
         
@@ -114,21 +112,18 @@ public class BufferModel extends ForwardingBakedModel {
         matrix.mul(Axis.YP.rotationDegrees(45).get(new Matrix3f()));
         return matrix;
     }
-
-
-    @Override
     public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
         UnaryOperator<TextureAtlasSprite> materialSwapper = null;
         UnaryOperator<TextureAtlasSprite> colorSwapper = null;
 
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
-            if (tag.contains("BlockEntityTag", Tag.TAG_COMPOUND)) {
-                CompoundTag blockEntityTag = tag.getCompound("BlockEntityTag");
-                if (blockEntityTag.contains("Material", Tag.TAG_COMPOUND)) {
-                    materialSwapper = getSwapper(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockEntityTag.getCompound("Material")));
+            if (tag.contains("BlockEntityTag")) {
+                CompoundTag blockEntityTag = tag.getCompound("BlockEntityTag").orElse(new CompoundTag());
+                if (blockEntityTag.contains("Material")) {
+                    materialSwapper = getSwapper(NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockEntityTag.getCompound("Material").orElse(new CompoundTag())));
                 }
-                if (blockEntityTag.contains("Color", Tag.TAG_INT)) {
+                if (blockEntityTag.contains("Color")) {
                     colorSwapper = getSwapper(DyeColor.byId(blockEntityTag.getInt("Color")));
                 }
             }
@@ -147,43 +142,27 @@ public class BufferModel extends ForwardingBakedModel {
         private SpriteReplacingBakedModel(UnaryOperator<TextureAtlasSprite> spriteSwapper) {
             this.spriteSwapper = spriteSwapper;
         }
-
-        @Override
         public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random) {
             return BakedModelHelper.swapSprites(wrapped.getQuads(state, direction, random), this.spriteSwapper);
         }
-
-        @Override
         public boolean useAmbientOcclusion() {
             return wrapped.useAmbientOcclusion();
         }
-
-        @Override
         public boolean isGui3d() {
             return wrapped.isGui3d();
         }
-
-        @Override
         public boolean usesBlockLight() {
             return wrapped.usesBlockLight();
         }
-
-        @Override
         public boolean isCustomRenderer() {
             return wrapped.isCustomRenderer();
         }
-
-        @Override
         public TextureAtlasSprite getParticleIcon() {
             return wrapped.getParticleIcon();
         }
-
-        @Override
         public ItemTransforms getTransforms() {
             return wrapped.getTransforms();
         }
-
-        @Override
         public ItemOverrides getOverrides() {
             return wrapped.getOverrides();
         }

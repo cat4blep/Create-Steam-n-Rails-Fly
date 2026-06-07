@@ -23,12 +23,12 @@ import com.railwayteam.railways.content.buffer.headstock.CopycatHeadstockBarsBlo
 import com.railwayteam.railways.content.buffer.headstock.CopycatHeadstockBlock;
 import com.railwayteam.railways.content.buffer.headstock.CopycatHeadstockBlockEntity;
 import com.railwayteam.railways.registry.CRBlocks;
-import com.simibubi.create.AllBlocks;
-import com.simibubi.create.content.decoration.copycat.CopycatBlock;
-import com.simibubi.create.content.decoration.copycat.CopycatSpecialCases;
-import com.simibubi.create.content.decoration.copycat.FilteredBlockAndTintGetter;
-import com.simibubi.create.foundation.model.BakedModelHelper;
-import net.createmod.catnip.data.Iterate;
+import com.zurrtum.create.AllBlocks;
+import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
+import com.zurrtum.create.content.decoration.copycat.CopycatSpecialCases;
+import com.zurrtum.create.content.decoration.copycat.FilteredBlockAndTintGetter;
+import com.zurrtum.create.foundation.model.BakedModelHelper;
+import com.zurrtum.create.catnip.data.Iterate;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
@@ -45,7 +45,7 @@ import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -57,7 +57,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.DyeColor;
@@ -78,7 +78,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import static com.railwayteam.railways.content.buffer.BufferModelUtils.getSwapper;
-import static com.simibubi.create.content.decoration.copycat.CopycatModel.getModelOf;
+import static com.zurrtum.create.client.infrastructure.model.CopycatModel.getModelOf;
 
 @Environment(EnvType.CLIENT)
 @ParametersAreNonnullByDefault
@@ -102,17 +102,13 @@ public class CopycatHeadstockModel extends ForwardingBakedModel {
                 occlusionData.occlude(face);
         }
     }
-
-    @Override
     public boolean isVanillaAdapter() {
         return false;
     }
 
     private static boolean filterCopycatParts(BakedQuad quad) {
-        return !quad.getSprite().contents().name().equals(new ResourceLocation("create", "block/copycat_base"));
+        return !quad.getSprite().contents().name().equals(new Identifier("create", "block/copycat_base"));
     }
-
-    @Override
     public void emitBlockQuads(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context) {
         BlockState material;
         UnaryOperator<TextureAtlasSprite> colorSwapper = null;
@@ -266,20 +262,18 @@ public class CopycatHeadstockModel extends ForwardingBakedModel {
         context.popTransform();
         context.meshConsumer().accept(meshBuilder.build());
     }
-
-    @Override
     public void emitItemQuads(ItemStack stack, Supplier<RandomSource> randomSupplier, RenderContext context) {
         BlockState material = AllBlocks.COPYCAT_BASE.getDefaultState();
         UnaryOperator<TextureAtlasSprite> colorSwapper = null;
 
         if (stack.hasTag()) {
             CompoundTag tag = stack.getTag();
-            if (tag.contains("BlockEntityTag", Tag.TAG_COMPOUND)) {
-                CompoundTag blockEntityTag = tag.getCompound("BlockEntityTag");
-                if (blockEntityTag.contains("Material", Tag.TAG_COMPOUND)) {
-                    material = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockEntityTag.getCompound("Material"));
+            if (tag.contains("BlockEntityTag")) {
+                CompoundTag blockEntityTag = tag.getCompound("BlockEntityTag").orElse(new CompoundTag());
+                if (blockEntityTag.contains("Material")) {
+                    material = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), blockEntityTag.getCompound("Material").orElse(new CompoundTag()));
                 }
-                if (blockEntityTag.contains("Color", Tag.TAG_INT)) {
+                if (blockEntityTag.contains("Color")) {
                     colorSwapper = getSwapper(DyeColor.byId(blockEntityTag.getInt("Color")));
                 }
             }
@@ -320,43 +314,27 @@ public class CopycatHeadstockModel extends ForwardingBakedModel {
         protected @NotNull List<BakedQuad> filterQuads(@NotNull List<BakedQuad> quads) {
             return quads.stream().filter(filter).toList();
         }
-
-        @Override
         public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random) {
             return BakedModelHelper.swapSprites(filterQuads(wrapped.getQuads(state, direction, random)), this.spriteSwapper);
         }
-
-        @Override
         public boolean useAmbientOcclusion() {
             return wrapped.useAmbientOcclusion();
         }
-
-        @Override
         public boolean isGui3d() {
             return wrapped.isGui3d();
         }
-
-        @Override
         public boolean usesBlockLight() {
             return wrapped.usesBlockLight();
         }
-
-        @Override
         public boolean isCustomRenderer() {
             return wrapped.isCustomRenderer();
         }
-
-        @Override
         public TextureAtlasSprite getParticleIcon() {
             return wrapped.getParticleIcon();
         }
-
-        @Override
         public ItemTransforms getTransforms() {
             return wrapped.getTransforms();
         }
-
-        @Override
         public ItemOverrides getOverrides() {
             return wrapped.getOverrides();
         }
@@ -395,7 +373,6 @@ public class CopycatHeadstockModel extends ForwardingBakedModel {
     }
 
     private record MaterialFixer(RenderMaterial materialDefault) implements RenderContext.QuadTransform {
-        @Override
         public boolean transform(MutableQuadView quad) {
             if (quad.material().blendMode() == BlendMode.DEFAULT) {
                 // default needs to be changed from the Copycat's default (cutout) to the wrapped material's default.

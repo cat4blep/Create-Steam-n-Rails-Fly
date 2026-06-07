@@ -20,25 +20,16 @@ package com.railwayteam.railways.fabric;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.config.fabric.CRConfigsImpl;
-import com.railwayteam.railways.content.fuel.tank.FuelTankBlock;
 import com.railwayteam.railways.fabric.events.CommonEventsFabric;
 import com.railwayteam.railways.multiloader.CommandRegistrar;
 import com.railwayteam.railways.registry.fabric.CRBlockEntitiesImpl;
 import com.railwayteam.railways.registry.fabric.CRBlocksImpl;
 import com.railwayteam.railways.registry.fabric.CRMountedStorageTypesImpl;
 import com.railwayteam.railways.registry.fabric.CRParticleTypesParticleEntryImpl;
-import com.simibubi.create.api.connectivity.ConnectivityHandler;
-import com.simibubi.create.api.contraption.BlockMovementChecks;
-import com.simibubi.create.api.contraption.BlockMovementChecks.CheckResult;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class RailwaysImpl implements ModInitializer {
-	@Override
 	public void onInitialize() {
 		Railways.init();
 		CRConfigsImpl.register();
@@ -56,12 +47,6 @@ public class RailwaysImpl implements ModInitializer {
 	}
 
 	public static void platformBasedRegistration() {
-		BlockMovementChecks.registerAttachedCheck((BlockState state, Level world, BlockPos pos, Direction direction) -> {
-			if (state.getBlock() instanceof FuelTankBlock && ConnectivityHandler.isConnected(world, pos, pos.relative(direction)))
-				return CheckResult.SUCCESS;
-			return CheckResult.PASS;
-		});
-
 		CRMountedStorageTypesImpl.init();
 		CRBlocksImpl.init();
 		CRBlockEntitiesImpl.init();

@@ -43,47 +43,31 @@ public class ConductorFakePlayerFabric extends FakePlayer implements IConductorH
 		super(world, ConductorEntity.FAKE_PLAYER_PROFILE);
 		this.conductor = new WeakReference<>(conductor);
 	}
-
-	@Override
 	@NotNull
 	public OptionalInt openMenu(MenuProvider container) {
 		return OptionalInt.empty();
 	}
-
-	@Override
 	@NotNull
 	public Component getDisplayName() {
 		return Component.translatable(Railways.MOD_ID + "." + "conductor_name");
 	}
-
-	@Override
 	public float getEyeHeight(@NotNull Pose pose) {
 		return 0;
 	}
-
-	@Override
 	public Vec3 position() {
 		return new Vec3(getX(), getY(), getZ());
 	}
-
-	@Override
 	public float getCurrentItemAttackStrengthDelay() {
 		return 1 / 64f;
 	}
-
-	@Override
 	public boolean canEat(boolean ignoreHunger) {
 		return false;
 	}
-
-	@Override
 	@NotNull
 	public ItemStack eat(@NotNull Level world, ItemStack stack) {
 		stack.shrink(1);
 		return stack;
 	}
-
-	@Override
 	public @Nullable ConductorEntity getConductor() {
 		return conductor.get();
 	}

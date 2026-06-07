@@ -21,7 +21,7 @@ package com.railwayteam.railways.fabric.mixin.self;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.base.reload.ClientResourceReloadListener;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -29,10 +29,8 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(ClientResourceReloadListener.class)
 public abstract class ClientResourceReloadListenerMixin implements ResourceManagerReloadListener, IdentifiableResourceReloadListener {
     @Unique
-    private static final ResourceLocation ID = Railways.asResource("client_reload_listener");
-
-    @Override
-    public ResourceLocation getFabricId() {
+    private static final Identifier ID = Railways.asResource("client_reload_listener");
+    public Identifier getFabricId() {
         return ID;
     }
 }

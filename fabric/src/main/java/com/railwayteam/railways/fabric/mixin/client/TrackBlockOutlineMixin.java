@@ -19,7 +19,7 @@
 package com.railwayteam.railways.fabric.mixin.client;
 
 import com.railwayteam.railways.content.custom_tracks.monorail.CustomTrackBlockOutline;
-import com.simibubi.create.content.trains.track.TrackBlockOutline;
+import com.zurrtum.create.client.content.trains.track.TrackBlockOutline;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

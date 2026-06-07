@@ -14,7 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DyeColor;
 
@@ -56,7 +56,7 @@ public class CRCreativeModeTabsImpl {
     }
 
     private static TabInfo register(String name, Supplier<CreativeModeTab> supplier) {
-        ResourceLocation id = Railways.asResource(name);
+        Identifier id = Railways.asResource(name);
         ResourceKey<CreativeModeTab> key = ResourceKey.create(Registries.CREATIVE_MODE_TAB, id);
         CreativeModeTab tab = supplier.get();
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, key, tab);

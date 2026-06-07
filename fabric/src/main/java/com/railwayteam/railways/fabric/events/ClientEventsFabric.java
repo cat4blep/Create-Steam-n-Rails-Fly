@@ -29,7 +29,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
@@ -44,12 +44,9 @@ public class ClientEventsFabric {
 		ClientWorldEvents.LOAD.register((mc, level) -> ClientEvents.onClientWorldLoad(level));
 		ParticleManagerRegistrationCallback.EVENT.register(CRParticleTypes::registerFactories);
 		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-			@Override
-			public ResourceLocation getFabricId() {
+			public Identifier getFabricId() {
 				return Railways.asResource("client_events");
 			}
-
-			@Override
 			public void onResourceManagerReload(@NotNull ResourceManager resourceManager) {
 				ClientEvents.onTagsUpdated();
 			}

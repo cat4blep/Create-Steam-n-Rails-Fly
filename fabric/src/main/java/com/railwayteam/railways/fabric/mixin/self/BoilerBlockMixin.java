@@ -19,7 +19,7 @@
 package com.railwayteam.railways.fabric.mixin.self;
 
 import com.railwayteam.railways.content.palettes.boiler.BoilerBlock;
-import com.simibubi.create.foundation.block.render.ReducedDestroyEffects;
+import com.zurrtum.create.foundation.block.render.ReducedDestroyEffects;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(BoilerBlock.class)

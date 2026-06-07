@@ -21,8 +21,6 @@ package com.railwayteam.railways.fabric;
 import com.mojang.brigadier.CommandDispatcher;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.RailwaysClient;
-import com.railwayteam.railways.content.conductor.fabric.ConductorCapItemRenderer;
-import com.railwayteam.railways.fabric.events.ClientEventsFabric;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -39,11 +37,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class RailwaysClientImpl implements ClientModInitializer {
-	@Override
 	public void onInitializeClient() {
 		RailwaysClient.init();
-		ClientEventsFabric.init();
-		ConductorCapItemRenderer.register();
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"}) // jank!

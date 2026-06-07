@@ -18,19 +18,16 @@
 
 package com.railwayteam.railways.content.fuel.tank;
 
-import com.simibubi.create.api.behaviour.movement.MovementBehaviour;
-import com.simibubi.create.content.contraptions.behaviour.MovementContext;
+import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
+import com.zurrtum.create.content.contraptions.behaviour.MovementContext;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class FuelTankMovementBehavior implements MovementBehaviour {
-    @Override
+public class FuelTankMovementBehavior extends MovementBehaviour {
     public boolean mustTickWhileDisabled() {
         return true;
     }
-
-    @Override
     public void tick(MovementContext context) {
-        if(!context.world.isClientSide)
+        if(!context.world.isClientSide())
             return;
 
         BlockEntity be = context.contraption.getOrCreateClientContraptionLazy().getBlockEntity(context.localPos);

@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import io.github.fabricators_of_create.porting_lib.models.generators.CustomLoaderBuilder;
 import io.github.fabricators_of_create.porting_lib.models.generators.ModelBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 
 public class ObjModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T> {
@@ -13,23 +13,23 @@ public class ObjModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuil
         return new ObjModelBuilder<>(parent, existingFileHelper);
     }
 
-    private ResourceLocation modelLocation;
+    private Identifier modelLocation;
     private Boolean automaticCulling;
     private Boolean shadeQuads;
     private Boolean flipV;
     private Boolean emissiveAmbient;
-    private ResourceLocation mtlOverride;
+    private Identifier mtlOverride;
 
     // needed so that the right loader is called for forge and fabric
-    private static final ResourceLocation FORGE_OBJ = new ResourceLocation("forge", "obj");
-    private static final ResourceLocation PORTING_LIB_LOADER = new ResourceLocation("porting_lib", "loader");
-    private static final ResourceLocation PORTING_LIB_OBJ = new ResourceLocation("porting_lib", "obj");
+    private static final Identifier FORGE_OBJ = new Identifier("forge", "obj");
+    private static final Identifier PORTING_LIB_LOADER = new Identifier("porting_lib", "loader");
+    private static final Identifier PORTING_LIB_OBJ = new Identifier("porting_lib", "obj");
 
     protected ObjModelBuilder(T parent, ExistingFileHelper existingFileHelper) {
         super(FORGE_OBJ, parent, existingFileHelper);
     }
 
-    public ObjModelBuilder<T> modelLocation(ResourceLocation modelLocation) {
+    public ObjModelBuilder<T> modelLocation(Identifier modelLocation) {
         Preconditions.checkNotNull(modelLocation, "modelLocation must not be null");
         Preconditions.checkArgument(existingFileHelper.exists(modelLocation, PackType.CLIENT_RESOURCES),
                 "OBJ Model %s does not exist in any known resource pack", modelLocation);
@@ -57,15 +57,13 @@ public class ObjModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuil
         return this;
     }
 
-    public ObjModelBuilder<T> overrideMaterialLibrary(ResourceLocation mtlOverride) {
+    public ObjModelBuilder<T> overrideMaterialLibrary(Identifier mtlOverride) {
         Preconditions.checkNotNull(mtlOverride, "mtlOverride must not be null");
         Preconditions.checkArgument(existingFileHelper.exists(mtlOverride, PackType.CLIENT_RESOURCES),
                 "OBJ Model %s does not exist in any known resource pack", mtlOverride);
         this.mtlOverride = mtlOverride;
         return this;
     }
-
-    @Override
     public JsonObject toJson(JsonObject json) {
         json = super.toJson(json);
 

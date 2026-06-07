@@ -31,7 +31,6 @@ import java.nio.file.Paths;
 import java.util.Set;
 
 public class RailwaysDataFabric implements DataGeneratorEntrypoint {
-	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator gen) {
 		// Ensure that all mods are present if they are needed for data gen
 		for (Mods mod : Mods.values())
@@ -47,8 +46,6 @@ public class RailwaysDataFabric implements DataGeneratorEntrypoint {
 		Railways.gatherData(pack);
 		pack.addProvider(GeneratedEntriesProvider::new);
 	}
-
-	@Override
 	public void buildRegistry(RegistrySetBuilder builder) {
 		GeneratedEntriesProvider.addBootstraps(builder);
 	}

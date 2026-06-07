@@ -90,8 +90,6 @@ class PaintPitcherFluidStorage implements SingleSlotStorage<FluidVariant> {
         return ItemVariant.of(color.getItemEntry().get()
             .copyAsFilledStack(context.getItemVariant().toStack(), levels));
     }
-
-    @Override
     public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
         StoragePreconditions.notBlankNotNegative(resource, maxAmount);
 
@@ -112,8 +110,6 @@ class PaintPitcherFluidStorage implements SingleSlotStorage<FluidVariant> {
 
         return 0;
     }
-
-    @Override
     public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
         StoragePreconditions.notBlankNotNegative(resource, maxAmount);
 
@@ -132,13 +128,9 @@ class PaintPitcherFluidStorage implements SingleSlotStorage<FluidVariant> {
 
         return 0;
     }
-
-    @Override
     public boolean isResourceBlank() {
         return getLevels() == 0;
     }
-
-    @Override
     public FluidVariant getResource() {
         ItemStack stack = context.getItemVariant().toStack();
         if (!(stack.getItem() instanceof PaintPitcherItem item)) return FluidVariant.blank();
@@ -150,18 +142,12 @@ class PaintPitcherFluidStorage implements SingleSlotStorage<FluidVariant> {
             PaintFluid.setColor(new CompoundTag(), item.getColor())
         );
     }
-
-    @Override
     public long getAmount() {
         return getLevels() * FLUID_PER_LEVEL;
     }
-
-    @Override
     public long getCapacity() {
         return MAX_LEVELS * FLUID_PER_LEVEL;
     }
-
-    @Override
     public String toString() {
         return "PaintPitcherFluidStorage[" + context + "]";
     }

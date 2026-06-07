@@ -38,8 +38,6 @@ public class ConductorCapItemRenderer implements ArmorRenderer {
 			ArmorRenderer.register(renderer, item);
 		}
 	}
-
-	@Override
 	public void render(PoseStack matrices, MultiBufferSource vertexConsumers, ItemStack stack, LivingEntity entity,
 					   EquipmentSlot slot, int light, HumanoidModel<LivingEntity> contextModel) {
 		if (!(stack.getItem() instanceof ConductorCapItem cap))

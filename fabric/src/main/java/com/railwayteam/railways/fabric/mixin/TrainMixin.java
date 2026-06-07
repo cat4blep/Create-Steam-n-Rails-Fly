@@ -21,7 +21,7 @@ package com.railwayteam.railways.fabric.mixin;
 import com.google.common.collect.Iterators;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.railwayteam.railways.registry.CRTags;
-import com.simibubi.create.content.trains.entity.Train;
+import com.zurrtum.create.content.trains.entity.Train;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import org.spongepowered.asm.mixin.Mixin;

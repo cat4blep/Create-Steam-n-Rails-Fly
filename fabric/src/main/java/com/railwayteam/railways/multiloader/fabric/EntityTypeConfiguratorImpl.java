@@ -34,14 +34,10 @@ public class EntityTypeConfiguratorImpl extends EntityTypeConfigurator {
 			return new EntityTypeConfiguratorImpl(fabricBuilder);
 		throw new IllegalArgumentException("builder must be a FabricEntityTypeBuilder");
 	}
-
-	@Override
 	public EntityTypeConfigurator size(float width, float height) {
 		builder.dimensions(EntityDimensions.scalable(width, height));
 		return this;
 	}
-
-	@Override
 	public EntityTypeConfigurator fireImmune() {
 		builder.fireImmune();
 		return this;

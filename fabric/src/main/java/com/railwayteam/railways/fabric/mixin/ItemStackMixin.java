@@ -31,8 +31,6 @@ import org.spongepowered.asm.mixin.Shadow;
 public class ItemStackMixin implements ItemStackDuck {
     @Mutable
     @Shadow @Final private @Nullable Item item;
-
-    @Override
     public void railways$setItem(Item item) {
         this.item = item;
     }

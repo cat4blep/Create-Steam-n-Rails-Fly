@@ -18,8 +18,8 @@
 
 package com.railwayteam.railways.content.buffer.headstock.fabric;
 
-import com.simibubi.create.content.decoration.copycat.CopycatModel;
-import net.createmod.catnip.render.SpriteShiftEntry;
+import com.zurrtum.create.client.infrastructure.model.CopycatModel;
+import com.zurrtum.create.client.catnip.render.SpriteShiftEntry;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.model.SpriteFinder;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
@@ -39,8 +39,6 @@ public class CopycatHeadstockBarsModel extends CopycatModel {
     public CopycatHeadstockBarsModel(BakedModel originalModel) {
         super(originalModel);
     }
-
-    @Override
     public boolean useAmbientOcclusion() {
         return false;
     }
@@ -58,8 +56,6 @@ public class CopycatHeadstockBarsModel extends CopycatModel {
         }
         emitBlockQuadsInner(blockView, state, pos, randomSupplier, context, material, actualCullFaceRemovalData, actualOcclusionData);
     }
-
-    @Override
     protected void emitBlockQuadsInner(BlockAndTintGetter blockView, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context, BlockState material, CullFaceRemovalData cullFaceRemovalData, OcclusionData occlusionData) {
         BakedModel model = getModelOf(material);
         TextureAtlasSprite mainTargetSprite = model.getParticleIcon();

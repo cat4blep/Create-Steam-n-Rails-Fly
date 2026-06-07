@@ -19,18 +19,18 @@
 package com.railwayteam.railways.content.fuel.tank;
 
 import com.railwayteam.railways.registry.fabric.CRBlockEntitiesImpl;
-import com.simibubi.create.api.connectivity.ConnectivityHandler;
-import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.content.fluids.transfer.GenericItemEmptying;
-import com.simibubi.create.content.fluids.transfer.GenericItemFilling;
-import com.simibubi.create.foundation.advancement.AdvancementBehaviour;
-import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.blockEntity.ComparatorUtil;
-import com.simibubi.create.foundation.fluid.FluidHelper;
+import com.zurrtum.create.api.connectivity.ConnectivityHandler;
+import com.zurrtum.create.content.equipment.wrench.IWrenchable;
+import com.zurrtum.create.content.fluids.transfer.GenericItemEmptying;
+import com.zurrtum.create.content.fluids.transfer.GenericItemFilling;
+import com.zurrtum.create.foundation.advancement.AdvancementBehaviour;
+import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.foundation.blockEntity.ComparatorUtil;
+import com.zurrtum.create.foundation.fluid.FluidHelper;
 import io.github.fabricators_of_create.porting_lib.block.CustomSoundTypeBlock;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
-import net.createmod.catnip.lang.Lang;
+import com.zurrtum.create.client.catnip.lang.Lang;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -79,8 +79,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
     public static final BooleanProperty BOTTOM = BooleanProperty.create("bottom");
     public static final EnumProperty<Shape> SHAPE = EnumProperty.create("shape", Shape.class);
     public static final IntegerProperty LIGHT_LEVEL = IntegerProperty.create("light_level", 0, 15);
-
-    @Override
     public void setPlacedBy(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, LivingEntity pPlacer,
                             @NotNull ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
@@ -102,8 +100,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
     public static boolean isTank(BlockState state) {
         return state.getBlock() instanceof FuelTankBlock;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onPlace(BlockState state, @NotNull Level world, @NotNull BlockPos pos, BlockState oldState, boolean moved) {
         if (oldState.getBlock() == state.getBlock())
@@ -116,8 +112,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
                 : FuelTankBlockEntity::updateConnectivity;
         withBlockEntityDo(world, pos, consumer);
     }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(TOP, BOTTOM, SHAPE, LIGHT_LEVEL);
     }
@@ -133,26 +127,20 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
 //			return 0;
 //		return tankAt.luminosity;
 //	}
-
-    @Override
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
         withBlockEntityDo(context.getLevel(), context.getClickedPos(), FuelTankBlockEntity::toggleWindows);
         return InteractionResult.SUCCESS;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull VoxelShape getBlockSupportShape(@NotNull BlockState pState, @NotNull BlockGetter pReader,
                                                     @NotNull BlockPos pPos) {
         return Shapes.block();
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull InteractionResult use(@NotNull BlockState state, Level world, @NotNull BlockPos pos, Player player,
                                           @NotNull InteractionHand hand, @NotNull BlockHitResult ray) {
         ItemStack heldItem = player.getItemInHand(hand);
-        boolean onClient = world.isClientSide;
+        boolean onClient = world.isClientSide();
 
         if (heldItem.isEmpty())
             return InteractionResult.PASS;
@@ -241,8 +229,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
 
         return InteractionResult.SUCCESS;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, @NotNull Level world, @NotNull BlockPos pos,
                          @NotNull BlockState newState, boolean isMoving) {
@@ -254,18 +240,12 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
             ConnectivityHandler.splitMulti(tankBE);
         }
     }
-
-    @Override
     public Class<FuelTankBlockEntity> getBlockEntityClass() {
         return FuelTankBlockEntity.class;
     }
-
-    @Override
     public BlockEntityType<? extends FuelTankBlockEntity> getBlockEntityType() {
         return CRBlockEntitiesImpl.FUEL_TANK.get();
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull BlockState mirror(@NotNull BlockState state, @NotNull Mirror mirror) {
         if (mirror == Mirror.NONE)
@@ -279,8 +259,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
             default -> state;
         };
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public @NotNull BlockState rotate(@NotNull BlockState state, Rotation rotation) {
         for (int i = 0; i < rotation.ordinal(); i++)
@@ -300,8 +278,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
 
     public enum Shape implements StringRepresentable {
         PLAIN, WINDOW, WINDOW_NW, WINDOW_SW, WINDOW_NE, WINDOW_SE;
-
-        @Override
         public @NotNull String getSerializedName() {
             return Lang.asId(name());
         }
@@ -311,8 +287,6 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
     public static final SoundType SILENCED_METAL =
             new SoundType(0.1F, 1.5F, SoundEvents.METAL_BREAK, SoundEvents.METAL_STEP,
                     SoundEvents.METAL_PLACE, SoundEvents.METAL_HIT, SoundEvents.METAL_FALL);
-
-    @Override
     public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, Entity entity) {
         SoundType soundType = getSoundType(state);
         if (entity != null && entity.getCustomData()
@@ -320,14 +294,10 @@ public class FuelTankBlock extends Block implements IWrenchable, IBE<FuelTankBlo
             return SILENCED_METAL;
         return soundType;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public boolean hasAnalogOutputSignal(@NotNull BlockState state) {
         return true;
     }
-
-    @Override
     @SuppressWarnings("deprecation")
     public int getAnalogOutputSignal(@NotNull BlockState blockState, @NotNull Level worldIn, @NotNull BlockPos pos) {
         return getBlockEntityOptional(worldIn, pos).map(FuelTankBlockEntity::getControllerBE)

@@ -19,18 +19,18 @@
 package com.railwayteam.railways.content.fuel.tank;
 
 import com.railwayteam.railways.content.fuel.LiquidFuelTrainHandler;
-import com.simibubi.create.api.connectivity.ConnectivityHandler;
-import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.foundation.blockEntity.IMultiBlockEntityContainer;
-import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.fluid.SmartFluidTank;
-import com.simibubi.create.infrastructure.config.AllConfigs;
+import com.zurrtum.create.api.connectivity.ConnectivityHandler;
+import com.zurrtum.create.client.api.goggles.IHaveGoggleInformation;
+import com.zurrtum.create.foundation.blockEntity.IMultiBlockEntityContainer;
+import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
+import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
+import com.zurrtum.create.foundation.fluid.SmartFluidTank;
+import com.zurrtum.create.infrastructure.config.AllConfigs;
 import io.github.fabricators_of_create.porting_lib.block.CustomRenderBoundingBoxBlockEntity;
 import io.github.fabricators_of_create.porting_lib.fluids.FluidStack;
 import io.github.fabricators_of_create.porting_lib.transfer.TransferUtil;
 import io.github.fabricators_of_create.porting_lib.transfer.fluid.FluidTank;
-import net.createmod.catnip.animation.LerpedFloat;
+import com.zurrtum.create.catnip.animation.LerpedFloat;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributeHandler;
@@ -96,14 +96,12 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
 
     protected void updateConnectivity() {
         updateConnectivity = false;
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
             return;
         if (!isController())
             return;
         ConnectivityHandler.formMulti(this);
     }
-
-    @Override
     public void tick() {
         super.tick();
         if (syncCooldown > 0) {
@@ -128,23 +126,17 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         if (fluidLevel != null)
             fluidLevel.tickChaser();
     }
-
-    @Override
     public BlockPos getLastKnownPos() {
         return lastKnownPos;
     }
-
-    @Override
     public boolean isController() {
         return controller == null || worldPosition.getX() == controller.getX()
                 && worldPosition.getY() == controller.getY() && worldPosition.getZ() == controller.getZ();
     }
-
-    @Override
     public void initialize() {
         super.initialize();
         sendData();
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
             invalidateRenderBoundingBox();
     }
 
@@ -182,7 +174,7 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
             }
         }
 
-        if (level != null && !level.isClientSide) {
+        if (level != null && !level.isClientSide()) {
             setChanged();
             sendData();
         }
@@ -196,7 +188,7 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     protected void setLuminosity(int luminosity) {
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
             return;
         if (this.luminosity == luminosity)
             return;
@@ -205,7 +197,7 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     protected void updateStateLuminosity() {
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
             return;
         int actualLuminosity = luminosity;
         FuelTankBlockEntity controllerBE = getControllerBE();
@@ -219,7 +211,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     @SuppressWarnings("unchecked")
-    @Override
     public FuelTankBlockEntity getControllerBE() {
         if (isController())
             return this;
@@ -240,7 +231,7 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     }
 
     public void removeController(boolean keepFluids) {
-        if (level != null && level.isClientSide)
+        if (level != null && level.isClientSide())
             return;
         updateConnectivity = true;
         if (!keepFluids)
@@ -276,8 +267,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         queuedSync = false;
         sendData();
     }
-
-    @Override
     public void sendData() {
         if (syncCooldown > 0) {
             queuedSync = true;
@@ -326,10 +315,8 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
             }
         }
     }
-
-    @Override
     public void setController(BlockPos controller) {
-        if (level != null && level.isClientSide && !isVirtual())
+        if (level != null && level.isClientSide() && !isVirtual())
             return;
         if (controller.equals(this.controller))
             return;
@@ -347,21 +334,15 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         return isController() ? tankInventory :
                 getControllerBE() != null ? getControllerBE().handlerForCapability() : new FluidTank(0);
     }
-
-    @Override
     public BlockPos getController() {
         return isController() ? worldPosition : controller;
     }
-
-    @Override
     protected AABB createRenderBoundingBox() {
         if (isController())
             return super.createRenderBoundingBox().expandTowards(width - 1, height - 1, width - 1);
         else
             return super.createRenderBoundingBox();
     }
-
-    @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         FuelTankBlockEntity controllerBE = getControllerBE();
         if (controllerBE == null)
@@ -370,8 +351,7 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
                 controllerBE.getFluidStorage(null));
     }
 
-    @Override
-    protected void read(CompoundTag compound, boolean clientPacket) {
+        protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
 
         BlockPos controllerBefore = controller;
@@ -385,16 +365,16 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         lastKnownPos = null;
 
         if (compound.contains("LastKnownPos"))
-            lastKnownPos = NbtUtils.readBlockPos(compound.getCompound("LastKnownPos"));
+            lastKnownPos = NbtUtils.readBlockPos(compound.getCompound("LastKnownPos").orElse(new CompoundTag()));
         if (compound.contains("Controller"))
-            controller = NbtUtils.readBlockPos(compound.getCompound("Controller"));
+            controller = NbtUtils.readBlockPos(compound.getCompound("Controller").orElse(new CompoundTag()));
 
         if (isController()) {
             window = compound.getBoolean("Window");
             width = compound.getInt("Size");
             height = compound.getInt("Height");
             tankInventory.setCapacity(getTotalTankSize() * getCapacityMultiplier());
-            tankInventory.readFromNBT(compound.getCompound("TankContent"));
+            tankInventory.readFromNBT(compound.getCompound("TankContent").orElse(new CompoundTag()));
             if (tankInventory.getSpace() < 0) {
                 try (Transaction t = TransferUtil.getTransaction()) {
                     tankInventory.extract(tankInventory.variant, -tankInventory.getSpace(), t);
@@ -439,8 +419,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public float getFillState() {
         return (float) tankInventory.getFluidAmount() / tankInventory.getCapacity();
     }
-
-    @Override
     public void write(CompoundTag compound, boolean clientPacket) {
         if (updateConnectivity)
             compound.putBoolean("Uninitialized", true);
@@ -465,14 +443,10 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
             compound.putBoolean("LazySync", true);
         forceFluidLevelUpdate = false;
     }
-
-    @Override
     public void invalidate() {
         super.invalidate();
     }
-
-    @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {}
 
     public FluidTank getTankInventory() {
         return tankInventory;
@@ -501,8 +475,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public void setFluidLevel(LerpedFloat fluidLevel) {
         this.fluidLevel = fluidLevel;
     }
-
-    @Override
     public void preventConnectivityUpdate() {
         updateConnectivity = false;
     }
@@ -511,8 +483,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
     public void queueConnectivityUpdate() {
         updateConnectivity = true;
     }
-
-    @Override
     public void notifyMultiUpdated() {
         BlockState state = this.getBlockState();
         if (FuelTankBlock.isTank(state)) { // safety
@@ -525,20 +495,14 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         onFluidStackChanged(tankInventory.getFluid());
         setChanged();
     }
-
-    @Override
     public void setExtraData(@Nullable Object data) {
         if (data instanceof Boolean)
             window = (boolean) data;
     }
-
-    @Override
     @Nullable
     public Object getExtraData() {
         return window;
     }
-
-    @Override
     public Object modifyExtraData(Object data) {
         if (data instanceof Boolean windows) {
             windows |= window;
@@ -546,72 +510,47 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         }
         return data;
     }
-
-    @Override
     public Direction.Axis getMainConnectionAxis() {
         return Direction.Axis.Y;
     }
-
-    @Override
     public int getMaxLength(Direction.Axis longAxis, int width) {
         if (longAxis == Direction.Axis.Y)
             return getMaxHeight();
         return getMaxWidth();
     }
-
-    @Override
     public int getMaxWidth() {
         return MAX_SIZE;
     }
-
-    @Override
     public int getHeight() {
         return height;
     }
-
-    @Override
     public void setHeight(int height) {
         this.height = height;
     }
-
-    @Override
     public int getWidth() {
         return width;
     }
-
-    @Override
     public void setWidth(int width) {
         this.width = width;
     }
-
-    @Override
     public boolean hasTank() {
         return true;
     }
-
-    @Override
     public long getTankSize(int tank) {
         return getCapacityMultiplier();
     }
-
-    @Override
     public void setTankSize(int tank, int blocks) {
         applyFluidTankSize(blocks);
     }
-
-    @Override
     public FluidTank getTank(int tank) {
         return tankInventory;
     }
-
-    @Override
     public FluidStack getFluid(int tank) {
         return tankInventory.getFluid()
                 .copy();
     }
 
     @Nullable
-    @Override
     public Storage<FluidVariant> getFluidStorage(@Nullable Direction direction) {
         if (exposedTank == null)
             refreshCapability();
@@ -626,8 +565,6 @@ public class FuelTankBlockEntity extends SmartBlockEntity implements IHaveGoggle
         public boolean isFluidValid(FluidVariant stack) {
             return LiquidFuelTrainHandler.isFuelForTanks(stack.getFluid());
         }
-
-        @Override
         public long insert(FluidVariant insertedVariant, long maxAmount, TransactionContext transaction) {
             if (!isFluidValid(insertedVariant))
                 return 0;
