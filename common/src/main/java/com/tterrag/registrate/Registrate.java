@@ -63,7 +63,7 @@ public class Registrate extends AbstractRegistrate<Registrate> {
     }
 
     public <T extends AbstractContainerMenu, S> MenuBuilder<T, Registrate> menu(String name, MenuBuilder.ForgeMenuFactory<T> factory, java.util.function.Supplier<MenuBuilder.ScreenFactory<T, S>> screenFactory) {
-        return new MenuBuilder<>(this, name, (type, id) -> factory.create(type, id, null, null));
+        return new MenuBuilder<T, Registrate>(this, name, factory).screen(screenFactory);
     }
 
     public Identifier id(String name) {
