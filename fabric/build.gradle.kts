@@ -55,6 +55,11 @@ dependencies {
 
     modCompileOnly("dev.emi:emi-fabric:${"emi_version"()}:api") { isTransitive = false }
 
+    // JEI (recipe viewer) - dev runtime only, for testing recipe-viewer compatibility
+    if ("enable_jei"().toBoolean()) {
+        modLocalRuntime("maven.modrinth:jei:${"jei_fabric_version"()}")
+    }
+
     modCompileOnly("de.maxhenkel.voicechat:voicechat-api:${"voicechat_api_version"()}")
 
     if ("enable_simple_voice_chat"().toBoolean()) {
