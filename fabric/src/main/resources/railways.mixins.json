@@ -1,9 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.railwayteam.railways.fabric.mixin",
+  "package": "com.railwayteam.railways.fabric_mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": [],
+  "client": [
+    "client.BlockElementDeserializerMixin"
+  ],
   "mixins": [],
   "injectors": {
     "defaultRequire": 1,
