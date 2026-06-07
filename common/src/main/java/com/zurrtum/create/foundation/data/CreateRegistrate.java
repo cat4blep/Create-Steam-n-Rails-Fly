@@ -34,14 +34,11 @@ public class CreateRegistrate extends Registrate {
         return NonNullConsumer.noop();
     }
 
-    public static boolean isInCreativeTab(RegistryEntry<?> entry, ResourceKey<CreativeModeTab> tab) {
-        return true;
-    }
-
     public void setTooltipModifierFactory(Function<Item, TooltipModifier> factory) {
     }
 
     public void setCreativeTab(ResourceKey<CreativeModeTab> tab) {
+        setCurrentCreativeTab(tab);
     }
 
     public void register() {

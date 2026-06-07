@@ -13,11 +13,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -33,9 +35,29 @@ import java.util.function.Function;
 
 public class Registrate extends AbstractRegistrate<Registrate> {
     private final Map<String, RegistryEntry<?>> entries = new HashMap<>();
+    private ResourceKey<CreativeModeTab> currentCreativeTab = null;
+    private final Map<ResourceLocation, ResourceKey<CreativeModeTab>> creativeTabAssignments = new HashMap<>();
 
     protected Registrate(String modid) {
         super(modid);
+    }
+
+    public void setCurrentCreativeTab(ResourceKey<CreativeModeTab> tab) {
+        this.currentCreativeTab = tab;
+    }
+
+    public ResourceKey<CreativeModeTab> getCurrentCreativeTab() {
+        return currentCreativeTab;
+    }
+
+    /** Records which creative tab an entry belongs to. A null tab marks the entry as hidden from all Railways tabs. */
+    public void assignCreativeTab(ResourceLocation id, ResourceKey<CreativeModeTab> tab) {
+        creativeTabAssignments.put(id, tab);
+    }
+
+    public boolean isInCreativeTab(RegistryEntry<?> entry, ResourceKey<CreativeModeTab> tab) {
+        ResourceKey<CreativeModeTab> assigned = creativeTabAssignments.get(entry.getId());
+        return assigned != null && assigned.equals(tab);
     }
 
     public static Registrate create(String modid) {

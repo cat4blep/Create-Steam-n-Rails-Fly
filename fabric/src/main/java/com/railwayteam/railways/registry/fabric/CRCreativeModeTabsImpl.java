@@ -70,6 +70,6 @@ public class CRCreativeModeTabsImpl {
     }
 
     public static boolean isInCreativeTab(RegistryEntry<?> entry, ResourceKey<CreativeModeTab> tab) {
-        return CreateRegistrate.isInCreativeTab(entry, tab);
+        return Railways.registrate().isInCreativeTab(entry, tab);
     }
 }
