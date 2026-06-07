@@ -42,9 +42,9 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${"fabric_api_version"()}")
 
     // Create - dependencies are added transitively
-    modImplementation("com.simibubi.create:create-fabric:${"create_fabric_version"()}")
-
-    modImplementation("net.createmod.ponder:Ponder-Fabric-${"minecraft_version"()}:${"ponder_version"()}")
+    modImplementation("maven.modrinth:create-fly:${"create_fabric_version"()}")
+    compileOnly("com.tterrag.registrate:Registrate:MC1.20-1.3.11")
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
 
     // Fabric ASM (enum extension etc)
     modImplementation("com.github.Chocohead:Fabric-ASM:v2.3") {
@@ -102,6 +102,30 @@ dependencies {
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${"mixin_extras_version"()}")!!)!!
     implementation(include("io.github.llamalad7:mixinextras-fabric:${"mixin_extras_version"()}")!!)!!
+}
+
+sourceSets.main {
+    java {
+        exclude("com/railwayteam/railways/base/data/fabric/CRTagGenImpl.java")
+        exclude("com/railwayteam/railways/base/data/fabric/GeneratedEntriesProvider.java")
+        exclude("com/railwayteam/railways/base/data/recipe/fabric/**")
+        exclude("com/railwayteam/railways/compat/emi/fabric/**")
+        exclude("com/railwayteam/railways/content/buffer/fabric/BufferModel.java")
+        exclude("com/railwayteam/railways/content/buffer/headstock/fabric/CopycatHeadstockBarsModel.java")
+        exclude("com/railwayteam/railways/content/buffer/headstock/fabric/CopycatHeadstockModel.java")
+        exclude("com/railwayteam/railways/content/custom_tracks/generic_crossing/fabric/GenericCrossingModel.java")
+        exclude("com/railwayteam/railways/content/fuel/psi/**")
+        exclude("com/railwayteam/railways/content/fuel/tank/**")
+        exclude("com/railwayteam/railways/content/palettes/boiler/fabric/BoilerBigOutlinesImpl.java")
+        exclude("com/railwayteam/railways/content/palettes/boiler/fabric/BoilerBlockPlacementHelperImpl.java")
+        exclude("com/railwayteam/railways/content/palettes/boiler/fabric/ObjModelBuilder.java")
+        exclude("com/railwayteam/railways/content/palettes/painting/fabric/PaintPitcherFluidStorage.java")
+        exclude("com/railwayteam/railways/content/conductor/fabric/ConductorCapItemRenderer.java")
+        exclude("com/railwayteam/railways/fabric/events/ClientEventsFabric.java")
+        exclude("com/railwayteam/railways/fabric/mixin/**")
+        exclude("com/railwayteam/railways/fabric/ConductorFakePlayerFabric.java")
+        exclude("com/railwayteam/railways/fabric/RailwaysDataFabric.java")
+    }
 }
 
 operator fun String.invoke(): String {

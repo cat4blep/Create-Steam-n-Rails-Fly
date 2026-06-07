@@ -20,12 +20,6 @@
     "client": [
       "com.railwayteam.railways.fabric.RailwaysClientImpl"
     ],
-    "fabric-datagen": [
-      "com.railwayteam.railways.fabric.RailwaysDataFabric"
-    ],
-    "emi": [
-      "com.railwayteam.railways.compat.emi.fabric.RailwaysEmiPlugin"
-    ],
     "mm:early_risers": [
       "com.railwayteam.railways.fabric.EarlyRiser"
     ]

@@ -40,7 +40,7 @@ plugins {
     java
     `maven-publish`
     id("architectury-plugin") version "3.4-SNAPSHOT"
-    id("dev.architectury.loom") version "1.11.+" apply false
+    id("dev.architectury.loom") version "1.14.+" apply false
     id("me.modmuss50.mod-publish-plugin") version "0.7.4" apply false // https://github.com/modmuss50/mod-publish-plugin
     id("com.github.johnrengelman.shadow") version "8.1.1" apply false
     id("dev.ithundxr.silk") version "0.11.15" // https://github.com/IThundxr/silk
@@ -80,7 +80,7 @@ allprojects {
 
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(21))
         }
     }
 
@@ -298,7 +298,7 @@ subprojects {
             modLoaders.add("neoforge")
         }
 
-        val createVersionType = if (project.name == "fabric") "create-fabric" else "create"
+        val createVersionType = if (project.name == "fabric") "create-fly" else "create"
         curseforge {
             projectId = "curseforge_id"()
             accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")

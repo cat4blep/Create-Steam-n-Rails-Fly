@@ -4,29 +4,8 @@
   "package": "com.railwayteam.railways.fabric.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "Steam_Rails-fabric-refmap.json",
-  "client": [
-    "client.CopycatModelMixin",
-    "client.LevelRendererMixin",
-    "client.PortingLibModelsMixin",
-    "client.PortingLibObjLoaderMixin",
-    "client.TrackBlockOutlineMixin",
-    "client.TrainHUDMixin"
-  ],
-  "mixins": [
-    "AllKeysMixin",
-    "ContainerLevelAccessMixin",
-    "DetectorRailBlockMixin",
-    "EnderManMixin",
-    "FluidHelperMixin",
-    "FluidNetworkMixin",
-    "ItemStackMixin",
-    "MixinLootDataManager",
-    "TrainMixin",
-    "TrainRelocationPacketMixin",
-    "self.BoilerBlockMixin",
-    "self.ClientResourceReloadListenerMixin",
-    "self.LiquidFuelManagerReloadListenerMixin"
-  ],
+  "client": [],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1,
     "maxShiftBy": 5
