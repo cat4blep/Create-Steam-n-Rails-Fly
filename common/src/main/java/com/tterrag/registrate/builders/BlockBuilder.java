@@ -74,7 +74,6 @@ public class BlockBuilder<T extends Block, P> extends AbstractBuilder<T, P, Bloc
 
     public BlockEntry<T> register() {
         T block = getOrCreate();
-        owner.registerVanilla(BuiltInRegistries.BLOCK, name, block);
         return new BlockEntry<>(owner.id(name), block);
     }
 
@@ -83,7 +82,9 @@ public class BlockBuilder<T extends Block, P> extends AbstractBuilder<T, P, Bloc
         if (existing != null)
             return existing;
         ResourceKey<Block> key = ResourceKey.create(Registries.BLOCK, owner.id(name));
-        return factory.apply(properties.apply(BlockBehaviour.Properties.of()).setId(key));
+        T block = factory.apply(properties.apply(BlockBehaviour.Properties.of()).setId(key));
+        owner.registerVanilla(BuiltInRegistries.BLOCK, name, block);
+        return block;
     }
 
     private static BlockBehaviour.Properties copyInitialProperties(Object supplied) {
