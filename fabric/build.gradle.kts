@@ -53,9 +53,6 @@ dependencies {
 
     include("com.github.Chocohead:Fabric-ASM:v2.3")
 
-    // Development QOL
-    modLocalRuntime("com.terraformersmc:modmenu:${"modmenu_version"()}")
-
     modCompileOnly("dev.emi:emi-fabric:${"emi_version"()}:api") { isTransitive = false }
 
     modCompileOnly("de.maxhenkel.voicechat:voicechat-api:${"voicechat_api_version"()}")
