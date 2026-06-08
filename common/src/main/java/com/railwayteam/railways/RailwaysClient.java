@@ -31,8 +31,12 @@ import com.railwayteam.railways.registry.CREdgePointTypes;
 import com.railwayteam.railways.registry.CRFluids;
 import com.railwayteam.railways.registry.CRKeys;
 import com.railwayteam.railways.registry.CRPackets;
+import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.CustomTrackOverlayRendering;
 import com.railwayteam.railways.util.DevCapeUtils;
+import com.zurrtum.create.client.AllTrackMaterialModels;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.content.trains.track.TrackMaterial;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -71,6 +75,32 @@ public class RailwaysClient {
     CRFluids.initRendering();
 
     DevCapeUtils.INSTANCE.init();
+
+    registerTrackModels();
+  }
+
+  /**
+   * Create only assigns a render {@link AllTrackMaterialModels.TrackModelHolder} to its own track
+   * materials, so addon tracks have a null model holder and render no curves or placement preview.
+   * Register a holder for every Railways track material from its per-material partial models
+   * ({@code block/track/<material>/{tie,segment_left,segment_right}}).
+   */
+  private static void registerTrackModels() {
+    for (TrackMaterial material : TrackMaterial.ALL.values()) {
+      if (!Railways.MOD_ID.equals(material.getId().getNamespace()))
+        continue;
+      if (material.modelHolder != null)
+        continue;
+      // Monorail tracks have no tie/segment models (single-rail render), so they get no standard holder.
+      if (CRTrackMaterials.CRTrackType.MONORAIL.equals(CRTrackMaterials.getType(material)))
+        continue;
+      String base = "block/track/" + material.getId().getPath() + "/";
+      AllTrackMaterialModels.register(material, new AllTrackMaterialModels.TrackModelHolder(
+        PartialModel.of(Railways.asResource(base + "tie")),
+        PartialModel.of(Railways.asResource(base + "segment_left")),
+        PartialModel.of(Railways.asResource(base + "segment_right"))
+      ));
+    }
   }
 
   public static void registerReloadCallback(ClientResourceReloadCallback callback) {
