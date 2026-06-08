@@ -60,7 +60,8 @@ public class BlockBuilder<T extends Block, P> extends AbstractBuilder<T, P, Bloc
     }
 
     public <I extends BlockItem> ItemBuilder<I, BlockBuilder<T, P>> item(BiFunction<? super T, Item.Properties, ? extends I> factory) {
-        return new ItemBuilder<>(owner, name, props -> factory.apply(getOrCreate(), props), this);
+        return new ItemBuilder<I, BlockBuilder<T, P>>(owner, name, props -> factory.apply(getOrCreate(), props), this)
+            .properties(Item.Properties::useBlockDescriptionPrefix);
     }
 
     public BlockBuilder<T, P> removeTag(ProviderType<?> type, TagKey<?> tag) {
