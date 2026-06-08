@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/narrow_gauge_base/cross_d2_xo",
   "textures": {
     "1": "byg:block/track/rainbow_eucalyptus/standard_track_rainbow_eucalyptus",

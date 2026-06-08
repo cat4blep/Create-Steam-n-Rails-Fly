@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/ascending",
   "textures": {
     "0": "natures_spirit:block/track/maple/standard_track_maple",

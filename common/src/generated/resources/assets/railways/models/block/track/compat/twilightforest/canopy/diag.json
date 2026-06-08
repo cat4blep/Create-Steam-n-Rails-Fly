@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/diag",
   "textures": {
     "0": "twilightforest:block/track/canopy/standard_track_canopy",

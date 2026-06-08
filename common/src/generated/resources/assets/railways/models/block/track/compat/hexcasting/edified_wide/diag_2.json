@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/diag_2",
   "textures": {
     "1": "hexcasting:block/track/edified/standard_track_edified",

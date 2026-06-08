@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/segment_right",
   "textures": {
     "0": "tfc:block/track/rosewood/standard_track_rosewood",

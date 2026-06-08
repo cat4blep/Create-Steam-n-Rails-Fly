@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_d2_zo",
   "textures": {
     "0": "tfc:block/track/birch/standard_track_birch",

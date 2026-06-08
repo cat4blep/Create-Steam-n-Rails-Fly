@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/teleport",
   "textures": {
     "1": "biomesoplenty:block/track/fir/portal_track_fir",

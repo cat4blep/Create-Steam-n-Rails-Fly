@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/z_ortho",
   "textures": {
     "1": "byg:block/track/witch_hazel/standard_track_witch_hazel",

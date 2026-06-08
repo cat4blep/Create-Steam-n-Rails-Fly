@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_diag",
   "textures": {
     "0": "byg:block/track/sythian/standard_track_sythian",

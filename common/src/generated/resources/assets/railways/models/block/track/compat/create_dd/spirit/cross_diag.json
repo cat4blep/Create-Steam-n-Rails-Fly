@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_diag",
   "textures": {
     "0": "create_dd:block/track/spirit/standard_track_spirit",

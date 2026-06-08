@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/x_ortho",
   "textures": {
     "1": "twilightforest:block/track/darkwood/standard_track_darkwood",

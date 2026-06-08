@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/x_ortho",
   "textures": {
     "1": "railways:block/track/warped/standard_track_warped",

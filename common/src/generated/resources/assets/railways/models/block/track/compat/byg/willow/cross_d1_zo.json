@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_d1_zo",
   "textures": {
     "0": "byg:block/track/willow/standard_track_willow",

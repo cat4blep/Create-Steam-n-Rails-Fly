@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/segment_left",
   "textures": {
     "0": "railways:block/track/cherry/standard_track_cherry",

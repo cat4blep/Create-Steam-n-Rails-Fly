@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/ascending",
   "textures": {
     "0": "twilightforest:block/track/mangrove/standard_track_mangrove",

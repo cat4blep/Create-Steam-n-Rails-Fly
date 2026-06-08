@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_d2_xo",
   "textures": {
     "0": "byg:block/track/ether/standard_track_ether",

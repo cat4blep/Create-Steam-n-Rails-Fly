@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/diag",
   "textures": {
     "0": "quark:block/track/azalea/standard_track_azalea",

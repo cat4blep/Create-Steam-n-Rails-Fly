@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/diag",
   "textures": {
     "0": "railways:block/track/stripped_bamboo/standard_track_stripped_bamboo",

@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_diag",
   "textures": {
     "0": "byg:block/track/white_mangrove/standard_track_white_mangrove",

@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/narrow_gauge_base/diag",
   "textures": {
     "1": "natures_spirit:block/track/wisteria/standard_track_wisteria",

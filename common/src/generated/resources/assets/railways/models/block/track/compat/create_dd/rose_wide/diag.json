@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/diag",
   "textures": {
     "1": "create_dd:block/track/rose/standard_track_rose",

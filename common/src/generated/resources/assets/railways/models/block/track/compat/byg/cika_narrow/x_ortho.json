@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/narrow_gauge_base/x_ortho",
   "textures": {
     "1": "byg:block/track/cika/standard_track_cika",

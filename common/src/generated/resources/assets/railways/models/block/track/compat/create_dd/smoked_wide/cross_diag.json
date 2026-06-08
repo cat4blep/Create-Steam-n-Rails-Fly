@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/cross_diag",
   "textures": {
     "1": "create_dd:block/track/smoked/standard_track_smoked",

@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/cross_diag",
   "textures": {
     "1": "tfc:block/track/sycamore/standard_track_sycamore",

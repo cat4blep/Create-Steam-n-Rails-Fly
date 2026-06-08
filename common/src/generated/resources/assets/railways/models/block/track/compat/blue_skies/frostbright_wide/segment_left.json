@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/segment_left",
   "textures": {
     "0": "blue_skies:block/track/frostbright/standard_track_frostbright",

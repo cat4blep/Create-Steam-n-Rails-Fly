@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/cross_d1_zo",
   "textures": {
     "0": "natures_spirit:block/track/ghaf/standard_track_ghaf",

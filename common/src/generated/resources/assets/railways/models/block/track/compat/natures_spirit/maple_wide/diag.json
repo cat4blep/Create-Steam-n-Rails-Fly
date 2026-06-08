@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/diag",
   "textures": {
     "1": "natures_spirit:block/track/maple/standard_track_maple",

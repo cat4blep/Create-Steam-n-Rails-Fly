@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/segment_right",
   "textures": {
     "0": "railways:block/track/mangrove/standard_track_mangrove",

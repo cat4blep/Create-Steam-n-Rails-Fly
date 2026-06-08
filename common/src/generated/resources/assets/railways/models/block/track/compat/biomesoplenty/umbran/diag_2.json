@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/diag_2",
   "textures": {
     "0": "biomesoplenty:block/track/umbran/standard_track_umbran",

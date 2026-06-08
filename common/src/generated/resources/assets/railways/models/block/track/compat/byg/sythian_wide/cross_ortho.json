@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "railways:block/wide_gauge_base/cross_ortho",
   "textures": {
     "1": "byg:block/track/sythian/standard_track_sythian",

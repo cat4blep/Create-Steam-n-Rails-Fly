@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:cutout_mipped",
   "parent": "create:block/track/teleport",
   "textures": {
     "1": "byg:block/track/palm/portal_track_palm",
