@@ -36,7 +36,9 @@ import java.util.function.Function;
 public class Registrate extends AbstractRegistrate<Registrate> {
     private final Map<String, RegistryEntry<?>> entries = new HashMap<>();
     private ResourceKey<CreativeModeTab> currentCreativeTab = null;
-    private final Map<ResourceLocation, ResourceKey<CreativeModeTab>> creativeTabAssignments = new HashMap<>();
+    // Keyed by ResourceLocation string form: the shim's RegistryEntry builds ResourceLocations via the
+    // deprecated constructor, whose instances do not hash/equal reliably across builders.
+    private final Map<String, ResourceKey<CreativeModeTab>> creativeTabAssignments = new HashMap<>();
 
     protected Registrate(String modid) {
         super(modid);
@@ -52,11 +54,11 @@ public class Registrate extends AbstractRegistrate<Registrate> {
 
     /** Records which creative tab an entry belongs to. A null tab marks the entry as hidden from all Railways tabs. */
     public void assignCreativeTab(ResourceLocation id, ResourceKey<CreativeModeTab> tab) {
-        creativeTabAssignments.put(id, tab);
+        creativeTabAssignments.put(id.toString(), tab);
     }
 
     public boolean isInCreativeTab(RegistryEntry<?> entry, ResourceKey<CreativeModeTab> tab) {
-        ResourceKey<CreativeModeTab> assigned = creativeTabAssignments.get(entry.getId());
+        ResourceKey<CreativeModeTab> assigned = creativeTabAssignments.get(entry.getId().toString());
         return assigned != null && assigned.equals(tab);
     }
 
