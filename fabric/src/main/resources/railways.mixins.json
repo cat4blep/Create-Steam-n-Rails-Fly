@@ -7,7 +7,9 @@
     "client.BlockElementDeserializerMixin",
     "client.MixinObjGeometryModelMesh"
   ],
-  "mixins": [],
+  "mixins": [
+    "MixinBlockEntityType"
+  ],
   "injectors": {
     "defaultRequire": 1,
     "maxShiftBy": 5
