@@ -19,7 +19,7 @@
 package com.railwayteam.railways.mixin.client;
 
 import com.railwayteam.railways.content.conductor.ConductorEntity;
-import com.railwayteam.railways.util.EntityUtils;
+import com.zurrtum.create.AllSynchedDatas;
 import com.zurrtum.create.client.content.equipment.toolbox.ToolboxHandlerClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -42,13 +42,18 @@ public class MixinToolboxHandlerClient {
   private static ConductorEntity railways$getConductorForSlot(int slot) {
     Minecraft mc = Minecraft.getInstance();
     LocalPlayer player = mc.player;
-    CompoundTag toolboxData = EntityUtils.getPersistentData(player).getCompound("CreateToolboxData").orElse(new CompoundTag());
+    CompoundTag toolboxData = AllSynchedDatas.TOOLBOX.get(player);
     String slotKey = String.valueOf(slot);
 
-    CompoundTag data = toolboxData.getCompound(slotKey);
-    if (!data.hasUUID("EntityUUID"))
+    CompoundTag data = toolboxData.getCompound(slotKey).orElse(new CompoundTag());
+    UUID uuid;
+    try {
+      uuid = data.getString("EntityUUID").map(UUID::fromString).orElse(null);
+    } catch (IllegalArgumentException ignored) {
+      uuid = null;
+    }
+    if (uuid == null)
       return null;
-    UUID uuid = data.getUUID("EntityUUID");
     // can't do UUID lookup on clients...
     ConductorEntity conductor = null;
     for (ConductorEntity ce : ConductorEntity.WITH_TOOLBOXES.get(mc.level)) {
@@ -73,13 +78,12 @@ public class MixinToolboxHandlerClient {
           method = "onKeyInput",
           at = @At(
                   value = "INVOKE",
-                  target = "Lcom/simibubi/create/content/equipment/toolbox/ToolboxHandler;getMaxRange(Lnet/minecraft/world/entity/player/Player;)D",
-                  remap = true
+                  target = "Lcom/zurrtum/create/content/equipment/toolbox/ToolboxHandler;getMaxRange(Lnet/minecraft/world/entity/player/Player;)D"
           )
   )
   @SuppressWarnings("DataFlowIssue")
   private static BlockPos railways$useConductorToolboxDistance(BlockPos pos) {
-    ConductorEntity conductor = railways$getConductorForSlot(Minecraft.getInstance().player.getInventory().selected);
+    ConductorEntity conductor = railways$getConductorForSlot(Minecraft.getInstance().player.getInventory().getSelectedSlot());
     railways$conductorForSelectedSlot = conductor;
     return conductor == null ? pos : conductor.blockPosition();
   }
@@ -123,6 +127,7 @@ public class MixinToolboxHandlerClient {
 
   @ModifyVariable(
           method = "renderOverlay",
+          require = 0,
           remap = false,
           at = @At(
                   value = "INVOKE_ASSIGN",

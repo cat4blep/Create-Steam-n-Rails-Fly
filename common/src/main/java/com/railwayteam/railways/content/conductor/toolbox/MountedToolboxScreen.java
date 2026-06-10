@@ -1,6 +1,6 @@
 /*
  * Steam 'n' Rails
- * Copyright (c) 2022-2024 The Railways Team
+ * Copyright (c) 2022-2026 The Railways Team
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,20 +18,46 @@
 
 package com.railwayteam.railways.content.conductor.toolbox;
 
-import com.zurrtum.create.client.foundation.gui.menu.AbstractSimiContainerScreen;
-import net.minecraft.client.gui.GuiGraphics;
+import com.railwayteam.railways.Railways;
+import com.railwayteam.railways.content.conductor.ConductorEntity;
+import com.zurrtum.create.client.content.equipment.toolbox.ToolboxScreen;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
+import com.zurrtum.create.foundation.gui.menu.MenuType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 
-public class MountedToolboxScreen extends AbstractSimiContainerScreen<MountedToolboxContainer> {
-  public MountedToolboxScreen(MountedToolboxContainer container, Inventory inv, Component title) {
-    super(container, inv, title);
-  }
+@Environment(EnvType.CLIENT)
+public class MountedToolboxScreen {
+    public static ToolboxScreen create(
+        Minecraft mc,
+        MenuType<ToolboxBlockEntity> type,
+        int syncId,
+        Inventory inventory,
+        Component title,
+        RegistryFriendlyByteBuf extraData
+    ) {
+        int conductorId = extraData.readVarInt();
+        CompoundTagReader nbt = new CompoundTagReader(extraData);
+        if (mc.level == null)
+            return null;
+        Entity entity = mc.level.getEntity(conductorId);
+        if (!(entity instanceof ConductorEntity conductor)) {
+            Railways.LOGGER.error("Conductor with ID not found: {}", conductorId);
+            return null;
+        }
+        MountedToolbox toolbox = conductor.getOrCreateToolboxHolder();
+        toolbox.read(nbt.read(), true);
+        return new ToolboxScreen(new MountedToolboxContainer(syncId, inventory, toolbox), inventory, title);
+    }
 
-  public static AbstractSimiContainerScreen<MountedToolboxContainer> create(MountedToolboxContainer container, Inventory inv, Component title) {
-    return new MountedToolboxScreen(container, inv, title);
-  }
-
-  protected void renderBg(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY) {
-  }
+    private record CompoundTagReader(RegistryFriendlyByteBuf buffer) {
+        net.minecraft.nbt.CompoundTag read() {
+            return buffer.readNbt();
+        }
+    }
 }

@@ -1,6 +1,6 @@
 /*
  * Steam 'n' Rails
- * Copyright (c) 2022-2024 The Railways Team
+ * Copyright (c) 2022-2026 The Railways Team
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,31 +21,27 @@ package com.railwayteam.railways.registry;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.conductor.toolbox.MountedToolboxContainer;
 import com.railwayteam.railways.content.conductor.toolbox.MountedToolboxScreen;
-import com.zurrtum.create.foundation.data.CreateRegistrate;
-import com.tterrag.registrate.builders.MenuBuilder;
-import com.tterrag.registrate.util.entry.MenuEntry;
-import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import com.zurrtum.create.api.registry.CreateRegistries;
+import com.zurrtum.create.client.AllMenuScreens;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
+import com.zurrtum.create.foundation.gui.menu.MenuType;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.core.Registry;
 
 public class CRContainerTypes {
-    private static final CreateRegistrate REGISTRATE = Railways.registrate();
-
-    public static final MenuEntry<MountedToolboxContainer> MOUNTED_TOOLBOX = register(
-            "mounted_toolbox",
-            MountedToolboxContainer::new,
-            () -> MountedToolboxScreen::create
+    public static final MenuType<ToolboxBlockEntity> MOUNTED_TOOLBOX = Registry.register(
+        CreateRegistries.MENU_TYPE,
+        Railways.asResource("mounted_toolbox"),
+        MountedToolboxContainer::new
     );
-
-    private static <C extends AbstractContainerMenu, S extends Screen & MenuAccess<C>> MenuEntry<C> register(
-            String name, MenuBuilder.ForgeMenuFactory<C> factory, NonNullSupplier<MenuBuilder.ScreenFactory<C, S>> screenFactory) {
-        return REGISTRATE
-                .menu(name, factory, screenFactory)
-                .register();
-    }
 
     @SuppressWarnings("EmptyMethod")
     public static void register() {
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void registerScreens() {
+        AllMenuScreens.register(MOUNTED_TOOLBOX, MountedToolboxScreen::create);
     }
 }

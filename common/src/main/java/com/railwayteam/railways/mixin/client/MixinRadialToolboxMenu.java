@@ -59,8 +59,8 @@ public abstract class MixinRadialToolboxMenu extends AbstractSimiScreen {
 			remap = true,
 			at = @At(
 					value = "INVOKE",
-					target = "Lcom/simibubi/create/content/equipment/toolbox/ToolboxDisposeAllPacket;<init>(Lnet/minecraft/core/BlockPos;)V",
-					remap = true
+					target = "Lcom/zurrtum/create/infrastructure/packet/c2s/ToolboxDisposeAllPacket;<init>(Lnet/minecraft/core/BlockPos;)V",
+					remap = false
 			),
 			cancellable = true
 	)
@@ -78,15 +78,15 @@ public abstract class MixinRadialToolboxMenu extends AbstractSimiScreen {
 					// skip first one, unequip works fine
 					@At(
 							value = "INVOKE",
-							target = "Lcom/simibubi/create/content/equipment/toolbox/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
+							target = "Lcom/zurrtum/create/infrastructure/packet/c2s/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
 							ordinal = 1,
-							remap = true
+							remap = false
 					),
 					@At(
 							value = "INVOKE",
-							target = "Lcom/simibubi/create/content/equipment/toolbox/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
+							target = "Lcom/zurrtum/create/infrastructure/packet/c2s/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
 							ordinal = 2,
-							remap = true
+							remap = false
 					),
 			},
 			cancellable = true
@@ -108,8 +108,8 @@ public abstract class MixinRadialToolboxMenu extends AbstractSimiScreen {
 			remap = true,
 			at = @At(
 					value = "INVOKE",
-					target = "Lcom/simibubi/create/content/equipment/toolbox/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
-					remap = true
+					target = "Lcom/zurrtum/create/infrastructure/packet/c2s/ToolboxEquipPacket;<init>(Lnet/minecraft/core/BlockPos;II)V",
+					remap = false
 			),
 			cancellable = true
 	)

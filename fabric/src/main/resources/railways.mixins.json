@@ -5,10 +5,16 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "client.BlockElementDeserializerMixin",
-    "client.MixinObjGeometryModelMesh"
+    "client.MixinObjGeometryModelMesh",
+    "client.MixinSectionCompiler",
+    "client.MixinSegmentAngles",
+    "client.MixinRadialToolboxMenu",
+    "client.MixinToolboxHandlerClient",
+    "client.MixinToolboxScreen"
   ],
   "mixins": [
-    "MixinBlockEntityType"
+    "MixinBlockEntityType",
+    "MixinToolboxHandler"
   ],
   "injectors": {
     "defaultRequire": 1,
