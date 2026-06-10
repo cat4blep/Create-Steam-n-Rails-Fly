@@ -1,31 +1,18 @@
 package com.railwayteam.railways.content.conductor.toolbox;
 
 import com.railwayteam.railways.registry.CRContainerTypes;
-import net.minecraft.network.FriendlyByteBuf;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxMenu;
+import com.zurrtum.create.foundation.gui.menu.MenuType;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
 
-public class MountedToolboxContainer extends AbstractContainerMenu {
-	public MountedToolboxContainer(MenuType<?> type, int id, Inventory inv, FriendlyByteBuf extraData) {
-		super(type, id);
-	}
+public class MountedToolboxContainer extends ToolboxMenu {
+    public MountedToolboxContainer(int id, Inventory inv, ToolboxBlockEntity toolbox) {
+        super(id, inv, toolbox);
+    }
 
-	public MountedToolboxContainer(MenuType<?> type, int id, Inventory inv, MountedToolbox toolbox) {
-		super(type, id);
-	}
-
-	public static MountedToolboxContainer create(int id, Inventory inv, MountedToolbox toolbox) {
-		return new MountedToolboxContainer(CRContainerTypes.MOUNTED_TOOLBOX.get(), id, inv, toolbox);
-	}
-
-	public boolean stillValid(Player player) {
-		return true;
-	}
-
-	public ItemStack quickMoveStack(Player player, int index) {
-		return ItemStack.EMPTY;
-	}
+    @Override
+    public MenuType<ToolboxBlockEntity> getMenuType() {
+        return CRContainerTypes.MOUNTED_TOOLBOX;
+    }
 }

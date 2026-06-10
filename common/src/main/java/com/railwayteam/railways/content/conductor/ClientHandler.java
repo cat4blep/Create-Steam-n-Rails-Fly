@@ -10,19 +10,20 @@
 
 package com.railwayteam.railways.content.conductor;
 
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
 public class ClientHandler {
 	public static boolean isPlayerMountedOnCamera() {
-		return false;
+		return Minecraft.getInstance().getCameraEntity() instanceof ConductorEntity;
 	}
 
 	@Nullable
 	public static ConductorEntity getPlayerMountedOnCamera() {
-		return null;
+		return Minecraft.getInstance().getCameraEntity() instanceof ConductorEntity conductor ? conductor : null;
 	}
 
 	public static boolean isPossessed(ConductorEntity conductor) {
-		return false;
+		return getPlayerMountedOnCamera() == conductor;
 	}
 }

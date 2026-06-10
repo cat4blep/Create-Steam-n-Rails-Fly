@@ -1,25 +1,61 @@
-/*
- * Steam 'n' Rails
- * Copyright (c) 2022-2024 The Railways Team
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- */
-
 package com.railwayteam.railways.content.conductor;
 
-import net.minecraft.client.renderer.entity.EntityRenderer;
+import com.railwayteam.railways.Railways;
+import com.railwayteam.railways.registry.CRBlockPartials;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
-public class ConductorRenderer extends EntityRenderer<ConductorEntity, EntityRenderState> {
+public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRenderState, ConductorRenderModel> {
+    public static final Identifier TEXTURE = Railways.asResource("textures/entity/conductor.png");
+
     public ConductorRenderer(EntityRendererProvider.Context ctx) {
-        super(ctx);
-        this.shadowRadius = 0.2f;
+        super(ctx, new ConductorRenderModel(ctx.bakeLayer(ConductorEntityModel.LAYER_LOCATION)), 0.2f);
     }
-    public EntityRenderState createRenderState() {
-        return new EntityRenderState();
+
+    @Override
+    public ConductorRenderState createRenderState() {
+        return new ConductorRenderState();
+    }
+
+    @Override
+    public void extractRenderState(ConductorEntity conductor, ConductorRenderState state, float partialTick) {
+        super.extractRenderState(conductor, state, partialTick);
+        state.color = conductor.getColor();
+        state.headStack = conductor.getItemBySlot(EquipmentSlot.HEAD);
+        state.texture = textureFor(conductor, state.headStack);
+    }
+
+    @Override
+    public Identifier getTextureLocation(ConductorRenderState state) {
+        return state.texture;
+    }
+
+    private static Identifier textureFor(ConductorEntity conductor, ItemStack headItem) {
+        String name = headItem.getHoverName().getString();
+        if (name.startsWith("[sus]"))
+            name = name.substring(5);
+
+        if (!headItem.isEmpty()
+            && headItem.getItem() instanceof ConductorCapItem
+            && CRBlockPartials.CUSTOM_CONDUCTOR_SKINS.containsKey(name)) {
+            return ensurePng(CRBlockPartials.CUSTOM_CONDUCTOR_SKINS.get(name));
+        }
+
+        if (conductor.getCustomName() != null) {
+            Identifier texture = CRBlockPartials.CUSTOM_CONDUCTOR_SKINS_FOR_NAME.get(conductor.getCustomName().getString());
+            if (texture != null)
+                return ensurePng(texture);
+        }
+
+        return TEXTURE;
+    }
+
+    private static Identifier ensurePng(Identifier id) {
+        if (id.getPath().endsWith(".png"))
+            return id;
+        return Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath() + ".png");
     }
 }

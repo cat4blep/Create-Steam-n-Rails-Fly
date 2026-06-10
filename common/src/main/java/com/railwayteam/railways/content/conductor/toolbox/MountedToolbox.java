@@ -1,42 +1,135 @@
 package com.railwayteam.railways.content.conductor.toolbox;
 
 import com.railwayteam.railways.content.conductor.ConductorEntity;
+import com.railwayteam.railways.util.packet.PacketSender;
+import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.content.equipment.toolbox.ToolboxBlockEntity;
-import net.minecraft.core.BlockPos;
+import com.zurrtum.create.content.equipment.toolbox.ToolboxBlock;
+import dev.architectury.injectables.annotations.ExpectPlatform;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class MountedToolbox extends ToolboxBlockEntity {
     private final ConductorEntity parent;
-    private final DyeColor color;
 
     public MountedToolbox(ConductorEntity parent, DyeColor color) {
-        super(BlockPos.ZERO, Blocks.BROWN_WOOL.defaultBlockState());
+        super(parent.blockPosition(), ToolboxBlock.getColorBlock(color).defaultBlockState());
         this.parent = parent;
-        this.color = color;
+        setLevel(parent.level());
+        setLazyTickRate(10);
     }
 
     public ConductorEntity getParent() {
         return parent;
     }
 
-    public DyeColor getColor() {
-        return color;
+    public void readFromItem(ItemStack stack) {
+        readInventory(stack.get(AllDataComponents.TOOLBOX_INVENTORY));
+        if (stack.has(AllDataComponents.TOOLBOX_UUID))
+            setUniqueId(stack.get(AllDataComponents.TOOLBOX_UUID));
+        if (stack.has(DataComponents.CUSTOM_NAME))
+            setCustomName(stack.getHoverName());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+    }
+
+    @Override
+    protected void read(ValueInput input, boolean clientPacket) {
+        super.read(input, clientPacket);
+        input.getInt("Color").ifPresent(colorId -> {
+            BlockState state = ToolboxBlock.getColorBlock(DyeColor.byId(colorId)).defaultBlockState();
+            setBlockState(state);
+        });
+    }
+
+    @Override
+    protected void write(ValueOutput output, boolean clientPacket) {
+        super.write(output, clientPacket);
+        output.putInt("Color", getColor().getId());
     }
 
     public void read(CompoundTag tag, boolean clientPacket) {
+        ValueInput input = TagValueInput.create(ProblemReporter.DISCARDING, parent.registryAccess(), tag);
+        if (clientPacket)
+            readClient(input);
+        else
+            loadWithComponents(input);
     }
 
     public CompoundTag write(boolean clientPacket) {
-        return new CompoundTag();
+        TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, parent.registryAccess());
+        if (clientPacket)
+            writeClient(output);
+        else
+            saveAdditional(output);
+        return output.buildResult();
     }
 
     public static MountedToolbox read(ConductorEntity parent, CompoundTag compound) {
-        return new MountedToolbox(parent, DyeColor.BROWN);
+        MountedToolbox toolbox = new MountedToolbox(parent, DyeColor.BROWN);
+        toolbox.read(compound, false);
+        return toolbox;
     }
 
+    @Override
+    public void sendData() {
+        if (level == null || level.isClientSide())
+            return;
+        PacketSender.syncMountedToolboxNBT(parent, write(true));
+    }
+
+    @Override
+    public void setChanged() {
+    }
+
+    @Override
+    public boolean canPlayerUse(Player player) {
+        return player.distanceToSqr(parent) < 8 * 8;
+    }
+
+    public ItemStack getDisplayStack() {
+        ItemStack stack = ToolboxBlock.getColorBlock(getColor()).asItem().getDefaultInstance();
+        if (hasCustomName())
+            stack.set(DataComponents.CUSTOM_NAME, getCustomName());
+        return stack;
+    }
+
+    public ItemStack getCloneItemStack() {
+        ItemStack stack = getDisplayStack();
+        stack.set(AllDataComponents.TOOLBOX_INVENTORY, inventory);
+        stack.set(AllDataComponents.TOOLBOX_UUID, getUniqueId());
+        return stack;
+    }
+
+    @Override
+    public MountedToolboxContainer createMenu(int id, Inventory inv, Player player, RegistryFriendlyByteBuf extraData) {
+        sendToMenu(extraData);
+        return new MountedToolboxContainer(id, inv, this);
+    }
+
+    @Override
+    public void sendToMenu(RegistryFriendlyByteBuf buffer) {
+        buffer.writeVarInt(parent.getId());
+        buffer.writeNbt(write(true));
+    }
+
+    @ExpectPlatform
     public static void openMenu(ServerPlayer player, MountedToolbox toolbox) {
+        throw new AssertionError();
     }
 }
