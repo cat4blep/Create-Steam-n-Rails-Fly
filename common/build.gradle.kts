@@ -58,6 +58,23 @@ tasks.processResources {
 
     // don't add development or to-do files into built jar
     exclude("**/*.bbmodel", "**/*.lnk", "**/*.xcf", "**/*.md", "**/*.txt", "**/*.blend", "**/*.blend1")
+
+    listOf("src/main/resources", "src/generated/resources").forEach { resourceDir ->
+        from(resourceDir) {
+            include("data/**/tags/items/**")
+            eachFile {
+                path = path.replace("/tags/items/", "/tags/item/")
+            }
+            includeEmptyDirs = false
+        }
+        from(resourceDir) {
+            include("data/**/tags/blocks/**")
+            eachFile {
+                path = path.replace("/tags/blocks/", "/tags/block/")
+            }
+            includeEmptyDirs = false
+        }
+    }
 }
 
 sourceSets.main {

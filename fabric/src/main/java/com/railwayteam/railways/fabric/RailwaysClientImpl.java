@@ -21,11 +21,16 @@ package com.railwayteam.railways.fabric;
 import com.mojang.brigadier.CommandDispatcher;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.RailwaysClient;
+import com.railwayteam.railways.base.reload.ClientResourceReloadListener;
+import com.railwayteam.railways.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -34,6 +39,9 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
@@ -43,6 +51,35 @@ import java.util.function.Supplier;
 public class RailwaysClientImpl implements ClientModInitializer {
 	public void onInitializeClient() {
 		RailwaysClient.init();
+		registerClientEvents();
+	}
+
+	private static void registerClientEvents() {
+		ClientTickEvents.START_CLIENT_TICK.register(ClientEvents::onClientTickStart);
+		ClientTickEvents.END_CLIENT_TICK.register(ClientEvents::onClientTickEnd);
+		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((mc, level) -> ClientEvents.onClientWorldLoad(level));
+		ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+			@Override
+			public Identifier getFabricId() {
+				return Railways.asResource("client_events");
+			}
+
+			@Override
+			public void onResourceManagerReload(ResourceManager resourceManager) {
+				ClientEvents.onTagsUpdated();
+			}
+		});
+		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
+			@Override
+			public Identifier getFabricId() {
+				return Railways.asResource("client_resource_reload");
+			}
+
+			@Override
+			public void onResourceManagerReload(ResourceManager resourceManager) {
+				ClientResourceReloadListener.INSTANCE.onResourceManagerReload(resourceManager);
+			}
+		});
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"}) // jank!

@@ -126,6 +126,9 @@ subprojects {
             vmArg("-Dmixin.debug.export=true")
             vmArg("-Dmixin.env.remapRefMap=true")
             vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
+            if (providers.gradleProperty("railways.debugCycleMenu").map { it.toBoolean() }.orElse(false).get()) {
+                vmArg("-Drailways.debugCycleMenu=true")
+            }
         }
     }
 
