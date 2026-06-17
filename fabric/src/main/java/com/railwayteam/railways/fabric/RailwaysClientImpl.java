@@ -22,6 +22,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.RailwaysClient;
 import com.railwayteam.railways.base.reload.ClientResourceReloadListener;
+import com.railwayteam.railways.content.buffer.headstock.fabric.CopycatHeadstockModelRegistration;
 import com.railwayteam.railways.events.ClientEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -50,6 +51,7 @@ import java.util.function.Supplier;
 
 public class RailwaysClientImpl implements ClientModInitializer {
 	public void onInitializeClient() {
+		CopycatHeadstockModelRegistration.register();
 		RailwaysClient.init();
 		registerClientEvents();
 	}

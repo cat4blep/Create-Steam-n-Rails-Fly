@@ -1,5 +1,6 @@
 package com.railwayteam.railways.fabric_mixin;
 
+import com.railwayteam.railways.content.buffer.headstock.CopycatHeadstockBlock;
 import com.zurrtum.create.AllBlockEntityTypes;
 import com.zurrtum.create.content.trains.track.TrackBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,6 +24,8 @@ public class MixinBlockEntityType {
     @Inject(method = "isValid", at = @At("HEAD"), cancellable = true)
     private void railways$allowAddonTracks(BlockState state, CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this == AllBlockEntityTypes.TRACK && state.getBlock() instanceof TrackBlock)
+            cir.setReturnValue(true);
+        if ((Object) this == AllBlockEntityTypes.COPYCAT && state.getBlock() instanceof CopycatHeadstockBlock)
             cir.setReturnValue(true);
     }
 }
