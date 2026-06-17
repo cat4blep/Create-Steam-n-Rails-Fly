@@ -31,9 +31,9 @@ import com.zurrtum.create.client.catnip.lang.Lang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -77,28 +77,21 @@ public class SmokeStackBlockEntity extends SmartBlockEntity implements IHaveGogg
         notifyUpdate();
     }
 
-        protected void read(CompoundTag tag, boolean clientPacket) {
-        
-        if (tag.contains("color")) {
-            int colorOrdinal = tag.getInt("color").orElse(0);
-            color = DyeColor.byId(colorOrdinal);
-        } else {
-            color = null;
-        }
-        isSoul = tag.getBoolean("isSoul").orElse(false);
-
-        height = Math.max(0, tag.getInt("height").orElse(0));
+    protected void read(ValueInput input, boolean clientPacket) {
+        super.read(input, clientPacket);
+        color = input.getInt("color").map(DyeColor::byId).orElse(null);
+        isSoul = input.getBooleanOr("isSoul", false);
+        height = Math.max(0, input.getIntOr("height", 0));
     }
 
-        protected void write(CompoundTag tag, boolean clientPacket) {
-        
+    protected void write(ValueOutput output, boolean clientPacket) {
+        super.write(output, clientPacket);
         if (color != null) {
-            tag.putInt("color", color.getId());
+            output.putInt("color", color.getId());
         }
-        tag.putBoolean("isSoul", isSoul());
-
+        output.putBoolean("isSoul", isSoul());
         if (height > 0) {
-            tag.putInt("height", height);
+            output.putInt("height", height);
         }
     }
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {

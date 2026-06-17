@@ -33,6 +33,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -98,30 +99,33 @@ public class SmokeStackBlock extends AbstractSmokeStackBlock<SmokeStackBlockEnti
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return rotationType.getShape(pState, shape);
     }
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if (pPlayer.getItemInHand(pHand).getItem() instanceof DyeItem dyeItem) {
+
+    @Override
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer,
+                                          InteractionHand pHand, BlockHitResult pHit) {
+        if (itemStack.getItem() instanceof DyeItem dyeItem) {
             DyeColor color = dyeItem.getDyeColor();
             withBlockEntityDo(pLevel, pPos, te -> te.setColor(color));
             if (!pPlayer.isCreative()) {
-                pPlayer.getItemInHand(pHand).shrink(1);
+                itemStack.shrink(1);
             }
-            return InteractionResult.SUCCESS;
+            return pLevel.isClientSide() ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
         }
-        if (pPlayer.getItemInHand(pHand).is(ItemTags.SOUL_FIRE_BASE_BLOCKS)) {
+        if (itemStack.is(ItemTags.SOUL_FIRE_BASE_BLOCKS)) {
             withBlockEntityDo(pLevel, pPos, te -> te.setSoul(true));
             if (!pPlayer.isCreative()) {
-                pPlayer.getItemInHand(pHand).shrink(1);
+                itemStack.shrink(1);
             }
-            return InteractionResult.SUCCESS;
+            return pLevel.isClientSide() ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
         }
         if (pPlayer.isShiftKeyDown()) {
             withBlockEntityDo(pLevel, pPos, te -> {
                 te.setSoul(false);
                 te.setColor(null);
             });
-            return InteractionResult.SUCCESS;
+            return pLevel.isClientSide() ? InteractionResult.CONSUME : InteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return super.useItemOn(itemStack, pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
     @SuppressWarnings("deprecation")
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {

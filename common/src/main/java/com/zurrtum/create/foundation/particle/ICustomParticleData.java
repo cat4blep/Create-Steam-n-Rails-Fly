@@ -2,7 +2,6 @@ package com.zurrtum.create.foundation.particle;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -19,15 +18,23 @@ public interface ICustomParticleData<T extends ParticleOptions> {
 
     Deserializer<T> getDeserializer();
 
-    Codec<T> getCodec(ParticleType<T> type);
+    MapCodec<T> getCodec(ParticleType<T> type);
+
+    void writeToNetwork(FriendlyByteBuf buffer);
 
     default ParticleType<T> createType() {
+        ICustomParticleData<T> self = this;
         return new ParticleType<T>(false) {
             public MapCodec<T> codec() {
-                return null;
+                return self.getCodec(this);
             }
+
+            @SuppressWarnings("unchecked")
             public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec() {
-                return null;
+                return StreamCodec.of(
+                    (buf, value) -> ((ICustomParticleData<T>) value).writeToNetwork((FriendlyByteBuf) buf),
+                    buf -> self.getDeserializer().fromNetwork(this, (FriendlyByteBuf) buf)
+                );
             }
         };
     }

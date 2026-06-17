@@ -24,6 +24,7 @@ import com.railwayteam.railways.RailwaysClient;
 import com.railwayteam.railways.base.reload.ClientResourceReloadListener;
 import com.railwayteam.railways.content.buffer.headstock.fabric.CopycatHeadstockModelRegistration;
 import com.railwayteam.railways.events.ClientEvents;
+import com.railwayteam.railways.registry.CRParticleTypes;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -53,6 +54,7 @@ public class RailwaysClientImpl implements ClientModInitializer {
 	public void onInitializeClient() {
 		CopycatHeadstockModelRegistration.register();
 		RailwaysClient.init();
+		CRParticleTypes.registerFactories();
 		registerClientEvents();
 	}
 
