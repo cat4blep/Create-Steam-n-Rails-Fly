@@ -20,9 +20,9 @@ package com.railwayteam.railways.ponder;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.registry.CRPonderTags;
-import net.createmod.ponder.api.registration.PonderPlugin;
-import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
-import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
+import com.zurrtum.create.client.ponder.api.registration.PonderPlugin;
+import com.zurrtum.create.client.ponder.api.registration.PonderSceneRegistrationHelper;
+import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHelper;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 

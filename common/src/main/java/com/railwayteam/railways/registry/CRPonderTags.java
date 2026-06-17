@@ -19,21 +19,22 @@
 package com.railwayteam.railways.registry;
 
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.infrastructure.ponder.AllCreatePonderTags;
-import com.tterrag.registrate.util.entry.RegistryEntry;
-import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
+import com.zurrtum.create.client.infrastructure.ponder.AllCreatePonderTags;
+import com.zurrtum.create.client.ponder.api.registration.PonderTagRegistrationHelper;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 
 public class CRPonderTags {
     public static void register(PonderTagRegistrationHelper<Identifier> helper) {
-        PonderTagRegistrationHelper<RegistryEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
+        PonderTagRegistrationHelper<Item> HELPER = helper.withKeyFunction(BuiltInRegistries.ITEM::getKey);
 
         HELPER.addToTag(AllCreatePonderTags.DISPLAY_SOURCES)
-            .add(AllBlocks.TRACK_SIGNAL)
-            .add(CRBlocks.TRACK_COUPLER)
-            .add(CRBlocks.ANDESITE_SWITCH)
-            .add(CRBlocks.BRASS_SWITCH);
+            .add(AllBlocks.TRACK_SIGNAL.asItem())
+            .add(CRBlocks.TRACK_COUPLER.asItem())
+            .add(CRBlocks.ANDESITE_SWITCH.asItem())
+            .add(CRBlocks.BRASS_SWITCH.asItem());
         HELPER.addToTag(AllCreatePonderTags.DISPLAY_TARGETS)
-            .add(CRBlocks.SEMAPHORE);
+            .add(CRBlocks.SEMAPHORE.asItem());
     }
 }

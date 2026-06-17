@@ -25,7 +25,9 @@ import com.railwayteam.railways.content.conductor.ConductorCapModel;
 import com.railwayteam.railways.content.conductor.ConductorEntityModel;
 import com.railwayteam.railways.content.conductor.ConductorRenderer;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingRenderUtils;
+import com.railwayteam.railways.ponder.CRPonderPlugin;
 import com.railwayteam.railways.registry.CRBlockPartials;
+import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import com.railwayteam.railways.registry.CRCommandsClient;
 import com.railwayteam.railways.registry.CRDevCaps;
 import com.railwayteam.railways.registry.CREdgePointTypes;
@@ -73,6 +75,8 @@ public class RailwaysClient {
     registerClientCommands(CRCommandsClient::register);
 
     CRPackets.PACKETS.registerS2CListener();
+
+    PonderIndex.addPlugin(new CRPonderPlugin());
 
     CRKeys.register();
     CRBlockPartials.init();

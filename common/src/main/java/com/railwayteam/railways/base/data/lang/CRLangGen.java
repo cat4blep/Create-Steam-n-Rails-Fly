@@ -26,7 +26,7 @@ import com.railwayteam.railways.registry.CRPalettes;
 import com.railwayteam.railways.registry.CRTags;
 import com.zurrtum.create.foundation.utility.FilesHelper;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
-import net.createmod.ponder.foundation.PonderIndex;
+import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 
 import java.util.Map;
 import java.util.function.BiConsumer;

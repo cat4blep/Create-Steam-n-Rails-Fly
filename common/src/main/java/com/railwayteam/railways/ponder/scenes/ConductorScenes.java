@@ -18,33 +18,34 @@
 
 package com.railwayteam.railways.ponder.scenes;
 
-import com.mojang.authlib.GameProfile;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.registry.CREntities;
 import com.railwayteam.railways.registry.CRItems;
 import com.zurrtum.create.AllBlocks;
-import com.zurrtum.create.foundation.ponder.CreateSceneBuilder;
+import com.zurrtum.create.client.foundation.ponder.CreateSceneBuilder;
 import com.zurrtum.create.catnip.math.Pointing;
-import net.createmod.ponder.api.PonderPalette;
-import net.createmod.ponder.api.element.ElementLink;
-import net.createmod.ponder.api.element.EntityElement;
-import net.createmod.ponder.api.scene.SceneBuilder;
-import net.createmod.ponder.api.scene.SceneBuildingUtil;
+import com.zurrtum.create.client.ponder.api.PonderPalette;
+import com.zurrtum.create.client.ponder.api.element.ElementLink;
+import com.zurrtum.create.client.ponder.api.element.EntityElement;
+import com.zurrtum.create.client.ponder.api.scene.SceneBuilder;
+import com.zurrtum.create.client.ponder.api.scene.SceneBuildingUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Rotations;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.SkullBlockEntity;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.phys.Vec3;
@@ -53,24 +54,16 @@ public class ConductorScenes {
 
   public static ElementLink<EntityElement> makePlayerStand(SceneBuilder scene, String playerName, int leatherColor, Vec3 pos) {
     ItemStack playerHead = new ItemStack(Items.PLAYER_HEAD);
-    GameProfile gameprofile = new GameProfile(null, playerName);
-    /*try {
-      Minecraft.getInstance().getSkinManager().registerSkins(gameprofile, null, false);
-    } catch (NullPointerException ignored) {}*/
-    SkullBlockEntity.updateGameprofile(gameprofile, (profile) -> {
-      CompoundTag itemTag = playerHead.getOrCreateTag();
-      itemTag.put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), profile));
-      playerHead.setTag(itemTag);
-    });
+    playerHead.set(DataComponents.PROFILE, ResolvableProfile.createUnresolved(playerName));
 
     ElementLink<EntityElement> player = scene.world().createEntity(w -> {
-      ArmorStand entity = EntityType.ARMOR_STAND.create(w);
+      ArmorStand entity = EntityType.ARMOR_STAND.create(w, EntitySpawnReason.COMMAND);
       entity.setPos(pos.x, pos.y, pos.z);
       entity.xo = pos.x;
       entity.yo = pos.y;
       entity.zo = pos.z;
       WalkAnimationState animation = entity.walkAnimation;
-      animation.update(-animation.position(), 1);
+      animation.update(-animation.position(), 1, 1);
       animation.setSpeed(1);
       entity.yRotO = 210;
       entity.setYRot(210);
@@ -81,29 +74,24 @@ public class ConductorScenes {
     });
 
     scene.world().modifyEntity(player, entity -> {
-      entity.setItemSlot(EquipmentSlot.HEAD, playerHead);
-      CompoundTag leatherTag = new CompoundTag();
-      {
-        CompoundTag displayTag = new CompoundTag();
-        displayTag.putInt("color", leatherColor);
-        leatherTag.put("display", displayTag);
-      }
+      LivingEntity living = (LivingEntity) entity;
+      living.setItemSlot(EquipmentSlot.HEAD, playerHead);
       ItemStack chestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
       ItemStack leggings = new ItemStack(Items.LEATHER_LEGGINGS);
       ItemStack boots = new ItemStack(Items.LEATHER_BOOTS);
-      chestplate.setTag(leatherTag);
-      leggings.setTag(leatherTag);
-      boots.setTag(leatherTag);
-      entity.setItemSlot(EquipmentSlot.CHEST, chestplate);
-      entity.setItemSlot(EquipmentSlot.LEGS, leggings);
-      entity.setItemSlot(EquipmentSlot.FEET, boots);
+      chestplate.set(DataComponents.DYED_COLOR, new DyedItemColor(leatherColor));
+      leggings.set(DataComponents.DYED_COLOR, new DyedItemColor(leatherColor));
+      boots.set(DataComponents.DYED_COLOR, new DyedItemColor(leatherColor));
+      living.setItemSlot(EquipmentSlot.CHEST, chestplate);
+      living.setItemSlot(EquipmentSlot.LEGS, leggings);
+      living.setItemSlot(EquipmentSlot.FEET, boots);
     });
     return player;
   }
 
   public static ElementLink<EntityElement> makeConductor(SceneBuilder scene, DyeColor color, Vec3 pos) {
     return scene.world().createEntity(w -> {
-      ConductorEntity entity = CREntities.CONDUCTOR.create(w);
+      ConductorEntity entity = CREntities.CONDUCTOR.get().create(w, EntitySpawnReason.COMMAND);
       entity.setColor(color);
       entity.setItemSlot(EquipmentSlot.HEAD, CRItems.ITEM_CONDUCTOR_CAP.get(color).asStack());
       entity.setPos(pos.x, pos.y, pos.z);
@@ -111,7 +99,7 @@ public class ConductorScenes {
       entity.yo = pos.y;
       entity.zo = pos.z;
       WalkAnimationState animation = entity.walkAnimation;
-      animation.update(-animation.position(), 1);
+      animation.update(-animation.position(), 1, 1);
       animation.setSpeed(1);
       entity.yRotO = 210;
       entity.setYRot(210);
@@ -158,7 +146,7 @@ public class ConductorScenes {
     scene.idle(26);
 
     scene.world().destroyBlock(casing);
-    ElementLink<EntityElement> conductor = makeConductor(scene, DyeColor.RED, Vec3.atBottomCenterOf(casing));
+    makeConductor(scene, DyeColor.RED, Vec3.atBottomCenterOf(casing));
 
     scene.world().moveDeployer(deployer, -1, 25);
     scene.idle(30);
@@ -299,7 +287,7 @@ public class ConductorScenes {
     scene.idle(10);
 
     scene.world().modifyEntity(player, entity -> {
-      entity.setItemSlot(EquipmentSlot.HEAD, CRItems.ITEM_CONDUCTOR_CAP.get(DyeColor.RED).asStack());
+      ((LivingEntity) entity).setItemSlot(EquipmentSlot.HEAD, CRItems.ITEM_CONDUCTOR_CAP.get(DyeColor.RED).asStack());
     });
 
     scene.overlay().showText(30)
@@ -388,7 +376,7 @@ public class ConductorScenes {
 
     scene.idle(45);
 
-    ItemStack toolboxStack = AllBlocks.TOOLBOXES.get(DyeColor.LIME).asStack();
+    ItemStack toolboxStack = new ItemStack(AllBlocks.LIME_TOOLBOX);
 
     scene.overlay().showControls(util.vector().topOf(conductorPos), Pointing.DOWN, 40)
             .rightClick()
