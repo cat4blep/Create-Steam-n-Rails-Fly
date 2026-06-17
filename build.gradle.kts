@@ -56,6 +56,7 @@ val buildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toInt()
 val removeDevMixinAnyway = System.getenv("REMOVE_DEV_MIXIN_ANYWAY")?.toBoolean() ?: false
 // whether the build should include dev commands, even in a non-dev environment
 val includeDevCommands = !isRelease && System.getenv("INCLUDE_DEV_COMMANDS")?.toBoolean() ?: false
+val artifactNameSuffix = "-r2"
 val gitHash = "\"${calculateGitHash() + (if (hasUnstaged()) "-modified" else "")}\""
 
 if (!isRelease && removeDevMixinAnyway) {
@@ -178,6 +179,15 @@ subprojects {
     // from here down is platform configuration
     if(project.path == ":common") {
         return@subprojects
+    }
+
+    tasks.withType<org.gradle.api.tasks.bundling.AbstractArchiveTask>().configureEach {
+        archiveFileName.set(provider {
+            val appendix = archiveAppendix.orNull?.takeIf { it.isNotEmpty() }?.let { "-$it" } ?: ""
+            val version = archiveVersion.orNull?.takeIf { it.isNotEmpty() }?.let { "-$it" } ?: ""
+            val classifier = archiveClassifier.orNull?.takeIf { it.isNotEmpty() }?.let { "-$it" } ?: ""
+            "${archiveBaseName.get()}$appendix$version$classifier$artifactNameSuffix.${archiveExtension.get()}"
+        })
     }
 
     apply(plugin = "com.github.johnrengelman.shadow")
