@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -34,7 +35,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Registrate extends AbstractRegistrate<Registrate> {
-    private final Map<String, RegistryEntry<?>> entries = new HashMap<>();
+    private final Map<String, RegistryEntry<?>> entries = new LinkedHashMap<>();
+    private final List<RegistryEntry<?>> orderedEntries = new ArrayList<>();
     private ResourceKey<CreativeModeTab> currentCreativeTab = null;
     // Keyed by ResourceLocation string form: the shim's RegistryEntry builds ResourceLocations via the
     // deprecated constructor, whose instances do not hash/equal reliably across builders.
@@ -55,6 +57,9 @@ public class Registrate extends AbstractRegistrate<Registrate> {
     /** Records which creative tab an entry belongs to. A null tab marks the entry as hidden from all Railways tabs. */
     public void assignCreativeTab(ResourceLocation id, ResourceKey<CreativeModeTab> tab) {
         creativeTabAssignments.put(id.toString(), tab);
+    }
+
+    public void registerTooltipModifier(Item item) {
     }
 
     public boolean isInCreativeTab(RegistryEntry<?> entry, ResourceKey<CreativeModeTab> tab) {
@@ -96,13 +101,16 @@ public class Registrate extends AbstractRegistrate<Registrate> {
 
     public <V, T extends V> T registerVanilla(Registry<V> registry, String name, T value) {
         T registered = Registry.register(registry, id(name), value);
-        entries.put(name, new RegistryEntry<>(id(name), registered));
+        RegistryEntry<T> entry = new RegistryEntry<>(id(name), registered);
+        entries.put(name, entry);
+        orderedEntries.add(entry);
         return registered;
     }
 
     public <T> RegistryEntry<T> entry(String name, T value) {
         RegistryEntry<T> entry = new RegistryEntry<>(id(name), value);
         entries.put(name, entry);
+        orderedEntries.add(entry);
         return entry;
     }
 
@@ -127,7 +135,7 @@ public class Registrate extends AbstractRegistrate<Registrate> {
         List<RegistryEntry<T>> result = new ArrayList<>();
         if (registry == null)
             return result;
-        for (RegistryEntry<?> entry : entries.values()) {
+        for (RegistryEntry<?> entry : orderedEntries) {
             T value = registry.getValue(entry.getIdentifier());
             if (value == entry.get())
                 result.add((RegistryEntry<T>) entry);

@@ -162,7 +162,7 @@ public class CRBlocks {
         if (CRTrackMaterials.getType(material) != CRTrackMaterials.CRTrackType.MONORAIL)
             trackTags.add(AllTags.AllBlockTags.GIRDABLE_TRACKS.tag);
         List<TagKey<Item>> itemTags = new ArrayList<>();
-        if (material == CRTrackMaterials.PHANTOM || material == CRTrackMaterials.getWide(CRTrackMaterials.PHANTOM) || material == CRTrackMaterials.getNarrow(CRTrackMaterials.PHANTOM)) {
+        if (isPhantomTrack(material)) {
             itemTags.add(CRTags.AllItemTags.PHANTOM_TRACK_REVEALING.tag);
         }
         //noinspection unchecked
@@ -184,7 +184,17 @@ public class CRBlocks {
             .tag((TagKey<Item>[]) itemTags.toArray(TagKey[]::new))
             .tag(AllTags.AllItemTags.TRACKS.tag)
             .build()
+            .onRegisterAfter(Registries.ITEM, block -> {
+                if (isPhantomTrack(material))
+                    ItemDescription.useKey(block, "block.railways.track_phantom");
+            })
             .register();
+    }
+
+    private static boolean isPhantomTrack(TrackMaterial material) {
+        return material == CRTrackMaterials.PHANTOM
+            || material == CRTrackMaterials.getWide(CRTrackMaterials.PHANTOM)
+            || material == CRTrackMaterials.getNarrow(CRTrackMaterials.PHANTOM);
     }
 
     @FunctionalInterface
@@ -520,6 +530,7 @@ public class CRBlocks {
             .item(HandcarItem::new)
             .properties(p -> p.stacksTo(1))
             .build()
+            .onRegisterAfter(Registries.ITEM, v -> ItemDescription.useKey(v, "block.railways.handcar"))
             .lang("Handcar")
             .register();
 

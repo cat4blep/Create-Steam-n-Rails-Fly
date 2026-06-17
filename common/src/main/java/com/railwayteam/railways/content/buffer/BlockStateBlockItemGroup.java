@@ -122,7 +122,12 @@ public class BlockStateBlockItemGroup<C, T extends BlockStateBlockItemGroup.ISty
                 continue;
             }
 
-            items.put(v, REGISTRATE.item(v.getBlockId(context), BlockStateBlockItem.create(blockEntry::get, property, v, primary))
+            @SuppressWarnings("unchecked")
+            ItemBuilder<BlockStateBlockItem<T>, CreateRegistrate> itemBuilder =
+                (ItemBuilder<BlockStateBlockItem<T>, CreateRegistrate>) (ItemBuilder<?, ?>)
+                    REGISTRATE.<BlockStateBlockItem<T>>item(v.getBlockId(context), BlockStateBlockItem.create(blockEntry::get, property, v, primary));
+
+            items.put(v, itemTransformer.apply(itemBuilder)
                 .lang(v.getLangName(context))
                 .onRegisterAfter(Registries.ITEM, i -> ItemDescription.useKey(i, tooltipKey))
                 .tag(cycleTag)

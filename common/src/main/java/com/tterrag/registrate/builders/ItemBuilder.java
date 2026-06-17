@@ -15,6 +15,8 @@ public class ItemBuilder<T extends Item, P> extends AbstractBuilder<T, P, ItemBu
     private Function<Item.Properties, Item.Properties> properties = Function.identity();
     private boolean tabOverridden = false;
     private ResourceKey<CreativeModeTab> tabOverride = null;
+    private boolean callbacksRun = false;
+    private boolean itemCallbacksRun = false;
 
     public ItemBuilder(Registrate owner, String name, Function<Item.Properties, T> factory, P parent) {
         super(owner, name, parent);
@@ -56,6 +58,15 @@ public class ItemBuilder<T extends Item, P> extends AbstractBuilder<T, P, ItemBu
         }
         ResourceKey<CreativeModeTab> tab = tabOverridden ? tabOverride : owner.getCurrentCreativeTab();
         owner.assignCreativeTab(entry.getId(), tab);
+        owner.registerTooltipModifier(entry.get());
+        if (!callbacksRun) {
+            runRegisterCallbacks(entry.get());
+            callbacksRun = true;
+        }
+        if (!itemCallbacksRun) {
+            runAfterRegisterCallbacks(Registries.ITEM, entry.get());
+            itemCallbacksRun = true;
+        }
         return entry;
     }
 }

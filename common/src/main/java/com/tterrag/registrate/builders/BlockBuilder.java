@@ -23,6 +23,8 @@ import java.util.function.Supplier;
 public class BlockBuilder<T extends Block, P> extends AbstractBuilder<T, P, BlockBuilder<T, P>> {
     private final Function<BlockBehaviour.Properties, T> factory;
     private Function<BlockBehaviour.Properties, BlockBehaviour.Properties> properties = Function.identity();
+    private boolean callbacksRun = false;
+    private boolean itemCallbacksRun = false;
 
     public BlockBuilder(Registrate owner, String name, Function<BlockBehaviour.Properties, T> factory) {
         this(owner, name, factory, null);
@@ -75,6 +77,14 @@ public class BlockBuilder<T extends Block, P> extends AbstractBuilder<T, P, Bloc
 
     public BlockEntry<T> register() {
         T block = getOrCreate();
+        if (!callbacksRun) {
+            runRegisterCallbacks(block);
+            callbacksRun = true;
+        }
+        if (!itemCallbacksRun) {
+            runAfterRegisterCallbacks(Registries.ITEM, block);
+            itemCallbacksRun = true;
+        }
         return new BlockEntry<>(owner.id(name), block);
     }
 
