@@ -9,6 +9,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+
 public class BlockEntityBuilder<T extends BlockEntity, P> extends AbstractBuilder<BlockEntityType<T>, P, BlockEntityBuilder<T, P>> {
     @FunctionalInterface
     public interface BlockEntityFactory<T extends BlockEntity> {
@@ -42,13 +45,28 @@ public class BlockEntityBuilder<T extends BlockEntity, P> extends AbstractBuilde
     private BlockEntityType<T> createType() {
         try {
             BlockEntityType<?>[] typeRef = new BlockEntityType<?>[1];
-            Class<?> supplierClass = Class.forName("net.minecraft.world.level.block.entity.BlockEntityType$BlockEntitySupplier");
+            Class<?> supplierClass = Arrays.stream(BlockEntityType.class.getDeclaredClasses())
+                .filter(Class::isInterface)
+                .filter(clazz -> Arrays.stream(clazz.getDeclaredMethods())
+                    .anyMatch(method -> method.getParameterCount() == 2
+                        && method.getParameterTypes()[0] == BlockPos.class
+                        && method.getParameterTypes()[1] == BlockState.class))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to locate BlockEntityType supplier interface"));
             Object supplier = java.lang.reflect.Proxy.newProxyInstance(
                 supplierClass.getClassLoader(),
                 new Class<?>[]{supplierClass},
                 (proxy, method, args) -> factory.create(typeRef[0], (BlockPos) args[0], (BlockState) args[1])
             );
-            java.lang.reflect.Constructor<BlockEntityType> constructor = BlockEntityType.class.getDeclaredConstructor(supplierClass, java.util.Set.class);
+            Constructor<BlockEntityType> constructor = (Constructor<BlockEntityType>) Arrays.stream(BlockEntityType.class.getDeclaredConstructors())
+                .filter(candidate -> {
+                    Class<?>[] parameterTypes = candidate.getParameterTypes();
+                    return parameterTypes.length == 2
+                        && parameterTypes[0] == supplierClass
+                        && java.util.Set.class.isAssignableFrom(parameterTypes[1]);
+                })
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to locate BlockEntityType constructor"));
             constructor.setAccessible(true);
             BlockEntityType<T> type = (BlockEntityType<T>) constructor.newInstance(supplier, java.util.Set.of(validBlocks));
             typeRef[0] = type;
