@@ -1,6 +1,7 @@
 package com.railwayteam.railways.util.fabric;
 
 import com.railwayteam.railways.content.conductor.ConductorEntity;
+import com.railwayteam.railways.fabric.ConductorFakePlayerFabric;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +28,7 @@ public class EntityUtilsImpl {
     }
 
     public static ServerPlayer createConductorFakePlayer(ServerLevel level, ConductorEntity conductor) {
-        return null;
+        return new ConductorFakePlayerFabric(level, conductor);
     }
 
     public static double getReachDistance(Player player) {

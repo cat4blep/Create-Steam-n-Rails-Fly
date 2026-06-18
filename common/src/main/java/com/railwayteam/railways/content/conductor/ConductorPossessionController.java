@@ -11,13 +11,16 @@
 package com.railwayteam.railways.content.conductor;
 
 import com.railwayteam.railways.registry.CRPackets;
+import com.railwayteam.railways.util.packet.CameraMovePacket;
 import com.railwayteam.railways.util.packet.DismountCameraPacket;
 import com.railwayteam.railways.util.packet.SpyConductorInteractPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.multiplayer.ClientChunkCache;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -29,6 +32,8 @@ import java.util.Arrays;
 public class ConductorPossessionController {
 	@Environment(EnvType.CLIENT)
 	private static ClientChunkCache.Storage cameraStorage;
+	@Environment(EnvType.CLIENT)
+	public static CameraType previousCameraType;
 	private static boolean wasUpPressed;
 	private static boolean wasDownPressed;
 	private static boolean wasLeftPressed;
@@ -38,6 +43,7 @@ public class ConductorPossessionController {
 	private static boolean wasMounted;
 	private static final boolean[] wasMousePressed = new boolean[3];
 	private static boolean wasUsingBefore;
+	private static int positionReminder;
 
 	@Environment(EnvType.CLIENT)
 	public static void onClientTick(Minecraft mc, boolean start) {
@@ -72,9 +78,30 @@ public class ConductorPossessionController {
 					options.keyRight.setDown(true);
 				if (wasJumpPressed)
 					options.keyJump.setDown(true);
+
+				ConductorEntity conductor = (ConductorEntity) cameraEntity;
+				double dx = conductor.getX() - conductor.xLast;
+				double dy = conductor.getY() - conductor.yLast;
+				double dz = conductor.getZ() - conductor.zLast;
+				double dyRot = conductor.getYRot() - conductor.yRotLast;
+				double dxRot = conductor.getXRot() - conductor.xRotLast;
+				++positionReminder;
+				boolean moved = Mth.lengthSquared(dx, dy, dz) > Mth.square(2.0E-4) || positionReminder >= 20;
+				boolean rotated = dyRot != 0.0 || dxRot != 0.0;
+				if (moved || rotated) {
+					positionReminder = 0;
+					conductor.xLast = conductor.getX();
+					conductor.yLast = conductor.getY();
+					conductor.zLast = conductor.getZ();
+					conductor.yRotLast = conductor.getYRot();
+					conductor.xRotLast = conductor.getXRot();
+					CRPackets.PACKETS.send(new CameraMovePacket(conductor, conductor.getX(), conductor.getY(), conductor.getZ(),
+						conductor.getYRot(), conductor.getXRot(), conductor.onGround()));
+				}
 			}
 		} else if (wasMounted) {
 			wasMounted = false;
+			positionReminder = 0;
 			dismount();
 			if (mc.levelRenderer != null)
 				mc.levelRenderer.allChanged();

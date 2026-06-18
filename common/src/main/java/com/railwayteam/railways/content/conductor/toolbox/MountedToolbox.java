@@ -21,8 +21,19 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 public class MountedToolbox extends ToolboxBlockEntity {
     private final ConductorEntity parent;
+
+    // Create's ToolboxBlockEntity tracks connected players in a package-private field we can't reach
+    // across the package boundary; mirror the connection here via the public connectPlayer hook so the
+    // FollowToolboxPlayerGoal can find players linked to this toolbox.
+    private static final int KEEP_ALIVE_TICKS = 100;
+    private final Map<Player, Integer> trackedConnectedPlayers = new WeakHashMap<>();
 
     public MountedToolbox(ConductorEntity parent, DyeColor color) {
         super(parent.blockPosition(), ToolboxBlock.getColorBlock(color).defaultBlockState());
@@ -33,6 +44,16 @@ public class MountedToolbox extends ToolboxBlockEntity {
 
     public ConductorEntity getParent() {
         return parent;
+    }
+
+    @Override
+    public void connectPlayer(int slot, Player player, int hotbarSlot) {
+        super.connectPlayer(slot, player, hotbarSlot);
+        trackedConnectedPlayers.put(player, KEEP_ALIVE_TICKS);
+    }
+
+    public List<Player> getConnectedPlayers() {
+        return new ArrayList<>(trackedConnectedPlayers.keySet());
     }
 
     public void readFromItem(ItemStack stack) {
@@ -46,6 +67,13 @@ public class MountedToolbox extends ToolboxBlockEntity {
     @Override
     public void tick() {
         super.tick();
+        if (!trackedConnectedPlayers.isEmpty()) {
+            trackedConnectedPlayers.entrySet().removeIf(entry -> {
+                int remaining = entry.getValue() - 1;
+                entry.setValue(remaining);
+                return remaining <= 0 || !entry.getKey().isAlive();
+            });
+        }
     }
 
     @Override

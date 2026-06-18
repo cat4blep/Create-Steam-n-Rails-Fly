@@ -21,6 +21,7 @@ package com.railwayteam.railways.util.packet;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.content.conductor.ConductorPossessionController;
 import com.railwayteam.railways.multiloader.S2CPacket;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
@@ -46,9 +47,9 @@ public class SetCameraViewPacket implements S2CPacket {
             mc.setCameraEntity(entity);
 
             if (isCamera) {
-/*                ConductorPossessionController.previousCameraType = mc.options.getCameraType();
+                if (ConductorPossessionController.previousCameraType == null)
+                    ConductorPossessionController.previousCameraType = mc.options.getCameraType();
                 mc.options.setCameraType(CameraType.FIRST_PERSON);
-                mc.gui.setOverlayMessage(Utils.localize("mount.onboard", mc.options.keyShift.getTranslatedKeyMessage()), false);*/
                 ConductorPossessionController.setRenderPosition(entity);
                 if (mc.player != null) {
                     mc.player.xxa = 0.0f;
@@ -56,8 +57,10 @@ public class SetCameraViewPacket implements S2CPacket {
                     mc.player.setJumping(false);
                 }
             }
-/*            else if (ConductorPossessionController.previousCameraType != null)
-                mc.options.setCameraType(CameraController.previousCameraType);*/
+            else if (ConductorPossessionController.previousCameraType != null) {
+                mc.options.setCameraType(ConductorPossessionController.previousCameraType);
+                ConductorPossessionController.previousCameraType = null;
+            }
 
             mc.levelRenderer.allChanged();
 

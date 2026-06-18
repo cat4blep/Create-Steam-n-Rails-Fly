@@ -120,10 +120,8 @@ sourceSets.main {
         exclude("com/railwayteam/railways/content/palettes/boiler/fabric/BoilerBlockPlacementHelperImpl.java")
         exclude("com/railwayteam/railways/content/palettes/boiler/fabric/ObjModelBuilder.java")
         exclude("com/railwayteam/railways/content/palettes/painting/fabric/PaintPitcherFluidStorage.java")
-        exclude("com/railwayteam/railways/content/conductor/fabric/ConductorCapItemRenderer.java")
         exclude("com/railwayteam/railways/fabric/events/ClientEventsFabric.java")
         exclude("com/railwayteam/railways/fabric/mixin/**")
-        exclude("com/railwayteam/railways/fabric/ConductorFakePlayerFabric.java")
         exclude("com/railwayteam/railways/fabric/RailwaysDataFabric.java")
     }
 }

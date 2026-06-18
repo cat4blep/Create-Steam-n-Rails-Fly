@@ -19,12 +19,14 @@
 package com.railwayteam.railways.content.conductor;
 
 import com.railwayteam.railways.Railways;
+import com.zurrtum.create.AllBlocks;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.DyeColor;
@@ -33,7 +35,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +47,7 @@ public abstract class ConductorCapItem extends ArmorItem {
   public final String textureStr;
 
   protected ConductorCapItem(Properties props, DyeColor color) {
-    super(new ConductorArmorMaterial(), Type.HELMET, props);
+    super(new ConductorArmorMaterial(), Type.HELMET, props.equippable(EquipmentSlot.HEAD));
     this.color  = color;
     String colorName = color.getName().toLowerCase(Locale.ROOT);
     this.textureId = Railways.asResource("textures/entity/caps/%s_conductor_cap.png".formatted(colorName));
@@ -58,7 +59,7 @@ public abstract class ConductorCapItem extends ArmorItem {
     throw new AssertionError();
   }
 
-  static boolean isCasing (Block block) { return block.equals(Blocks.ANDESITE); }
+  static boolean isCasing (Block block) { return block == AllBlocks.ANDESITE_CASING; }
   static boolean isCasing (BlockState state) { return isCasing(state.getBlock()); }
   static boolean isCasing (Level level, BlockPos pos) { return isCasing(level.getBlockState(pos)); }
 
