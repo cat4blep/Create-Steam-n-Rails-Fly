@@ -19,81 +19,71 @@
 package com.railwayteam.railways.content.conductor;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.railwayteam.railways.content.conductor.toolbox.MountedToolbox;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.zurrtum.create.client.AllPartialModels;
-import com.zurrtum.create.AllTags;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.catnip.data.Iterate;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
-public class ConductorToolboxLayer<T extends ConductorEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
+public class ConductorToolboxLayer extends RenderLayer<ConductorRenderState, ConductorRenderModel> {
 
-  public ConductorToolboxLayer(RenderLayerParent<T, M> pRenderer) {
-    super(pRenderer);
-  }
-  public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight, @NotNull T conductorEntity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-    ItemStack itemstack = conductorEntity.getToolboxDisplayStack();
-    if (itemstack.is(AllTags.AllItemTags.TOOLBOXES.tag) && conductorEntity.isCarryingToolbox()) {
-      MountedToolbox holder = conductorEntity.getToolbox();
-      BlockState blockState = ((BlockItem) itemstack.getItem()).getBlock().defaultBlockState();
-      SuperByteBuffer body =
-          CachedBuffers.partial(CRBlockPartials.TOOLBOX_BODIES.get(holder.getColor()), blockState);
-      SuperByteBuffer lid =
-              CachedBuffers.partial(AllPartialModels.TOOLBOX_LIDS.get(holder.getColor()), blockState);
-      SuperByteBuffer drawer = CachedBuffers.partial(AllPartialModels.TOOLBOX_DRAWER, blockState);
+    private static final RenderType CUTOUT_BLOCKS = RenderType.create("railways_conductor_toolbox",
+            RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK)
+                    .withTexture("Sampler0", Identifier.withDefaultNamespace("textures/atlas/blocks.png"))
+                    .useLightmap()
+                    .createRenderSetup());
 
-      float lidAngle = holder.lid.getValue(partialTick);
-      float drawerOffset = holder.drawers.getValue(partialTick);
-
-      poseStack.pushPose();
-
-      poseStack.mulPose(Axis.XP.rotationDegrees(180.0f));
-      poseStack.translate(-0.5d, -1.2d, -0.94d);
-
-      double rotate = 0;
-
-      VertexConsumer builder = buffer.getBuffer(RenderType.cutoutMipped());
-      body.center()
-          .rotateY((float) rotate)
-          .uncenter()
-          .translate(0, 6 / 16f, 12 / 16f)
-          .translate(0, -6 / 16f, -12 / 16f)
-          .light(packedLight)
-          .renderInto(poseStack, builder);
-
-      lid.center()
-          .rotateY((float) rotate)
-          .uncenter()
-          .translate(0, 6 / 16f, 12 / 16f)
-          .rotateXDegrees(60 * lidAngle)
-          .translate(0, -6 / 16f, -12 / 16f)
-          .light(packedLight)
-          .renderInto(poseStack, builder);
-
-      for (int offset : Iterate.zeroAndOne) {
-        drawer.center()
-            .rotateY((float) rotate)
-            .uncenter()
-            .translate(0, offset / 8f, -drawerOffset * .175f * (2 - offset))
-            .light(packedLight)
-            .renderInto(poseStack, builder);
-      }
-      poseStack.popPose();
+    public ConductorToolboxLayer(RenderLayerParent<ConductorRenderState, ConductorRenderModel> pRenderer) {
+        super(pRenderer);
     }
-  }
+
+    @Override
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitter, int packedLight,
+                       ConductorRenderState state, float yRot, float xRot) {
+        if (!state.isCarryingToolbox || state.toolboxBlockState == null)
+            return;
+
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.XP.rotationDegrees(180.0f));
+        poseStack.translate(-0.5, -1.2, -0.94);
+
+        SuperByteBuffer body = CachedBuffers.partial(
+                CRBlockPartials.TOOLBOX_BODIES.get(state.toolboxColor), state.toolboxBlockState)
+                .light(packedLight);
+
+        SuperByteBuffer lid = CachedBuffers.partial(
+                AllPartialModels.TOOLBOX_LIDS.get(state.toolboxColor), state.toolboxBlockState)
+                .translate(0, 6 / 16f, 12 / 16f)
+                .rotateXDegrees(60 * state.toolboxLidAngle)
+                .translate(0, -6 / 16f, -12 / 16f)
+                .light(packedLight);
+
+        renderBuf(submitter, poseStack, body);
+        renderBuf(submitter, poseStack, lid);
+
+        for (int offset : Iterate.zeroAndOne) {
+            SuperByteBuffer drawer = CachedBuffers.partial(
+                    AllPartialModels.TOOLBOX_DRAWER, state.toolboxBlockState)
+                    .translate(0, offset / 8f, -state.toolboxDrawerOffset * .175f * (2 - offset))
+                    .light(packedLight);
+            renderBuf(submitter, poseStack, drawer);
+        }
+
+        poseStack.popPose();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void renderBuf(SubmitNodeCollector submitter, PoseStack poseStack, SuperByteBuffer buf) {
+        submitter.submitCustomGeometry(poseStack, CUTOUT_BLOCKS,
+                (pose, consumer) -> buf.renderInto(pose, consumer));
+    }
 }

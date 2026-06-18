@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 
 public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRenderState, ConductorRenderModel> {
@@ -15,6 +16,8 @@ public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRen
         super(ctx, new ConductorRenderModel(ctx.bakeLayer(ConductorEntityModel.LAYER_LOCATION)), 0.2f);
         addLayer(new ConductorCapLayer(this, ctx.getModelSet()));
         addLayer(new ConductorRemoteLayer(this));
+        addLayer(new ConductorFlagLayer(this));
+        addLayer(new ConductorToolboxLayer(this));
     }
 
     @Override
@@ -29,6 +32,19 @@ public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRen
         state.headStack = conductor.getItemBySlot(EquipmentSlot.HEAD);
         state.job = conductor.getJob();
         state.texture = textureFor(conductor, state.headStack);
+
+        state.isHoldingSchedules = conductor.isHoldingSchedulesClient();
+
+        state.isCarryingToolbox = conductor.isCarryingToolbox();
+        if (state.isCarryingToolbox) {
+            var toolbox = conductor.getToolbox();
+            ItemStack displayStack = conductor.getToolboxDisplayStack();
+            state.toolboxColor = toolbox.getColor();
+            state.toolboxBlockState = displayStack.getItem() instanceof BlockItem bi
+                    ? bi.getBlock().defaultBlockState() : null;
+            state.toolboxLidAngle = toolbox.lid.getValue(partialTick);
+            state.toolboxDrawerOffset = toolbox.drawers.getValue(partialTick);
+        }
     }
 
     @Override

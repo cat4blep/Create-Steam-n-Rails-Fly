@@ -21,37 +21,42 @@ package com.railwayteam.railways.content.conductor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
-public class ConductorFlagLayer<T extends ConductorEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
+public class ConductorFlagLayer extends RenderLayer<ConductorRenderState, ConductorRenderModel> {
 
-	public ConductorFlagLayer(RenderLayerParent<T, M> pRenderer) {
-		super(pRenderer);
-	}
-	public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight, @NotNull T conductorEntity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
-		if (conductorEntity.isHoldingSchedulesClient()) {
+    private static final RenderType CUTOUT_BLOCKS = RenderType.create("railways_conductor_flag",
+            RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK)
+                    .withTexture("Sampler0", Identifier.withDefaultNamespace("textures/atlas/blocks.png"))
+                    .useLightmap()
+                    .createRenderSetup());
 
-			poseStack.pushPose();
+    public ConductorFlagLayer(RenderLayerParent<ConductorRenderState, ConductorRenderModel> pRenderer) {
+        super(pRenderer);
+    }
 
-			//poseStack.mulPose(Axis.XP.rotationDegrees(180.0f));
-			//poseStack.translate(-0.5d, -1.2d, -0.94d);
+    @Override
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitter, int packedLight,
+                       ConductorRenderState state, float yRot, float xRot) {
+        if (!state.isHoldingSchedules)
+            return;
 
-
-			CachedBuffers.partial(CRBlockPartials.CONDUCTOR_WHISTLE_FLAGS.get(conductorEntity.getColor()), Blocks.AIR.defaultBlockState())
-					.translate(-0.78125, 0.15, -0.688)
-					.light(packedLight)
-					.renderInto(poseStack, buffer.getBuffer(RenderType.cutoutMipped()));
-
-			poseStack.popPose();
-		}
-	}
+        poseStack.pushPose();
+        SuperByteBuffer buf = CachedBuffers.partial(
+                CRBlockPartials.CONDUCTOR_WHISTLE_FLAGS.get(state.color),
+                Blocks.AIR.defaultBlockState())
+                .translate(-0.78125, 0.15, -0.688)
+                .light(packedLight);
+        submitter.submitCustomGeometry(poseStack, CUTOUT_BLOCKS,
+                (pose, consumer) -> buf.renderInto(pose, consumer));
+        poseStack.popPose();
+    }
 }
