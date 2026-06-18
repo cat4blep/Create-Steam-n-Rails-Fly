@@ -24,6 +24,8 @@ import com.railwayteam.railways.content.buffer.BufferModelUtils;
 import com.railwayteam.railways.content.conductor.ConductorCapModel;
 import com.railwayteam.railways.content.conductor.ConductorEntityModel;
 import com.railwayteam.railways.content.conductor.ConductorRenderer;
+import com.railwayteam.railways.content.conductor.vent.CopycatVentModel;
+import com.zurrtum.create.client.AllModels;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingRenderUtils;
 import com.railwayteam.railways.ponder.CRPonderPlugin;
 import com.railwayteam.railways.registry.CRBlockPartials;
@@ -81,6 +83,8 @@ public class RailwaysClient {
     CRKeys.register();
     CRBlockPartials.init();
     CRContainerTypes.registerScreens();
+
+    AllModels.register(com.railwayteam.railways.registry.CRBlocks.CONDUCTOR_VENT.get(), CopycatVentModel::new);
 
     CustomTrackOverlayRendering.register(CREdgePointTypes.COUPLER, CRBlockPartials.COUPLER_BOTH);
     CustomTrackOverlayRendering.register(CREdgePointTypes.SWITCH, CRBlockPartials.SWITCH_RIGHT_TURN);
