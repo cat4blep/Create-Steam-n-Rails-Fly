@@ -19,6 +19,7 @@
 package com.railwayteam.railways.content.conductor.vent;
 
 import com.railwayteam.railways.content.conductor.ClientHandler;
+import com.zurrtum.create.AllBlocks;
 import com.zurrtum.create.client.infrastructure.model.CopycatModel;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
@@ -45,6 +46,9 @@ public class CopycatVentModel extends CopycatModel {
             model.collectParts(random, parts);
             return;
         }
+        // No material applied yet — stay transparent (copycat_base is a visible placeholder cube, skip it)
+        if (material.is(AllBlocks.COPYCAT_BASE))
+            return;
         // Show whatever block the copycat is set to
         addModelParts(world, pos, material, random, getModelOf(material), parts);
     }
