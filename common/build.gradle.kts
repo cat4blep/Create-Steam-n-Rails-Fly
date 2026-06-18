@@ -104,7 +104,7 @@ sourceSets.main {
         exclude("com/railwayteam/railways/content/custom_tracks/casing/SpriteCopyingBakedModel.java")
         exclude("com/railwayteam/railways/content/conductor/ConductorElytraLayer.java")
         exclude("com/railwayteam/railways/content/conductor/ConductorFlagLayer.java")
-        exclude("com/railwayteam/railways/content/conductor/ConductorRemoteLayer.java")
+        // ConductorRemoteLayer is ported to 1.21.11 API and now lives in common
         exclude("com/railwayteam/railways/content/conductor/ConductorSecondaryHeadLayer.java")
         exclude("com/railwayteam/railways/content/conductor/ConductorToolboxLayer.java")
         exclude("com/railwayteam/railways/content/bogey_menu/components/**")

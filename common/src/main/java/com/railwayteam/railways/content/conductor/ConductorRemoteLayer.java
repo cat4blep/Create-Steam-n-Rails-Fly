@@ -22,65 +22,57 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.zurrtum.create.client.AllPartialModels;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
-import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
-public class ConductorRemoteLayer<T extends ConductorEntity, M extends ConductorEntityModel<T>> extends RenderLayer<T, M> {
+public class ConductorRemoteLayer extends RenderLayer<ConductorRenderState, ConductorRenderModel> {
 
-	public ConductorRemoteLayer(RenderLayerParent<T, M> pRenderer) {
-		super(pRenderer);
-	}
-	public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight,
-					   @NotNull T conductorEntity, float limbSwing, float limbSwingAmount, float partialTick,
-					   float ageInTicks, float netHeadYaw, float headPitch) {
-		if (conductorEntity.getJob() == ConductorEntity.Job.REMOTE_CONTROL) {
+    private static final RenderType CUTOUT_BLOCKS = RenderType.create("railways_conductor_attachment",
+            RenderSetup.builder(RenderPipelines.CUTOUT_BLOCK)
+                    .withTexture("Sampler0", Identifier.withDefaultNamespace("textures/atlas/blocks.png"))
+                    .useLightmap()
+                    .createRenderSetup());
 
-			poseStack.pushPose();
+    public ConductorRemoteLayer(RenderLayerParent<ConductorRenderState, ConductorRenderModel> pRenderer) {
+        super(pRenderer);
+    }
 
-			getParentModel().getHead().translateAndRotate(poseStack);
+    @Override
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitter, int packedLight,
+                       ConductorRenderState state, float yRot, float xRot) {
+        if (state.job == ConductorEntity.Job.REMOTE_CONTROL) {
+            poseStack.pushPose();
+            getParentModel().getHead().translateAndRotate(poseStack);
+            renderPartial(submitter, poseStack,
+                    CachedBuffers.partial(CRBlockPartials.CONDUCTOR_ANTENNA, Blocks.AIR.defaultBlockState())
+                            .rotateXDegrees(180)
+                            .translate(3 / 16.0, 3.5 / 16.0, 0 / 16.0)
+                            .rotateZDegrees(-30)
+                            .light(packedLight));
+            poseStack.popPose();
 
-			//poseStack.mulPose(Axis.XP.rotationDegrees(180.0f));
-			//poseStack.translate(-0.5d, -1.2d, -0.94d);
+        } else if (state.job == ConductorEntity.Job.SPY) {
+            poseStack.pushPose();
+            getParentModel().getHead().translateAndRotate(poseStack);
+            renderPartial(submitter, poseStack,
+                    CachedBuffers.partial(AllPartialModels.BLAZE_GOGGLES, Blocks.AIR.defaultBlockState())
+                            .rotateZDegrees(180)
+                            .translate(-8 / 16.0, 2 / 16.0, -8 / 16.0)
+                            .light(packedLight));
+            poseStack.popPose();
+        }
+    }
 
-
-			CachedBuffers.partial(CRBlockPartials.CONDUCTOR_ANTENNA, Blocks.AIR.defaultBlockState())
-					/*.rotateY(netHeadYaw)
-					.rotateX(headPitch)*/
-
-					.rotateXDegrees(180)
-					.translate(3 / 16.0, 3.5 / 16.0, 0 / 16.0)
-					.rotateZDegrees(-30)
-					.light(packedLight)
-					.renderInto(poseStack, buffer.getBuffer(RenderType.cutoutMipped()));
-
-			poseStack.popPose();
-		} else if (conductorEntity.getJob() == ConductorEntity.Job.SPY) {
-
-			poseStack.pushPose();
-
-			getParentModel().getHead().translateAndRotate(poseStack);
-
-			//poseStack.mulPose(Axis.XP.rotationDegrees(180.0f));
-			//poseStack.translate(-0.5d, -1.2d, -0.94d);
-
-
-			CachedBuffers.partial(AllPartialModels.BLAZE_GOGGLES, Blocks.AIR.defaultBlockState())
-					/*.rotateY(netHeadYaw)
-					.rotateX(headPitch)*/
-
-					.rotateZDegrees(180)
-					.translate(-8 / 16.0, 2 / 16.0, -8 / 16.0)
-					.light(packedLight)
-					.renderInto(poseStack, buffer.getBuffer(RenderType.cutoutMipped()));
-
-			poseStack.popPose();
-		}
-	}
+    @SuppressWarnings("unchecked")
+    private static void renderPartial(SubmitNodeCollector submitter, PoseStack poseStack, SuperByteBuffer buf) {
+        submitter.submitCustomGeometry(poseStack, CUTOUT_BLOCKS,
+                (pose, consumer) -> buf.renderInto(pose, consumer));
+    }
 }

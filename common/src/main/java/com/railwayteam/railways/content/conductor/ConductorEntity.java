@@ -358,6 +358,14 @@ public class ConductorEntity extends AbstractGolem {
         return isPossessedAndClient() || super.isEffectiveAi();
     }
 
+    @Override
+    public boolean canSimulateMovement() {
+        // 1.21.11: travel() is only called when canSimulateMovement() AND isEffectiveAi() are both true.
+        // isLocalInstanceAuthoritative() (which the default delegates to) returns false for server-
+        // controlled mobs on the client, so we must override this separately from isEffectiveAi().
+        return isPossessedAndClient() || super.canSimulateMovement();
+    }
+
     public void turnView(double yRot, double xRot) {
         float f = (float) xRot * 0.15f;
         float g = (float) yRot * 0.15f;
@@ -765,6 +773,8 @@ public class ConductorEntity extends AbstractGolem {
         if (level().isClientSide()) {
             ConductorPossessionController.tryUpdatePossession(this);
             updatePossessionInputs();
+            if (isPossessedAndClient())
+                this.getInterpolation().cancel();
         }
         if (level() instanceof ServerLevel serverLevel && fakePlayer == null)
             fakePlayer = EntityUtils.createConductorFakePlayer(serverLevel, this);

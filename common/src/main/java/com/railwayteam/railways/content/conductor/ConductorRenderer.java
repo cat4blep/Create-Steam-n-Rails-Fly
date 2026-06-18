@@ -6,18 +6,15 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRenderState, ConductorRenderModel> {
     public static final Identifier TEXTURE = Railways.asResource("textures/entity/conductor.png");
-    private final net.minecraft.client.renderer.item.ItemModelResolver itemModelResolver;
 
     public ConductorRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new ConductorRenderModel(ctx.bakeLayer(ConductorEntityModel.LAYER_LOCATION)), 0.2f);
-        this.itemModelResolver = ctx.getItemModelResolver();
         addLayer(new ConductorCapLayer(this, ctx.getModelSet()));
-        addLayer(new ConductorSecondaryHeadRenderLayer(this));
+        addLayer(new ConductorRemoteLayer(this));
     }
 
     @Override
@@ -30,9 +27,8 @@ public class ConductorRenderer extends MobRenderer<ConductorEntity, ConductorRen
         super.extractRenderState(conductor, state, partialTick);
         state.color = conductor.getColor();
         state.headStack = conductor.getItemBySlot(EquipmentSlot.HEAD);
+        state.job = conductor.getJob();
         state.texture = textureFor(conductor, state.headStack);
-        itemModelResolver.updateForLiving(state.secondaryHeadRenderState, conductor.getSecondaryHeadStack(),
-            ItemDisplayContext.HEAD, conductor);
     }
 
     @Override
