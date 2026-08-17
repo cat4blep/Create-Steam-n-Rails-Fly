@@ -19,7 +19,7 @@
 package com.railwayteam.railways.content.buffer;
 
 import com.railwayteam.railways.registry.CRBlockEntities;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;

@@ -11,6 +11,7 @@
 package com.railwayteam.railways.content.custom_tracks.monorail;
 
 import com.railwayteam.railways.Railways;
+import com.railwayteam.railways.fabric_mixin.client.AccessorSegmentAngles;
 import com.railwayteam.railways.registry.CRBlockPartials;
 import com.railwayteam.railways.registry.CRShapes;
 import com.railwayteam.railways.registry.CRTrackMaterials;
@@ -18,7 +19,6 @@ import com.railwayteam.railways.util.Utils;
 import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.AllTrackMaterialModels.TrackModelHolder;
-import com.zurrtum.create.client.content.trains.track.RailwaysTrackVisualBridge;
 import com.zurrtum.create.client.content.trains.track.TrackRenderer.SegmentAngles;
 import com.zurrtum.create.content.trains.track.BezierConnection;
 import net.minecraft.core.BlockPos;
@@ -64,7 +64,7 @@ public final class MonorailClientRuntimeChecks {
             positions, starts, axes, normals, true, false, CRTrackMaterials.MONORAIL
         );
 
-        SegmentAngles segments = RailwaysTrackVisualBridge.segmentAngles(connection);
+        SegmentAngles segments = AccessorSegmentAngles.railways$create(connection);
         require(segments.length == connection.getSegmentCount(),
             "curve segment array length does not match Bezier segment count");
         require(segments.length > 0, "curve probe produced no render segments");

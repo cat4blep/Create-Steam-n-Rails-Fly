@@ -25,7 +25,7 @@ import com.railwayteam.railways.util.ShapeWrapper;
 import com.zurrtum.create.api.equipment.goggles.IProxyHoveringInformation;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;

@@ -24,8 +24,8 @@ import com.railwayteam.railways.util.EntityUtils;
 import com.zurrtum.create.AllItems;
 import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlock;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import com.tterrag.registrate.util.nullness.NonNullFunction;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.compat.registrate.util.nullness.NonNullFunction;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -61,12 +61,26 @@ public class PalettesSlidingDoorBlock extends SlidingDoorBlock implements IWrenc
             .setValue(WINDOWED, false));
     }
     public InteractionResult onWrenched(BlockState state, UseOnContext context) {
-        Level world = context.getLevel();
-        BlockPos pos = context.getClickedPos();
-        BlockState newState = state.cycle(WINDOWED);
-        world.setBlock(pos, newState, UPDATE_ALL);
+        Level level = context.getLevel();
+        BlockPos clickedPos = context.getClickedPos();
+        BlockPos lowerPos = state.getValue(HALF) == DoubleBlockHalf.UPPER ? clickedPos.below() : clickedPos;
+
+        BlockState lowerState = level.getBlockState(lowerPos);
+        boolean windowed = lowerState.is(this)
+            ? !lowerState.getValue(WINDOWED)
+            : !state.getValue(WINDOWED);
+        if (lowerState.is(this)) {
+            level.setBlock(lowerPos, lowerState.setValue(WINDOWED, windowed), UPDATE_ALL);
+        }
+
+        BlockPos upperPos = lowerPos.above();
+        BlockState upperState = level.getBlockState(upperPos);
+        if (upperState.is(this)) {
+            level.setBlock(upperPos, upperState.setValue(WINDOWED, windowed), UPDATE_ALL);
+        }
         return InteractionResult.SUCCESS;
     }
+
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (EntityUtils.isHolding(player, stack -> stack.is(AllItems.WRENCH))) {
             return InteractionResult.PASS;

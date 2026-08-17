@@ -22,7 +22,7 @@ import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.util.Utils;
 import com.zurrtum.create.catnip.config.Builder;
 import com.zurrtum.create.catnip.config.ConfigBase;
-import net.minecraftforge.fml.config.ModConfig;
+import com.railwayteam.railways.internal.compat.minecraftforge.fml.config.ModConfig;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.ApiStatus;
 

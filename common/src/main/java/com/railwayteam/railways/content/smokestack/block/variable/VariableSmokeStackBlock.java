@@ -26,7 +26,7 @@ import com.railwayteam.railways.content.smokestack.block.StyledSmokeStackBlock;
 import com.railwayteam.railways.content.smokestack.block.be.SmokeStackBlockEntity;
 import com.railwayteam.railways.util.ShapeWrapper;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;

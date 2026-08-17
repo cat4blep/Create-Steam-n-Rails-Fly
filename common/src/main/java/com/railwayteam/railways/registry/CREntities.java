@@ -23,9 +23,9 @@ import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.content.minecarts.MinecartJukebox;
 import com.railwayteam.railways.content.minecarts.MinecartWorkbench;
 import com.railwayteam.railways.multiloader.EntityTypeConfigurator;
-import com.zurrtum.create.foundation.data.CreateRegistrate;
-import com.tterrag.registrate.util.entry.EntityEntry;
-import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import com.railwayteam.railways.internal.compat.create.foundation.data.CreateRegistrate;
+import com.railwayteam.railways.internal.compat.registrate.util.entry.EntityEntry;
+import com.railwayteam.railways.internal.compat.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.MobCategory;
 

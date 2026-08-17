@@ -31,10 +31,7 @@ import com.zurrtum.create.content.decoration.copycat.WaterloggedCopycatBlock;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.zurrtum.create.content.kinetics.base.KineticBlockEntity;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.color.item.ItemColor;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -46,7 +43,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
@@ -307,18 +303,6 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
         return InteractionResult.PASS;
     }
 
-    @Environment(EnvType.CLIENT)
-    public static ItemColor wrappedItemColor() {
-        return new WrappedItemColor();
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static class WrappedItemColor implements ItemColor {
-        public int getColor(ItemStack itemStack, int i) {
-            return GrassColor.get(0.5D, 1.0D);
-        }
-
-    }
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return CRBlocks.COPYCAT_HEADSTOCK_GROUP.get(state.getValue(STYLE)).asStack();
     }

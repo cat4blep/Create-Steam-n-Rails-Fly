@@ -19,12 +19,12 @@
 package com.railwayteam.railways.content.smokestack.block;
 
 import com.railwayteam.railways.util.ShapeWrapper;
-import com.zurrtum.create.AllTags;
+import com.railwayteam.railways.internal.compat.create.AllTags;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.ProperWaterloggedBlock;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;

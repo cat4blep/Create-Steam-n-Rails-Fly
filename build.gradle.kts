@@ -1,6 +1,8 @@
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import javax.imageio.ImageIO
+import java.util.zip.ZipFile
+import org.gradle.api.tasks.bundling.Jar
 
 plugins {
     id("net.fabricmc.fabric-loom") version "1.16-SNAPSHOT"
@@ -111,6 +113,9 @@ dependencies {
 
     annotationProcessor("io.github.llamalad7:mixinextras-common:${property("mixin_extras_version")}")
     implementation(include("io.github.llamalad7:mixinextras-fabric:${property("mixin_extras_version")}")!!)
+
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 val connectedTextureResourceRoots = listOf(
@@ -369,6 +374,7 @@ tasks.processResources {
     inputs.property("railwayCompatTrackLootConditions", "fabric-resource-conditions-6.1-v1")
     inputs.property("railwayCompatTrackLootConditionMapping", compatTrackLootTableModIds)
     inputs.property("railwayInternalNoDropLootTables", internalNoDropBlockLootTables.sorted())
+    inputs.property("railwayAnimatedDoorBlockstates", "create-fly-6.0.9-particle-only-v1")
 
     filesMatching("fabric.mod.json") {
         expand(properties)
@@ -382,6 +388,65 @@ tasks.processResources {
 
     doLast {
         val outputRoot = destinationDir
+        val doorBlockstateRoot = outputRoot.resolve("assets/railways/blockstates")
+        val doorBlockstatePattern = Regex(
+            "^(?:(.+)_)?(sliding|folding)_locometal_door\\.json$",
+        )
+        val doorTypesByColor = linkedMapOf<String, MutableSet<String>>()
+        val animatedDoorBlockstates = fileTree(doorBlockstateRoot) {
+            include("*sliding_locometal_door.json", "*folding_locometal_door.json")
+        }.files.sortedBy(File::getName)
+        if (animatedDoorBlockstates.isEmpty()) {
+            throw GradleException("No palette sliding/folding door blockstates were processed")
+        }
+
+        animatedDoorBlockstates.forEach { blockstateFile ->
+            val match = doorBlockstatePattern.matchEntire(blockstateFile.name)
+                ?: throw GradleException("Unexpected palette door blockstate name: $blockstateFile")
+            val color = match.groupValues[1].ifEmpty { "netherite" }
+            val doorType = match.groupValues[2]
+            doorTypesByColor.getOrPut(color, ::linkedSetOf).add(doorType)
+
+            val blockstate = linkedMapOf<String, Any>(
+                "variants" to linkedMapOf(
+                    "" to linkedMapOf(
+                        "model" to "railways:block/palettes/$color/door_particle",
+                    ),
+                ),
+            )
+            blockstateFile.writeText(
+                JsonOutput.prettyPrint(JsonOutput.toJson(blockstate)) + "\n",
+                Charsets.UTF_8,
+            )
+        }
+
+        doorTypesByColor.forEach { (color, doorTypes) ->
+            if (doorTypes != setOf("sliding", "folding")) {
+                throw GradleException(
+                    "Palette color '$color' must provide both animated door types, found: " +
+                        doorTypes.sorted().joinToString(),
+                )
+            }
+
+            val particleModel = outputRoot.resolve(
+                "assets/railways/models/block/palettes/$color/door_particle.json",
+            )
+            particleModel.parentFile.mkdirs()
+            val model = linkedMapOf<String, Any>(
+                "textures" to linkedMapOf(
+                    "particle" to "railways:block/palettes/$color/annexed_slashed",
+                ),
+            )
+            particleModel.writeText(
+                JsonOutput.prettyPrint(JsonOutput.toJson(model)) + "\n",
+                Charsets.UTF_8,
+            )
+        }
+        logger.lifecycle(
+            "Replaced ${animatedDoorBlockstates.size} animated palette door blockstates with " +
+                "${doorTypesByColor.size} particle-only models",
+        )
+
         val legacyPaintProjectileFiles = fileTree(outputRoot) {
             include("data/*/create/potato_projectile/**/*.json")
         }.files
@@ -890,6 +955,10 @@ tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.addAll(listOf("-Xmaxerrs", "10000", "-Xmaxwarns", "1000"))
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
@@ -898,6 +967,54 @@ java {
 
 tasks.jar {
     from("LICENSE")
+}
+
+val forbiddenPublishedNamespaces = listOf(
+    "com/simibubi/create/",
+    "com/tterrag/",
+    "com/zurrtum/create/",
+    "net/createmod/ponder/",
+    "net/minecraft/",
+    "net/minecraftforge/",
+)
+
+val verifyPublishedNamespaces by tasks.registering {
+    group = "verification"
+    description = "Rejects bundled classes and sources in namespaces owned by Minecraft, Create, or Registrate."
+
+    val binaryArchive = tasks.jar.flatMap { it.archiveFile }
+    val sourceArchive = tasks.named<Jar>("sourcesJar").flatMap { it.archiveFile }
+    val publishedArchives = listOf(binaryArchive, sourceArchive)
+
+    dependsOn(tasks.jar, tasks.named("sourcesJar"))
+    inputs.files(publishedArchives)
+    inputs.property("forbiddenPublishedNamespaces", forbiddenPublishedNamespaces)
+
+    doLast {
+        publishedArchives.forEach { archiveProvider ->
+            val archive = archiveProvider.get().asFile
+            val offenders = ZipFile(archive).use { zip ->
+                zip.entries().asSequence()
+                    .filterNot { it.isDirectory }
+                    .map { it.name }
+                    .filter { entry ->
+                        (entry.endsWith(".class") || entry.endsWith(".java")) &&
+                            forbiddenPublishedNamespaces.any(entry::startsWith)
+                    }
+                    .sorted()
+                    .toList()
+            }
+            if (offenders.isNotEmpty()) {
+                throw GradleException(
+                    "${archive.name} publishes files in foreign namespaces:\n${offenders.joinToString("\n")}",
+                )
+            }
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn(verifyPublishedNamespaces)
 }
 
 publishing {

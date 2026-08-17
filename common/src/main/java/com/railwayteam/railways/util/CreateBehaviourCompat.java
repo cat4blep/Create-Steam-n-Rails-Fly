@@ -4,8 +4,8 @@ import com.zurrtum.create.api.behaviour.interaction.MovingInteractionBehaviour;
 import com.zurrtum.create.api.behaviour.movement.MovementBehaviour;
 import com.zurrtum.create.api.behaviour.display.DisplaySource;
 import com.zurrtum.create.api.behaviour.display.DisplayTarget;
-import com.tterrag.registrate.util.entry.RegistryEntry;
-import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import com.railwayteam.railways.internal.compat.registrate.util.entry.RegistryEntry;
+import com.railwayteam.railways.internal.compat.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.world.level.block.Block;
 
 public class CreateBehaviourCompat {

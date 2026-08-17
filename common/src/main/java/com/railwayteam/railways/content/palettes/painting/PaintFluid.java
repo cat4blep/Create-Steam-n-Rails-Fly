@@ -21,10 +21,10 @@ package com.railwayteam.railways.content.palettes.painting;
 import com.mojang.datafixers.util.Pair;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.palettes.PalettesColor;
-import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.Contract;
 
 import java.util.Optional;

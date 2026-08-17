@@ -16,12 +16,10 @@
 
 package com.railwayteam.railways.mixin;
 
-import com.railwayteam.railways.base.datafixerapi.DataFixesInternals;
 import com.railwayteam.railways.base.datafix.fixes.CompatCherryTrackFix;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,12 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(NbtUtils.class)
 public class NbtUtilsMixin {
-    // moved general updating to MixinDataFixTypes.java
-    @Inject(method = "addDataVersion", at = @At("HEAD"))
-    private static void addModDataVersions(CompoundTag tag, int dataVersion, CallbackInfoReturnable<CompoundTag> cir) {
-        DataFixesInternals.get().addModDataVersions(tag);
-    }
-
     @Inject(method = "readBlockState", at = @At("HEAD"))
     private static void railways$upgradeBlocks(HolderGetter<Block> blockGetter, CompoundTag tag, CallbackInfoReturnable<BlockState> cir) {
         if (tag.contains("Name")) {

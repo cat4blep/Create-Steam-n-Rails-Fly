@@ -32,6 +32,11 @@ public abstract class MixinDataFixTypes {
         Operation<Dynamic<T>> original
     ) {
         Dynamic<T> vanillaFixed = original.call(fixer, input, version, newVersion);
-        return DataFixesInternals.get().updateWithAllFixers((DataFixTypes) (Object) this, vanillaFixed);
+        DataFixTypes dataFixTypes = (DataFixTypes) (Object) this;
+        // PlayerAdvancements treats every remaining root key as an advancement
+        // id. Railways has no advancement fixer, so never stamp its marker here.
+        if (dataFixTypes == DataFixTypes.ADVANCEMENTS)
+            return vanillaFixed;
+        return DataFixesInternals.get().updateWithAllFixers(dataFixTypes, vanillaFixed);
     }
 }

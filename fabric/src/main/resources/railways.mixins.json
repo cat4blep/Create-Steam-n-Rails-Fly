@@ -4,6 +4,7 @@
   "package": "com.railwayteam.railways.fabric_mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "client.AccessorSegmentAngles",
     "client.AccessorTrainRelocatorClient",
     "client.BlockElementDeserializerMixin",
     "client.MixinAllBlockEntityBehaviours",
@@ -25,6 +26,7 @@
     "client.MixinRadialToolboxMenu",
     "client.MixinRollingModeScrollBehaviour",
     "client.MixinSlidingDoorRenderer",
+    "client.MixinSlidingDoorVisual",
     "client.MixinToolboxHandlerClient",
     "client.MixinToolboxScreen",
     "client.MixinTrackCouplerBlockEntityGoggles",
@@ -59,6 +61,7 @@
     "MixinNavigationWaypoint",
     "MixinPotatoCannonItem",
     "MixinNbtUtilsDataFix",
+    "MixinPlayerAdvancements",
     "MixinRollerBlockEntity",
     "MixinRollerMovementBehaviour",
     "MixinRailwaySavedDataShadow",

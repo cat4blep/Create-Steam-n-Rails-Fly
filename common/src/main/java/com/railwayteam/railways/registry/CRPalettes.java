@@ -37,20 +37,19 @@ import com.railwayteam.railways.content.palettes.smokebox.PalettesSmokeboxBlock;
 import com.railwayteam.railways.content.palettes.trapdoors.PalettesTrapDoorBlock;
 import com.railwayteam.railways.util.BlockStateUtils;
 import com.railwayteam.railways.util.TextUtils;
-import com.zurrtum.create.AllTags;
+import com.railwayteam.railways.internal.compat.create.AllTags;
 import com.zurrtum.create.content.contraptions.behaviour.TrapdoorMovingInteraction;
 import com.zurrtum.create.content.decoration.MetalLadderBlock;
 import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorMovementBehaviour;
 import com.zurrtum.create.content.kinetics.flywheel.FlywheelBlock;
 import com.zurrtum.create.client.foundation.item.ItemDescription;
-import com.zurrtum.create.foundation.data.CreateRegistrate;
-import com.tterrag.registrate.builders.BlockBuilder;
-import com.tterrag.registrate.providers.ProviderType;
-import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
-import com.tterrag.registrate.util.entry.BlockEntry;
-import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import com.railwayteam.railways.internal.compat.create.foundation.data.CreateRegistrate;
+import com.railwayteam.railways.internal.compat.registrate.builders.BlockBuilder;
+import com.railwayteam.railways.internal.compat.registrate.providers.ProviderType;
+import com.railwayteam.railways.internal.compat.registrate.providers.loot.RegistrateBlockLootTables;
+import com.railwayteam.railways.internal.compat.registrate.util.entry.BlockEntry;
+import com.railwayteam.railways.internal.compat.registrate.util.nullness.NonNullUnaryOperator;
 import com.zurrtum.create.catnip.data.Pair;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.BlockTags;
@@ -84,7 +83,7 @@ import java.util.function.Supplier;
 import static com.railwayteam.railways.util.TextUtils.*;
 import static com.railwayteam.railways.util.CreateBehaviourCompat.interactionBehaviour;
 import static com.railwayteam.railways.util.CreateBehaviourCompat.movementBehaviour;
-import static com.zurrtum.create.foundation.data.ModelGen.customItemModel;
+import static com.railwayteam.railways.internal.compat.create.foundation.data.ModelGen.customItemModel;
 
 public class CRPalettes {
     private static final CreateRegistrate REGISTRATE = Railways.registrate();
@@ -602,7 +601,6 @@ public class CRPalettes {
                 .transform(BuilderTransformers.locometalWindow(color, type))
                 .properties(CRPalettes::glassProperties)
                 .lang(joinSpace(colorName, type.getLangName(), "Locometal Window"))
-                .addLayer(() -> RenderType::cutoutMipped)
                 .tag(BlockTags.IMPERMEABLE)
                 .removeTag(ProviderType.BLOCK_TAGS, AllTags.AllBlockTags.WRENCH_PICKUP.tag)
                 .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
@@ -623,7 +621,6 @@ public class CRPalettes {
             .transform(BuilderTransformers.locometalTrapdoor(color))
             .lang(joinSpace(colorName, "Locometal Trapdoor"))
             .properties(BlockBehaviour.Properties::noOcclusion)
-            .addLayer(() -> RenderType::cutoutMipped)
             .tag(BlockTags.TRAPDOORS)
             .onRegister(interactionBehaviour(new TrapdoorMovingInteraction()))
             .item()

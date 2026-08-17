@@ -31,6 +31,11 @@ public class MixinDataFixTypes {
     @WrapMethod(method = "update(Lcom/mojang/datafixers/DataFixer;Lcom/mojang/serialization/Dynamic;II)Lcom/mojang/serialization/Dynamic;")
     private <T> Dynamic<T> updateFixers(DataFixer fixer, Dynamic<T> input, int version, int newVersion, Operation<Dynamic<T>> original) {
         Dynamic<T> vanillaFixed = original.call(fixer, input, version, newVersion);
-        return DataFixesInternals.get().updateWithAllFixers((DataFixTypes) (Object) this, vanillaFixed);
+        DataFixTypes dataFixTypes = (DataFixTypes) (Object) this;
+        // PlayerAdvancements treats every remaining root key as an advancement
+        // id. Railways has no advancement fixer, so never stamp its marker here.
+        if (dataFixTypes == DataFixTypes.ADVANCEMENTS)
+            return vanillaFixed;
+        return DataFixesInternals.get().updateWithAllFixers(dataFixTypes, vanillaFixed);
     }
 }

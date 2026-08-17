@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.util;
 
-import com.tterrag.registrate.util.entry.BlockEntry;
+import com.railwayteam.railways.internal.compat.registrate.util.entry.BlockEntry;
 
 //So that mixin doesn't load all blocks
 @SuppressWarnings("SameReturnValue")

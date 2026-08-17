@@ -20,16 +20,16 @@ package com.railwayteam.railways.base.data.recipe;
 
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.mixin.AccessorIngredient$TagValue;
+import com.railwayteam.railways.multiloader.CommonTags;
 import com.railwayteam.railways.registry.CRItems;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.zurrtum.create.AllItems;
-import com.zurrtum.create.AllTags;
+import com.railwayteam.railways.internal.compat.create.AllTags;
 import com.zurrtum.create.content.kinetics.deployer.DeployerApplicationRecipe;
 import com.zurrtum.create.content.kinetics.press.PressingRecipe;
 import com.zurrtum.create.content.kinetics.saw.CuttingRecipe;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyRecipeBuilder;
 import com.zurrtum.create.content.trains.track.TrackMaterial;
-import com.zurrtum.create.foundation.data.recipe.CommonMetal;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -116,8 +116,8 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
                     Ingredient railsIngredient = baseMaterial.railsIngredient;
                     if (railsIngredient.values.length == 2 && Arrays.stream(railsIngredient.values).allMatch((value) -> {
                         return value instanceof Ingredient.TagValue tagValue
-                            && (((AccessorIngredient$TagValue)tagValue).getTag().equals(CommonMetal.IRON.nuggets)
-                            || ((AccessorIngredient$TagValue)tagValue).getTag().equals(CommonMetal.ZINC.nuggets));
+                            && (((AccessorIngredient$TagValue)tagValue).getTag().equals(CommonTags.IRON_NUGGETS.forge)
+                            || ((AccessorIngredient$TagValue)tagValue).getTag().equals(CommonTags.ZINC_NUGGETS.forge));
                     })) {
                         railsIngredient = Ingredient.of(AllTags.AllItemTags.TRACK_NUGGETS.tag);
                     }
@@ -141,8 +141,8 @@ public class RailwaysSequencedAssemblyRecipeGen extends RailwaysRecipeProvider {
             Ingredient railsIngredient = material.railsIngredient;
             if (railsIngredient.values.length == 2 && Arrays.stream(railsIngredient.values).allMatch((value) -> {
                 return value instanceof Ingredient.TagValue tagValue
-                    && (((AccessorIngredient$TagValue) tagValue).getTag().equals(CommonMetal.ZINC.nuggets)
-                    || ((AccessorIngredient$TagValue) tagValue).getTag().equals(CommonMetal.IRON.nuggets));
+                    && (((AccessorIngredient$TagValue) tagValue).getTag().equals(CommonTags.ZINC_NUGGETS.forge)
+                    || ((AccessorIngredient$TagValue) tagValue).getTag().equals(CommonTags.IRON_NUGGETS.forge));
             })) {
                 railsIngredient = Ingredient.of(AllTags.AllItemTags.TRACK_NUGGETS.tag);
             }

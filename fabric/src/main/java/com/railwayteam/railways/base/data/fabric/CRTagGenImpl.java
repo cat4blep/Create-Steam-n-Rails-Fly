@@ -18,7 +18,7 @@
 
 package com.railwayteam.railways.base.data.fabric;
 
-import com.tterrag.registrate.providers.RegistrateTagsProvider;
+import com.railwayteam.railways.internal.compat.registrate.providers.RegistrateTagsProvider;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.tags.TagKey;
 

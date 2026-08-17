@@ -31,7 +31,7 @@ import com.zurrtum.create.content.trains.track.TrackBlock;
 import com.zurrtum.create.content.trains.track.TrackShape;
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import com.zurrtum.create.foundation.block.IBE;
-import com.tterrag.registrate.util.nullness.NonNullBiFunction;
+import com.railwayteam.railways.internal.compat.registrate.util.nullness.NonNullBiFunction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;

@@ -19,7 +19,7 @@
 package com.railwayteam.railways.content.buffer;
 
 import com.railwayteam.railways.Railways;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;

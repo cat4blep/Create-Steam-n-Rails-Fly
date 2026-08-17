@@ -20,7 +20,7 @@ package com.railwayteam.railways.content.palettes.boiler;
 
 import com.railwayteam.railways.content.palettes.PalettesColor;
 import com.railwayteam.railways.registry.CRPalettes.Wrapping;
-import com.zurrtum.create.foundation.data.SpecialBlockStateGen;
+import com.railwayteam.railways.internal.compat.create.foundation.data.SpecialBlockStateGen;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

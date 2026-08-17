@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Version stamping plus an idempotent last-resort path for all known Railways blockstate fixes. */
+/** NBT-root version stamping plus an idempotent last-resort path for known blockstate fixes. */
 @Mixin(NbtUtils.class)
 public abstract class MixinNbtUtilsDataFix {
     @Inject(

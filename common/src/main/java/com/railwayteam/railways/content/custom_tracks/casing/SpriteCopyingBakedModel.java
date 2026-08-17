@@ -21,7 +21,6 @@ package com.railwayteam.railways.content.custom_tracks.casing;
 import com.railwayteam.railways.Railways;
 import com.zurrtum.create.foundation.model.BakedQuadHelper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -99,8 +98,5 @@ public class SpriteCopyingBakedModel implements BakedModel {
     }
     public ItemTransforms getTransforms() {
         return ItemTransforms.NO_TRANSFORMS;
-    }
-    public ItemOverrides getOverrides() {
-        return baseModel.getOverrides();
     }
 }
