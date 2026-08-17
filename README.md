@@ -3,7 +3,7 @@
   <h1>Create: Steam 'n' Rails — Create Fly port</h1>
   <p>Steam 'n' Rails for Fabric, Minecraft 26.2, and Create Fly.</p>
 
-[![discord-plural](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/social/discord-plural_vector.svg)](https://discord.gg/UKFkg5NQzu)
+[![discord-plural](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/social/discord-plural_vector.svg)](https://discord.gg/r75NPJWD68) 
 </div>
 
 This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to the latest public version of [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.2. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
