@@ -30,6 +30,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -40,6 +41,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -116,7 +118,8 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
         super.createBlockStateDefinition(builder.add(WATERLOGGED, STYLE, getConstructSafePartProperty()));
         getConstructSafeRotationType().createBlockStateDefinition(builder);
     }
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return cycleGroup.get().get(state.getValue(STYLE)).asStack();
     }
     @SuppressWarnings("deprecation")
@@ -152,12 +155,13 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
             return currentPos;
         }
     }
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack heldItem, BlockState state, Level level, BlockPos pos, Player player,
+                                          InteractionHand hand, BlockHitResult hit) {
         BlockPos rootPos = findRoot(level, pos);
         BlockState rootState = level.getBlockState(rootPos);
         if (rootState.getBlock() instanceof VariableSmokeStackBlock rootBlock)
-            return rootBlock.use(rootState, level, rootPos, player, hand, new BlockHitResult(
+            return rootBlock.useItemOn(heldItem, rootState, level, rootPos, player, hand, new BlockHitResult(
                 hit.getLocation(),
                 hit.getDirection(),
                 rootPos,
@@ -171,9 +175,11 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
         BlockState below = level.getBlockState(pos.below());
         return (below.is(this) || below.is(baseBlock())) && below.getValue(partProperty).isFullHeight();
     }
-    @SuppressWarnings("deprecation")
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, level, state, currentPos);
+    @Override
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
+                                     BlockPos currentPos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighborState, RandomSource random) {
+        updateWater(level, tickAccess, state, currentPos);
 
         if (direction.getAxis() != Axis.Y)
             return state;
@@ -195,14 +201,14 @@ public non-sealed class SmokeStackExtenderBlock extends Block implements ProperW
         return rotationType.cloneRotation(state.setValue(STYLE, below.getValue(STYLE)), below);
     }
     @SuppressWarnings("deprecation")
+    @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (oldState.getBlock() != this || oldState.getValue(partProperty) != state.getValue(partProperty))
             VariableSmokeStackBlock.queueHeightUpdate(level, findRoot(level, pos));
     }
-    @SuppressWarnings("deprecation")
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (newState.getBlock() != this)
-            VariableSmokeStackBlock.queueHeightUpdate(level, findRoot(level, pos));
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        VariableSmokeStackBlock.queueHeightUpdate(level, findRoot(level, pos));
     }
     public BlockPos getInformationSource(Level level, BlockPos pos, BlockState state) {
         return findRoot(level, pos);

@@ -51,6 +51,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -173,12 +174,14 @@ public class MonorailTrackBlock extends TrackBlock {
         if (edge.getTrackMaterial() != getMaterial())
             TrackPropagator.onRailAdded(level, pos, state);
     }
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack heldItem, BlockState state, Level world, BlockPos pos, Player player,
+                                          InteractionHand hand, BlockHitResult hit) {
         InteractionResult result = InteractionResult.PASS;
         if (result.consumesAction())
             return result;
 
-        if (!world.isClientSide() && player.getItemInHand(hand).is(AllItems.BRASS_HAND)) {
+        if (!world.isClientSide() && heldItem.is(AllItems.BRASS_HAND)) {
             TrackPropagator.onRailAdded(world, pos, state);
             return InteractionResult.SUCCESS;
         }

@@ -29,13 +29,17 @@ import com.zurrtum.create.catnip.math.VoxelShaper;
 import com.railwayteam.railways.internal.annotation.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -67,13 +71,6 @@ public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirecti
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(FACING, WATERLOGGED));
     }
-    @SuppressWarnings("deprecation")
-    public void onRemove(@NotNull BlockState state, @NotNull Level worldIn,
-                         @NotNull BlockPos pos, @NotNull BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock()))
-            worldIn.removeBlockEntity(pos);
-    }
-
     protected abstract BlockState cycleStyle(BlockState originalState, Direction targetedFace);
     public BlockState getRotatedBlockState(BlockState originalState, Direction targetedFace) {
         if (targetedFace.getAxis().isVertical()) {
@@ -108,18 +105,20 @@ public abstract class AbstractDyeableSingleBufferBlock extends HorizontalDirecti
         return getShaper(state, level, pos, context).get(state.getValue(FACING));
     }
 
-    @SuppressWarnings("deprecation")
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, level, state, currentPos);
+    @Override
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
+                                     BlockPos currentPos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighborState, RandomSource random) {
+        updateWater(level, tickAccess, state, currentPos);
         return state;
     }
 
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
-                                 BlockHitResult pHit) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack held, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer,
+                                          InteractionHand pHand, BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
             return InteractionResult.PASS;
-        return onBlockEntityUse(pLevel, pPos, be -> be.applyDyeIfValid(pPlayer.getItemInHand(pHand)));
+        return onBlockEntityUse(pLevel, pPos, be -> be.applyDyeIfValid(held));
     }
     public Class<DyeableBlockEntity> getBlockEntityClass() {
         return DyeableBlockEntity.class;

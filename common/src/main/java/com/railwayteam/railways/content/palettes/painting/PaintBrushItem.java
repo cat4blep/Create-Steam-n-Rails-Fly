@@ -41,9 +41,6 @@ public class PaintBrushItem extends Item {
     public PaintBrushItem(Properties properties) {
         super(properties);
     }
-    public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
-        return CRTags.AllItemTags.PAINT_BRUSH_REPAIR_ITEMS.matches(repairCandidate);
-    }
     public InteractionResult useOn(UseOnContext context) {
         Player player = context.getPlayer();
         Level level = context.getLevel();

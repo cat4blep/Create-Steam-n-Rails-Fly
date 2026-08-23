@@ -60,11 +60,14 @@ public final class DataFixesInternalsImpl extends DataFixesInternals {
         return factory.apply(0, this.latestVanillaSchema);
     }
     public @NotNull <T> Dynamic<T> updateWithAllFixers(@NotNull DataFixTypes dataFixTypes, @NotNull Dynamic<T> dynamic) {
-        // ADVANCEMENTS is a map codec whose root keys must all be advancement ids.
-        // Railways has no fixer for it and must never add a version marker there.
-        if (dataFixTypes == DataFixTypes.ADVANCEMENTS)
+        if (shouldBypassModFixers(dataFixTypes))
             return dynamic;
         return updateWithAllFixers(((AccessorDataFixTypes) (Object) dataFixTypes).railways$getType(), dynamic);
+    }
+    static boolean shouldBypassModFixers(@NotNull DataFixTypes dataFixTypes) {
+        // Both roots are maps whose keys have a fixed external meaning. Railways has
+        // no fixer for either and must never insert its data-version marker there.
+        return dataFixTypes == DataFixTypes.ADVANCEMENTS || dataFixTypes == DataFixTypes.STATS;
     }
     public @NotNull <T> Dynamic<T> updateWithAllFixers(@NotNull TypeReference rootType, @NotNull Dynamic<T> dynamic) {
         if (dataFixer == null)

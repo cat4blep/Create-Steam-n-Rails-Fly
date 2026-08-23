@@ -44,6 +44,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockAndLightGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -289,21 +290,23 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
     protected VoxelShape getHeadstockShape(BlockState state) {
         return CRShapes.HEADSTOCK_PLAIN.get(state.getValue(FACING));
     }
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand,
-                                 BlockHitResult pHit) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack held, BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer,
+                                          InteractionHand pHand, BlockHitResult pHit) {
         if (AdventureUtils.isAdventure(pPlayer))
             return InteractionResult.PASS;
         InteractionResult result = onBlockEntityUse(pLevel, pPos, be -> {
             if (be instanceof CopycatHeadstockBlockEntity copycatHeadstock) {
-                return copycatHeadstock.applyDyeIfValid(pPlayer.getItemInHand(pHand));
+                return copycatHeadstock.applyDyeIfValid(held);
             }
             return InteractionResult.PASS;
         });
         if (result.consumesAction()) return result;
-        return InteractionResult.PASS;
+        return super.useItemOn(held, pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return CRBlocks.COPYCAT_HEADSTOCK_GROUP.get(state.getValue(STYLE)).asStack();
     }
 }

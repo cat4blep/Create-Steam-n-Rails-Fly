@@ -31,6 +31,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -81,11 +82,13 @@ public class PalettesSlidingDoorBlock extends SlidingDoorBlock implements IWrenc
         return InteractionResult.SUCCESS;
     }
 
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack heldItem, BlockState state, Level level, BlockPos pos, Player player,
+                                          InteractionHand hand, BlockHitResult hit) {
         if (EntityUtils.isHolding(player, stack -> stack.is(AllItems.WRENCH))) {
             return InteractionResult.PASS;
         }
-        return InteractionResult.PASS;
+        return super.useItemOn(heldItem, state, level, pos, player, hand, hit);
     }
     public InteractionResult onSneakWrenched(BlockState state, UseOnContext context) {
         if (state.getValue(HALF) == DoubleBlockHalf.UPPER) {

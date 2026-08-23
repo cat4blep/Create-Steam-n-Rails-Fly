@@ -29,6 +29,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -80,10 +82,11 @@ public abstract class CasingCollisionBlock extends Block implements EntityBlock,
         return withWater(super.getStateForPlacement(pContext), pContext);
     }
 
-    @SuppressWarnings("deprecation")
-    public @NotNull BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState,
-                                           LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
-        updateWater(pLevel, pLevel, pState, pCurrentPos);
+    @Override
+    protected BlockState updateShape(BlockState pState, LevelReader level, ScheduledTickAccess tickAccess,
+                                     BlockPos pCurrentPos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighborState, RandomSource random) {
+        updateWater(level, tickAccess, pState, pCurrentPos);
         return pState;
     }
 

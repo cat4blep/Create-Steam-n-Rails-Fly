@@ -59,6 +59,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -112,9 +114,11 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
         return withWater(super.getStateForPlacement(context), context);
     }
 
-    @SuppressWarnings("deprecation")
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        updateWater(level, level, state, currentPos);
+    @Override
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
+                                     BlockPos currentPos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighborState, RandomSource random) {
+        updateWater(level, tickAccess, state, currentPos);
         return state;
     }
     public Vec3 getUpNormal(BlockGetter world, BlockPos pos, BlockState state) {
@@ -231,6 +235,7 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
     }
 
     @SuppressWarnings("deprecation")
+    @Override
     public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
         if (pOldState.getBlock() == this)
             return;
@@ -293,19 +298,8 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
         return IWrenchable.super.onSneakWrenched(state, context);
     }
 
-    @SuppressWarnings("deprecation")
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof GenericCrossingBlockEntity crossingBE && !crossingBE.cancelDrops) {
-                Item a = crossingBE.getPrimary().getBlock().asItem();
-                Item b = crossingBE.getSecondary().getBlock().asItem();
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(a));
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(b));
-            }
-
-            TrackPropagator.onRailRemoved(level, pos, state);
-            level.removeBlockEntity(pos);
-        }
+    @Override
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        TrackPropagator.onRailRemoved(level, pos, state);
     }
 }

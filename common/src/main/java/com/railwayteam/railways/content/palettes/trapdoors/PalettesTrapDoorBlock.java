@@ -28,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -56,11 +57,13 @@ public class PalettesTrapDoorBlock extends TrapDoorBlock implements IWrenchable 
         world.setBlock(pos, newState, UPDATE_ALL);
         return InteractionResult.SUCCESS;
     }
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (AllTags.AllItemTags.WRENCH.matches(player.getItemInHand(hand))) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack heldItem, BlockState state, Level level, BlockPos pos, Player player,
+                                          InteractionHand hand, BlockHitResult hit) {
+        if (AllTags.AllItemTags.WRENCH.matches(heldItem)) {
             return InteractionResult.PASS;
         }
-        return InteractionResult.PASS;
+        return super.useItemOn(heldItem, state, level, pos, player, hand, hit);
     }
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(WINDOWED));

@@ -44,6 +44,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
@@ -120,8 +122,11 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
         BlockState below = level.getBlockState(pos.below());
         return !(below.isAir() || below.is(this) || below.is(extenderBlock()));
     }*/
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos currentPos, BlockPos neighborPos) {
-        state = super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
+    @Override
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess,
+                                     BlockPos currentPos, Direction direction, BlockPos neighborPos,
+                                     BlockState neighborState, RandomSource random) {
+        state = super.updateShape(state, level, tickAccess, currentPos, direction, neighborPos, neighborState, random);
 
         if (direction.getAxis() != Axis.Y)
             return state;
@@ -149,14 +154,16 @@ public non-sealed class VariableSmokeStackBlock extends StyledSmokeStackBlock im
         withBlockEntityDo(level, pos, SmokeStackBlockEntity::updateHeight);
     }
     @SuppressWarnings("deprecation")
+    @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (oldState.getBlock() != this || oldState.getValue(partProperty) != state.getValue(partProperty))
             queueHeightUpdate(level, pos);
     }
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        ItemStack heldItem = pPlayer.getItemInHand(pHand);
-        if (heldItem.is(getCloneItemStack(pLevel, pPos, pState).getItem())) {
+    @Override
+    protected InteractionResult useItemOn(ItemStack heldItem, BlockState pState, Level pLevel, BlockPos pPos,
+                                          Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (heldItem.is(getCloneItemStack(pLevel, pPos, pState, false).getItem())) {
             incrementSize(pLevel, pPos);
             return InteractionResult.SUCCESS;
         }
