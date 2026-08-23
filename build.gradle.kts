@@ -966,6 +966,7 @@ java {
 }
 
 tasks.jar {
+    archiveFileName.set("${project.property("mod_version")}.jar")
     from("LICENSE")
 }
 
