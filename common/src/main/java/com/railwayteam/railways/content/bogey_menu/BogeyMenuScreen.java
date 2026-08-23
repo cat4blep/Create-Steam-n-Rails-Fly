@@ -253,8 +253,10 @@ public class BogeyMenuScreen extends AbstractSimiScreen {
 		int previewX = Mth.floor(x + 189.5f - previewSize / 2);
 		int previewY = Mth.floor(y + 86 - previewSize / 2);
 		int previewId = 31 * renderStyle.id.hashCode() + renderSize.id().hashCode();
+		// A null preview level makes the block entity renderer use its full-bright fallback
+		// instead of sampling the synthetic bogey's BlockPos.ZERO from the real world.
 		guiGraphics.guiRenderState.addPicturesInPictureState(EntityBlockRenderState.create(
-			previewId, guiGraphics, minecraft.level, BlockPos.ZERO, bogeyBE, bogeyState,
+			previewId, guiGraphics, null, BlockPos.ZERO, bogeyBE, bogeyState,
 			LightCoordsUtil.FULL_BRIGHT, previewX, previewY, modelScale, padding, 20, 45, 0
 		));
 	}
