@@ -221,7 +221,7 @@ public class BogeyMenuScreen extends AbstractSimiScreen {
 		Pair<BogeyStyle, BogeySize> renderPair = renderCycle.get((ticksOpen / 40) % renderCycle.size());
 		BogeyStyle renderStyle = renderPair.getFirst();
 		BogeySize renderSize = renderPair.getSecond();
-		Block renderBlock = style.getBlockForSize(renderSize);
+		Block renderBlock = renderStyle.getBlockForSize(renderSize);
 		if (!(renderBlock instanceof AbstractBogeyBlock<?> bogeyBlock) || minecraft == null || minecraft.level == null)
 			return;
 

@@ -18,7 +18,6 @@
 
 package com.railwayteam.railways.content.custom_bogeys.renderer.unified.impl;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplay;
 import com.railwayteam.railways.content.custom_bogeys.renderer.unified.BogeyDisplayHolder;
 import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityRenderer.BogeyRenderState;
@@ -26,9 +25,10 @@ import com.zurrtum.create.client.content.trains.bogey.BogeyRenderer;
 import com.zurrtum.create.catnip.data.Couple;
 import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
+import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -38,7 +38,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3f;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,78 +73,55 @@ public class UnifiedBogeyRenderer implements BogeyRenderer, BogeyDisplayHolder {
         BogeyRenderState customState = customRenderer == null ? null
             : customRenderer.getRenderData(bogeyData, wheelAngle, partialTick, packedLight, cardinalLighting,
                 inContraption);
-        List<Matrix4f> elementPoses = renderer.allElements.stream()
-            .map(element -> new Matrix4f(element.pose))
-            .toList();
-        List<Float> scrollingOffsets = renderer.scrollingElements.stream()
-            .map(element -> element.shiftV)
-            .toList();
-        return new RenderState(renderer, elementPoses, scrollingOffsets, customState, packedLight, cardinalLighting);
+
+        List<SuperByteBufferRenderState> elementStates = new ArrayList<>(renderer.allElements.size());
+        for (RenderedElement.Single element : renderer.singleElements) {
+            elementStates.add(prepareElement(element.model(), element.element(), packedLight, cardinalLighting)
+                .extractRenderState());
+        }
+
+        for (RenderedElement.Multiple elements : renderer.multipleElements) {
+            for (RenderedElement element : elements.elements()) {
+                elementStates.add(prepareElement(elements.model(), element, packedLight, cardinalLighting)
+                    .extractRenderState());
+            }
+        }
+
+        for (RenderedElement.Scrolling element : renderer.scrollingElements) {
+            float spriteSize = element.entry.getTarget().getV1() - element.entry.getTarget().getV0();
+            float scrollV = element.shiftV - Mth.floor(element.shiftV);
+            scrollV = scrollV * spriteSize * 0.5f;
+            elementStates.add(prepareElement(element.model, element.element, packedLight, cardinalLighting)
+                .shiftUVScrolling(element.entry, scrollV)
+                .extractRenderState());
+        }
+
+        return new RenderState(List.copyOf(elementStates), customState);
     }
 
-    private record RenderState(Renderer renderer, List<Matrix4f> elementPoses, List<Float> scrollingOffsets,
-                               @Nullable BogeyRenderState customState, int packedLight,
-                               @Nullable CardinalLighting cardinalLighting)
-        implements BogeyRenderState, SubmitNodeCollector.CustomGeometryRenderer {
+    private static SuperByteBuffer prepareElement(PartialModel model, RenderedElement element, int packedLight,
+                                                  @Nullable CardinalLighting cardinalLighting) {
+        return CachedBuffers.partial(model, Blocks.AIR.defaultBlockState())
+            .mulPose(element.pose)
+            .mulNormal(new Matrix3f(element.pose))
+            .cardinalLighting(cardinalLighting)
+            .light(packedLight)
+            .overlay(OverlayTexture.NO_OVERLAY);
+    }
+
+    private record RenderState(List<SuperByteBufferRenderState> elementStates,
+                               @Nullable BogeyRenderState customState) implements BogeyRenderState {
 
         @Override
         public void submit(PoseStack poseStack, SubmitNodeCollector queue) {
             poseStack.pushPose();
             poseStack.translate(0, -1.5 - 1 / 128f, 0);
-            queue.submitCustomGeometry(poseStack, RenderTypes.cutoutMovingBlock(), this);
+            for (SuperByteBufferRenderState elementState : elementStates)
+                elementState.submit(poseStack, queue);
             poseStack.popPose();
 
             if (customState != null)
                 customState.submit(poseStack, queue);
-        }
-
-        @Override
-        public void render(PoseStack.Pose matrices, VertexConsumer buffer) {
-            PoseStack ms = new PoseStack();
-            int poseIndex = 0;
-
-            for (RenderedElement.Single element : renderer.singleElements) {
-                setPose(ms.last(), matrices, elementPoses.get(poseIndex++));
-
-                CachedBuffers.partial(element.model(), Blocks.AIR.defaultBlockState())
-                    .cardinalLighting(cardinalLighting)
-                    .light(packedLight)
-                    .overlay(OverlayTexture.NO_OVERLAY)
-                    .renderInto(ms.last(), buffer);
-            }
-
-            for (RenderedElement.Multiple elements : renderer.multipleElements) {
-                SuperByteBuffer sbb = CachedBuffers.partial(elements.model(), Blocks.AIR.defaultBlockState());
-
-                for (RenderedElement element : elements.elements()) {
-                    setPose(ms.last(), matrices, elementPoses.get(poseIndex++));
-
-                    sbb.cardinalLighting(cardinalLighting)
-                        .light(packedLight)
-                        .overlay(OverlayTexture.NO_OVERLAY)
-                        .renderInto(ms.last(), buffer);
-                }
-            }
-
-            for (int i = 0; i < renderer.scrollingElements.size(); i++) {
-                RenderedElement.Scrolling element = renderer.scrollingElements.get(i);
-                setPose(ms.last(), matrices, elementPoses.get(poseIndex++));
-                float spriteSize = element.entry.getTarget().getV1() - element.entry.getTarget().getV0();
-                float shiftV = scrollingOffsets.get(i);
-                float scrollV = shiftV - Mth.floor(shiftV);
-                scrollV = scrollV * spriteSize * 0.5f;
-                CachedBuffers.partial(element.model, Blocks.AIR.defaultBlockState())
-                    .cardinalLighting(cardinalLighting)
-                    .light(packedLight)
-                    .overlay(OverlayTexture.NO_OVERLAY)
-                    .shiftUVScrolling(element.entry, scrollV)
-                    .renderInto(ms.last(), buffer);
-            }
-        }
-
-        private static void setPose(PoseStack.Pose target, PoseStack.Pose base, Matrix4f transform) {
-            target.pose().set(base.pose()).mul(transform);
-            target.normal().set(base.normal()).mul(new Matrix3f(transform));
         }
     }
 

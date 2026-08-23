@@ -44,8 +44,13 @@ public abstract class PhantomSpriteManager {
         return visible;
     }
 
+    public static boolean isPhantomSprite(SpriteContents sprite) {
+        return sprite.name().getNamespace().equals(Railways.MOD_ID)
+            && sprite.name().getPath().startsWith("block/track/phantom/");
+    }
+
     public static boolean register(SpriteContents sprite) {
-        if (sprite.name().getNamespace().equals(Railways.MOD_ID) && sprite.name().getPath().startsWith("block/track/phantom/")) {
+        if (isPhantomSprite(sprite)) {
             map.put(sprite.name(), new WeakReference<>(sprite));
             firstRun = true;
             return true;
