@@ -58,7 +58,7 @@ public abstract class MixinTrainRealism implements ITrueMaxSpeedTrain {
     }
 
     @Unique
-    static boolean railways$shouldLimitAcceleration(double actualTarget, double currentSpeed) {
+    private static boolean railways$shouldLimitAcceleration(double actualTarget, double currentSpeed) {
         return Math.abs(actualTarget) > Math.abs(currentSpeed);
     }
 
