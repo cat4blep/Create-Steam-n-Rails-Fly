@@ -41,6 +41,6 @@ jobs:
         with:
           name: steam-rails-fabric-26.2
           path: |
-            build/libs/Steam_Rails-*.jar
+            build/libs/*.jar
             !build/libs/*-sources.jar
           if-no-files-found: error
