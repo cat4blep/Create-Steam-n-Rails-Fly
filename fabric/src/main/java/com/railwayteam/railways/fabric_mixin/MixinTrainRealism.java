@@ -57,6 +57,11 @@ public abstract class MixinTrainRealism implements ITrueMaxSpeedTrain {
             && CRConfigs.server().realism.realisticTrains.get();
     }
 
+    @Unique
+    static boolean railways$shouldLimitAcceleration(double actualTarget, double currentSpeed) {
+        return Math.abs(actualTarget) > Math.abs(currentSpeed);
+    }
+
     @Inject(method = "maxSpeed", at = @At("RETURN"), cancellable = true)
     private void railways$limitMaxSpeed(CallbackInfoReturnable<Float> cir) {
         if (((IHandcarTrain) this).railways$isHandcar())
@@ -82,7 +87,7 @@ public abstract class MixinTrainRealism implements ITrueMaxSpeedTrain {
         Operation<Float> original,
         @Local(name = "actualTarget") double actualTarget
     ) {
-        if (Math.abs(actualTarget) > speed && railways$realismLimited())
+        if (railways$shouldLimitAcceleration(actualTarget, speed) && railways$realismLimited())
             return original.call(instance) / 20;
         return original.call(instance);
     }
