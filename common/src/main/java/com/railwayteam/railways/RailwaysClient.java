@@ -28,6 +28,7 @@ import com.railwayteam.railways.content.conductor.vent.CopycatVentModel;
 import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleFlagRenderer;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerRenderer;
 import com.railwayteam.railways.content.animated_flywheel.FlywheelMovementRender;
+import com.railwayteam.railways.content.palettes.ct.PaletteConnectedTextures;
 import com.railwayteam.railways.content.semaphore.SemaphoreRenderer;
 import com.railwayteam.railways.content.switches.TrackSwitchRenderer;
 import com.zurrtum.create.client.AllModels;
@@ -105,6 +106,7 @@ public class RailwaysClient {
     CRContainerTypes.registerScreens();
 
     AllModels.register(com.railwayteam.railways.registry.CRBlocks.CONDUCTOR_VENT.get(), CopycatVentModel::new);
+    PaletteConnectedTextures.register();
 
     CustomTrackOverlayRendering.register(CREdgePointTypes.COUPLER, CRBlockPartials.COUPLER_BOTH);
     CustomTrackOverlayRendering.register(CREdgePointTypes.SWITCH, CRBlockPartials.SWITCH_RIGHT_TURN);

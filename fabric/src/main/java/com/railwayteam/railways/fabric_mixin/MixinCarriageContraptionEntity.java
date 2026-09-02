@@ -20,7 +20,12 @@ package com.railwayteam.railways.fabric_mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import com.railwayteam.railways.mixin_interfaces.IHandcarTrain;
+import com.railwayteam.railways.mixin_interfaces.IBufferBlockCheckableNavigation;
+import com.railwayteam.railways.mixin_interfaces.IBufferBlockedTrain;
+import com.railwayteam.railways.mixin_interfaces.ICarriageBufferDistanceTracker;
 import com.zurrtum.create.AllItems;
 import net.minecraft.world.InteractionHand;
 import com.railwayteam.railways.config.CRConfigs;
@@ -29,18 +34,22 @@ import com.railwayteam.railways.content.switches.TrackSwitchBlock.SwitchState;
 import com.railwayteam.railways.mixin_interfaces.IDistanceTravelled;
 import com.railwayteam.railways.mixin_interfaces.IGenerallySearchableNavigation;
 import com.railwayteam.railways.registry.CRPackets;
+import com.railwayteam.railways.util.BlockPosUtils;
 import com.railwayteam.railways.util.MixinVariables;
 import com.railwayteam.railways.util.packet.SwitchDataUpdatePacket;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.contraptions.OrientedContraptionEntity;
 import com.zurrtum.create.content.contraptions.actors.trainControls.ControlsBlock;
+import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.entity.Carriage;
 import com.zurrtum.create.content.trains.entity.CarriageBogey;
+import com.zurrtum.create.content.trains.entity.CarriageContraption;
 import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Navigation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -55,6 +64,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 @Mixin(value = CarriageContraptionEntity.class, remap = false)
@@ -92,6 +102,57 @@ public abstract class MixinCarriageContraptionEntity extends OrientedContraption
     }
 
     @Inject(
+        method = "tickContraption",
+        at = @At(value = "INVOKE", target = "Lcom/zurrtum/create/content/trains/entity/CarriageContraptionEntity;tickActors()V")
+    )
+    private void railways$setupBufferDistanceData(CallbackInfo ci) {
+        if (level().isClientSide())
+            return;
+        ICarriageBufferDistanceTracker distanceTracker = (ICarriageBufferDistanceTracker) carriage;
+        if (distanceTracker.railways$getLeadingDistance() != null && distanceTracker.railways$getTrailingDistance() != null)
+            return;
+        if (!(contraption instanceof CarriageContraption cc))
+            return;
+
+        BlockPos leadingBogeyPos = null;
+        BlockPos trailingBogeyPos = null;
+        BlockPos maxPos = new BlockPos(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
+        BlockPos minPos = new BlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+        for (Map.Entry<BlockPos, StructureBlockInfo> info : contraption.getBlocks().entrySet()) {
+            minPos = BlockPosUtils.min(minPos, info.getKey());
+            maxPos = BlockPosUtils.max(maxPos, info.getKey());
+            if (info.getValue().state().getBlock() instanceof AbstractBogeyBlock<?>) {
+                if (leadingBogeyPos == null) {
+                    leadingBogeyPos = info.getKey();
+                } else if (trailingBogeyPos == null) {
+                    if (BlockPosUtils.normalize(info.getKey().subtract(leadingBogeyPos))
+                        .equals(cc.getAssemblyDirection().getUnitVec3i())) {
+                        trailingBogeyPos = info.getKey();
+                    } else {
+                        trailingBogeyPos = leadingBogeyPos;
+                        leadingBogeyPos = info.getKey();
+                    }
+                }
+            }
+        }
+
+        Direction.Axis axis = cc.getAssemblyDirection().getAxis();
+        boolean forward = cc.getAssemblyDirection().getAxisDirection() == Direction.AxisDirection.POSITIVE;
+
+        int leadingBounds = forward ? minPos.get(axis) : maxPos.get(axis);
+        int trailingBounds = forward ? maxPos.get(axis) : minPos.get(axis);
+
+        int leadingDistance = leadingBogeyPos == null ? 0 : Math.abs(leadingBounds - leadingBogeyPos.get(axis));
+        if (trailingBogeyPos == null)
+            trailingBogeyPos = leadingBogeyPos;
+        int trailingDistance = trailingBogeyPos == null ? 0 : Math.abs(trailingBounds - trailingBogeyPos.get(axis));
+
+        distanceTracker.railways$setLeadingDistance(leadingDistance);
+        distanceTracker.railways$setTrailingDistance(trailingDistance);
+    }
+
+    @Inject(
         method = "updateTrackGraph",
         at = @At(
             value = "FIELD",
@@ -104,6 +165,31 @@ public abstract class MixinCarriageContraptionEntity extends OrientedContraption
     private void railways$cancelClientDerailing(CallbackInfo ci) {
         if (level().isClientSide() && CRConfigs.client().skipClientDerailing.get())
             ci.cancel();
+    }
+
+    @Inject(
+        method = "control",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/zurrtum/create/content/trains/entity/Train;getCurrentStation()Lcom/zurrtum/create/content/trains/station/GlobalStation;"
+        )
+    )
+    private void railways$noBufferOverrun(BlockPos controlsLocalPos, Collection<Integer> heldControls, Player player,
+                                          CallbackInfoReturnable<Boolean> cir, @Local(name = "targetSpeed") LocalIntRef targetSpeedRef) {
+        int targetSpeed = targetSpeedRef.get();
+        if (targetSpeed == 0)
+            return;
+
+        IBufferBlockedTrain bufferBlockedTrain = (IBufferBlockedTrain) carriage.train;
+
+        if (!bufferBlockedTrain.railways$isControlBlocked() && bufferBlockedTrain.railways$getBlockedSign() == 0 && targetSpeed < 0)
+            ((IBufferBlockCheckableNavigation) carriage.train.navigation).railways$updateControlsBlock(true);
+
+        if (bufferBlockedTrain.railways$isControlBlocked()) {
+            int blockedSign = bufferBlockedTrain.railways$getBlockedSign();
+            if ((blockedSign == 0 && targetSpeed > 0) || blockedSign == Mth.sign(targetSpeed))
+                targetSpeedRef.set(0);
+        }
     }
 
     @Inject(method = "control", at = @At("TAIL"))

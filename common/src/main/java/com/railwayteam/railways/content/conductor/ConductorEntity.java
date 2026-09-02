@@ -831,6 +831,15 @@ public class ConductorEntity extends AbstractGolem {
     }
 
     @Override
+    public boolean hurtServer(@NotNull ServerLevel level, @NotNull DamageSource source, float amount) {
+        if (getRootVehicle() instanceof CarriageContraptionEntity)
+            return false;
+        if (source.getEntity() instanceof LivingEntity living && living.getMainHandItem().is(AllItems.WRENCH))
+            amount = 10;
+        return super.hurtServer(level, source, amount);
+    }
+
+    @Override
     protected int decreaseAirSupply(int air) { return air; }
 
     @Override
