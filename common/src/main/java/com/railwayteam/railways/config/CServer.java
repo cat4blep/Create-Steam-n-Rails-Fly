@@ -18,8 +18,11 @@
 
 package com.railwayteam.railways.config;
 
+import com.google.gson.JsonObject;
+import com.zurrtum.create.catnip.config.Builder;
 import com.zurrtum.create.catnip.config.ConfigBase;
 import com.zurrtum.create.catnip.config.ui.ConfigAnnotations;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("unused")
 public class CServer extends ConfigBase {
@@ -37,8 +40,82 @@ public class CServer extends ConfigBase {
     public final CSemaphores semaphores = nested(0, CSemaphores::new, Comments.semaphores);
     public final CConductors conductors = nested(0, CConductors::new, Comments.conductors);
     public final CRealism realism = nested(0, CRealism::new, Comments.realism);
+
+    private Builder builder;
+    private JsonObject localValues;
+
     public String getName() {
         return "server";
+    }
+
+    @Override
+    public void registerAll(Builder builder) {
+        this.builder = builder;
+        super.registerAll(builder);
+    }
+
+    public JsonObject getValues() {
+        return builder == null ? null : builder.object;
+    }
+
+    public void reload(@Nullable JsonObject synced) {
+        if (builder == null)
+            return;
+
+        if (synced == null) {
+            if (localValues == null)
+                return;
+            bind(localValues);
+            localValues = null;
+        } else {
+            rejectNullValues(synced);
+            if (localValues == null)
+                localValues = builder.object;
+            try {
+                bind(synced);
+            } catch (RuntimeException e) {
+                bind(localValues);
+                throw e;
+            }
+            builder.object = localValues;
+        }
+    }
+
+    private static void rejectNullValues(JsonObject values) {
+        // Create's ConfigValue accepts JSON null and returns it later from get(),
+        // outside the rollback guard. Reject it before rebinding any live values.
+        values.entrySet().forEach(entry -> {
+            if (entry.getValue().isJsonNull())
+                throw new IllegalArgumentException("Null server config entry: " + entry.getKey());
+            if (entry.getValue() instanceof JsonObject child)
+                rejectNullValues(child);
+        });
+    }
+
+    private void bind(JsonObject values) {
+        JsonObject previous = builder.object;
+        builder.object = values;
+        depth = 0;
+        try {
+            super.registerAll(builder);
+            builder.pop(depth);
+        } catch (RuntimeException e) {
+            unwind();
+            builder.object = previous;
+            throw e;
+        } finally {
+            depth = 0;
+        }
+    }
+
+    private void unwind() {
+        while (true) {
+            try {
+                builder.pop();
+            } catch (IllegalArgumentException e) {
+                return;
+            }
+        }
     }
 
     private static class Comments {
