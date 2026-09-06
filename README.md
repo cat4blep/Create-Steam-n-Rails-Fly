@@ -45,11 +45,7 @@ Back up existing worlds before upgrading the mod or Minecraft.
 
 See the [changelog](changelog.md) and [release history](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases) for more details. Earlier fixes for bogey gauges, monorail geometry, track-switch rendering, phantom textures, train buffers and moving block GUIs are retained.
 
-## Validation and issue reports
-
-Release 1.2 passed all 36 JUnit tests and clean Java 25 builds locally and in [GitHub Actions](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/actions/runs/34023370034), including access-widener and published-namespace checks. Runtime checks covered client resource loading on NVIDIA/OpenGL and server initialization with and without Trinkets Updated `4.1.0-rc.1+26.2`; the server check ended at the first-run EULA gate.
-
-The atlas fix addresses the packing failure reported by AMD/Vulkan users and is tested with Minecraft's actual stitcher. Physical AMD/Vulkan validation and an in-world gameplay session for these fixes remain outstanding. If the fallback is needed, distant texture filtering may use fewer mip levels for the block atlas. Optional third-party integrations and development/datagen paths inherited from the upstream 1.20.x project are not all validated on 26.2.
+## Issue reports
 
 When [reporting a problem](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/issues), include the complete `latest.log` or crash report, mod versions, a short reproduction sequence, and whether it also occurs with only Steam 'n' Rails and its required dependencies installed. For rendering or atlas issues, also include the GPU, driver version, graphics backend (OpenGL/Vulkan), resource packs, mipmap level and anisotropic filtering setting.
 
