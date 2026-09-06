@@ -1,4 +1,23 @@
 ------------------------------------------------------
+SNR.FLY-STABLE-1.2 (Fabric / Minecraft 26.2)
+------------------------------------------------------
+Fixes
+- Fix legacy train data migration with Trinkets Updated (#9), preserving equipment and third-party NBT.
+- Reduce block atlas usage by excluding 611 redundant connected-texture source sheets while retaining generated sprites.
+- Retry failed block atlas packing at a lower mip level when padding exceeds atlas capacity; retain original texture resolution and global settings.
+- Submit conductor, semaphore and diesel smokestack render buffers safely.
+- Fix quarter-turn rotation of axial smokestacks.
+- Read early datafixer and missing-track options from the current JSON config.
+- Reject unsupported coupler, switch, buffer and whistle interactions on curved track in the active handler.
+- Sync server configuration on join and restore local values on disconnect without overwriting client config files.
+- Reject malformed synced configuration and remove expensive whistle route diagnostics and log spam.
+
+Compatibility
+- Update both server and clients: the Railways network protocol is now 15.
+- Atlas overflow handling is regression-tested with the Minecraft stitcher; physical AMD/Vulkan validation is still pending.
+- Applicable fixes adapted from chaevsfe/Create-Steam-n-Rails-Fly.
+
+------------------------------------------------------
 Steam 'n' Rails 1.7.2
 ------------------------------------------------------
 Additions
