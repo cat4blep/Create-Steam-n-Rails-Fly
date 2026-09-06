@@ -35,6 +35,17 @@ public class V0 extends NamespacedSchema {
     public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes, Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
         super.registerTypes(schema, entityTypes, blockEntityTypes);
 
+        // This is Railways' private graph, not vanilla's. Rebuild the vanilla entity
+        // envelope around the inherited choices: third-party wrappers (notably
+        // Trinkets' allWithRemainder) can write an unchanged remainder over the
+        // migrated Contraption. Unknown fields, including trinkets, stay in the
+        // choices' remainder; the shared vanilla schema is never modified.
+        schema.registerType(true, References.ENTITY, () -> DSL.and(
+            References.ENTITY_EQUIPMENT.in(schema),
+            DSL.optionalFields("CustomName", References.TEXT_COMPONENT.in(schema),
+                DSL.taggedChoiceLazy("id", namespacedString(), entityTypes))
+        ));
+
         /*
          Note from Slimeist:
          I'm adding Create's create_tracks saved data here for now. Eventually I'll PR it to Create once I figure out
