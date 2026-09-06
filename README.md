@@ -10,9 +10,6 @@ This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Rai
 
 The current stable release is **SNR.FLY-STABLE-1.2** for Fabric / Minecraft 26.2. [Download the JAR](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/download/vSNR.FLY-STABLE-1.2/SNR.FLY-STABLE-1.2.jar), read the [1.2 release notes](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/tag/vSNR.FLY-STABLE-1.2), or browse [all releases](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases).
 
-> [!IMPORTANT]
-> This build targets stable Minecraft **26.2** exactly. The `rc-2` text in the historical Create Fly artifact filename does not change its published Minecraft compatibility metadata, which targets stable 26.2.
-
 ## Compatibility
 
 | Component | Required version |
