@@ -10,6 +10,8 @@
 
 package com.railwayteam.railways.config;
 
+import com.google.gson.JsonParser;
+import com.zurrtum.create.catnip.config.Builder;
 import net.fabricmc.loader.api.FabricLoader;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,17 +28,17 @@ class CRConfigsTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', textBlock = """
-        {"disableDatafixer":{"value":true},"registerMissingTracks":{"value":true}} | true
-        {"disableDatafixer":true,"registerMissingTracks":true} | true
-        {"disableDatafixer":{"value":false},"registerMissingTracks":{"value":false}} | false
-        {"disableDatafixer":"true","registerMissingTracks":1} | false
-        {"disableDatafixer":null,"registerMissingTracks":{}} | false
-        {} | false
-        invalid json | false
-        null | false
-        missing | false
+        {"disableDatafixer":{"value":true},"registerMissingTracks":{"value":true}} | true | true
+        {"disableDatafixer":true,"registerMissingTracks":true} | true | true
+        {"disableDatafixer":{"value":false},"registerMissingTracks":{"value":false}} | false | false
+        {"disableDatafixer":"true","registerMissingTracks":1} | false | true
+        {"disableDatafixer":null,"registerMissingTracks":{}} | false | true
+        {} | false | true
+        invalid json | false | true
+        null | false | true
+        missing | false | true
         """)
-    void readsEarlySettingsFromCommonConfig(String json, boolean expected) throws Exception {
+    void readsEarlySettingsFromCommonConfig(String json, boolean expectedDisableDatafixer, boolean expectedTracks) throws Exception {
         Field loaderDir = FabricLoader.getInstance().getClass().getDeclaredField("configDir");
         Field disable = CRConfigs.class.getDeclaredField("cachedDisableDatafixer");
         Field tracks = CRConfigs.class.getDeclaredField("cachedRegisterMissingTracks");
@@ -53,12 +55,54 @@ class CRConfigsTest {
             loaderDir.set(FabricLoader.getInstance(), configDir);
             disable.set(null, null);
             tracks.set(null, null);
-            assertEquals(expected, CRConfigs.getDisableDatafixer());
-            assertEquals(expected, CRConfigs.getRegisterMissingTracks());
+            assertEquals(expectedDisableDatafixer, CRConfigs.getDisableDatafixer());
+            assertEquals(expectedTracks, CRConfigs.getRegisterMissingTracks());
         } finally {
             loaderDir.set(FabricLoader.getInstance(), previousDir);
             disable.set(null, previousDisable);
             tracks.set(null, previousTracks);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+        missing | true
+        {"registerMissingTracks":{"value":false}} | false
+        """)
+    void generatedConfigAndNextStartupAgreeWithInitialRegistration(String json, boolean expected) throws Exception {
+        Field loaderDir = FabricLoader.getInstance().getClass().getDeclaredField("configDir");
+        Field tracks = CRConfigs.class.getDeclaredField("cachedRegisterMissingTracks");
+        Field disable = CRConfigs.class.getDeclaredField("cachedDisableDatafixer");
+        loaderDir.setAccessible(true);
+        tracks.setAccessible(true);
+        disable.setAccessible(true);
+        Object previousDir = loaderDir.get(FabricLoader.getInstance());
+        Object previousTracks = tracks.get(null);
+        Object previousDisable = disable.get(null);
+        try {
+            Path file = configDir.resolve("railways/common.json");
+            if (!json.equals("missing")) {
+                Files.createDirectories(file.getParent());
+                Files.writeString(file, json);
+            }
+            loaderDir.set(FabricLoader.getInstance(), configDir);
+            tracks.set(null, null);
+            disable.set(null, null);
+            assertEquals(expected, CRConfigs.getRegisterMissingTracks(), "block registration before config creation");
+
+            CCommon config = Builder.create(CCommon::new, "railways", "common");
+            assertEquals(expected, config.registerMissingTracks.get());
+            assertEquals(false, config.disableDatafixer.get());
+            var saved = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
+            assertEquals(expected, saved.getAsJsonObject("registerMissingTracks").get("value").getAsBoolean());
+
+            tracks.set(null, null);
+            disable.set(null, null);
+            assertEquals(expected, CRConfigs.getRegisterMissingTracks(), "block registration on the next startup");
+        } finally {
+            loaderDir.set(FabricLoader.getInstance(), previousDir);
+            tracks.set(null, previousTracks);
+            disable.set(null, previousDisable);
         }
     }
 }

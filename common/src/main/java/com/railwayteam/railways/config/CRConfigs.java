@@ -221,7 +221,7 @@ public class CRConfigs {
             cachedDisableDatafixer = false;
 
         if (cachedRegisterMissingTracks == null)
-            cachedRegisterMissingTracks = false;
+            cachedRegisterMissingTracks = CCommon.DEFAULT_REGISTER_MISSING_TRACKS;
     }
 
     private static Boolean readBoolean(JsonObject config, String key) {
