@@ -18,12 +18,10 @@
 
 package com.railwayteam.railways.content.conductor.whistle;
 
-import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRSounds;
-import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.TextUtils;
 import com.zurrtum.create.AllDataComponents;
 import com.zurrtum.create.AllSchedules;
@@ -37,18 +35,14 @@ import com.zurrtum.create.content.trains.entity.CarriageContraptionEntity;
 import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.content.trains.graph.DiscoveredPath;
 import com.zurrtum.create.content.trains.graph.EdgePointType;
-import com.zurrtum.create.content.trains.graph.TrackEdge;
-import com.zurrtum.create.content.trains.graph.TrackNode;
 import com.zurrtum.create.content.trains.schedule.Schedule;
 import com.zurrtum.create.content.trains.schedule.ScheduleEntry;
 import com.zurrtum.create.content.trains.schedule.ScheduleRuntime;
 import com.zurrtum.create.content.trains.schedule.condition.ScheduledDelay;
 import com.zurrtum.create.content.trains.schedule.destination.DestinationInstruction;
-import com.zurrtum.create.content.trains.station.GlobalStation;
 import com.zurrtum.create.content.trains.station.StationBlock;
 import com.zurrtum.create.content.trains.station.StationBlockEntity;
 import com.zurrtum.create.content.trains.track.ITrackBlock;
-import com.zurrtum.create.client.content.trains.track.TrackBlockOutline;
 import com.zurrtum.create.content.trains.track.TrackTargetingBlockItem;
 import com.zurrtum.create.foundation.block.IBE;
 import net.minecraft.ChatFormatting;
@@ -57,7 +51,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -84,27 +77,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ConductorWhistleItem extends TrackTargetingBlockItem {
 	public static final String SPECIAL_MARKER = "<ConductorFlag>";
-	private static final String LOG_PREFIX = "[ConductorWhistle]";
 
 	public ConductorWhistleItem(Block block, Item.Properties properties) {
 		super(block, properties, EdgePointType.STATION);
-	}
-
-	public boolean useOnCurve(TrackBlockOutline.BezierPointSelection selection, ItemStack stack) {
-		return false;
 	}
 
 	private static InteractionResult fail(Player player, String message) {
@@ -186,9 +170,6 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 		Train train = Create.RAILWAYS.trains.get(trainId);
 		if (player == null || train == null)
 			return InteractionResult.FAIL;
-		Railways.LOGGER.info("{} useOn: player={} pos={} block={} train={} conductorTagPresent={} client={}",
-			LOG_PREFIX, player.getName().getString(), pos, state.getBlock(), trainId,
-			getUuid(stackTag, "SelectedConductor").isPresent(), level.isClientSide());
 
 		if (player instanceof DeployerFakePlayer && state.getBlock() instanceof AirBlock && train.runtime.isAutoSchedule)
 			train.runtime.discardSchedule();
@@ -232,13 +213,8 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 		}
 
 		if (conductorCarriage == null) {
-			Railways.LOGGER.info("{} bound conductor {} was not found as a live passenger on train {} with {} carriages",
-				LOG_PREFIX, conductorId, trainId, train.carriages.size());
 			return fail(player, "conductor_missing");
 		}
-		Railways.LOGGER.info("{} bound conductor {} found on train {}; forwardConductor={} backwardConductor={} currentSchedule={} navDestination={}",
-			LOG_PREFIX, conductorId, trainId, train.hasForwardConductor(), train.hasBackwardConductor(),
-			train.runtime.getSchedule() != null, train.navigation.destination == null ? "<none>" : train.navigation.destination.name);
 
 		if (state.getBlock() instanceof ITrackBlock track) {
 			Vec3 lookAngle = player.getLookAngle();
@@ -286,15 +262,12 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 			temporaryFlagPos = placePos;
 			temporaryTrackPos = pos;
 			temporaryFlagDirection = front;
-			Railways.LOGGER.info("{} placing temporary flag: trackPos={} flagPos={} targetName={} front={} existingMatchingStations={}",
-				LOG_PREFIX, pos, placePos, stationName, front, countStationsNamed(train, stationName));
 
-			loadWhistleFlag(level, player, train, placePos, pos, stationName, selectedColor, front);
+			loadWhistleFlag(level, player, placePos, pos, stationName, selectedColor, front);
 			stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_POS);
 			stack.remove(AllDataComponents.TRACK_TARGETING_ITEM_SELECTED_DIRECTION);
 		} else if (level.getBlockEntity(pos) instanceof StationBlockEntity stationBe) {
 			stationName = Objects.requireNonNull(stationBe.getStation()).name;
-			Railways.LOGGER.info("{} targeting existing station: pos={} stationName={}", LOG_PREFIX, pos, stationName);
 		}
 
 		if (CRConfigs.server().conductors.whistleRequiresOwning.get() && train.runtime.getSchedule() != null
@@ -342,31 +315,17 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 		for (Carriage carriage : train.carriages)
 			carriage.updateConductors();
 		train.runtime.setSchedule(schedule, true);
-		Railways.LOGGER.info("{} schedule assigned: train={} destinationText={} matchingStations={} forwardConductor={} backwardConductor={} paused={} completed={} auto={} currentEntry={} navDestination={}",
-			LOG_PREFIX, trainId, stationName, countStationsNamed(train, stationName), train.hasForwardConductor(),
-			train.hasBackwardConductor(), train.runtime.paused, train.runtime.completed, train.runtime.isAutoSchedule,
-			train.runtime.currentEntry, train.navigation.destination == null ? "<none>" : train.navigation.destination.name);
 		DiscoveredPath immediatePath = train.runtime.startCurrentInstruction(level);
 		if (immediatePath == null && temporaryFlagPos != null && temporaryTrackPos != null) {
-			Railways.LOGGER.info("{} immediate navigation probe: first direction had no path; retrying opposite direction for flagPos={} oldDirection={} newDirection={}",
-				LOG_PREFIX, temporaryFlagPos, temporaryFlagDirection, !temporaryFlagDirection);
 			level.setBlock(temporaryFlagPos, Blocks.AIR.defaultBlockState(), 3);
-			loadWhistleFlag(level, player, train, temporaryFlagPos, temporaryTrackPos, stationName, selectedColor, !temporaryFlagDirection);
+			loadWhistleFlag(level, player, temporaryFlagPos, temporaryTrackPos, stationName, selectedColor, !temporaryFlagDirection);
 			immediatePath = train.runtime.startCurrentInstruction(level);
-			Railways.LOGGER.info("{} immediate navigation probe after opposite direction: path={} matchingStations={}",
-				LOG_PREFIX, immediatePath == null ? "<none>" : immediatePath.destination.name,
-				countStationsNamed(train, stationName));
 		}
-		if (immediatePath == null) {
-			logRouteDiagnostics(train, stationName);
-			Railways.LOGGER.info("{} immediate navigation probe: no path for train={} destinationText={} matchingStations={} forwardConductor={} backwardConductor={} cooldown/status may have been updated by Create",
-				LOG_PREFIX, trainId, stationName, countStationsNamed(train, stationName), train.hasForwardConductor(),
-				train.hasBackwardConductor());
-		} else if (immediatePath.destination == train.getCurrentStation()) {
+		if (immediatePath == null)
+			return InteractionResult.SUCCESS;
+		if (immediatePath.destination == train.getCurrentStation()) {
 			train.runtime.state = ScheduleRuntime.State.IN_TRANSIT;
 			train.runtime.destinationReached();
-			Railways.LOGGER.info("{} immediate navigation probe: destination is current station for train={} destination={}",
-				LOG_PREFIX, trainId, immediatePath.destination.name);
 		} else {
 			double navigationResult = train.navigation.startNavigation(immediatePath);
 			if (navigationResult != -1) {
@@ -374,10 +333,6 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 				train.runtime.state = ScheduleRuntime.State.IN_TRANSIT;
 				train.runtime.ticksInTransit = 0;
 			}
-			Railways.LOGGER.info("{} immediate navigation probe: pathDestination={} navigationResult={} navDestinationNow={} runtimeState={}",
-				LOG_PREFIX, immediatePath.destination == null ? "<none>" : immediatePath.destination.name,
-				navigationResult, train.navigation.destination == null ? "<none>" : train.navigation.destination.name,
-				train.runtime.state);
 		}
 		return InteractionResult.SUCCESS;
 	}
@@ -431,7 +386,7 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 		return found[0];
 	}
 
-	private static void loadWhistleFlag(Level level, Player player, Train train, BlockPos placePos, BlockPos selectedPos,
+	private static void loadWhistleFlag(Level level, Player player, BlockPos placePos, BlockPos selectedPos,
 										String stationName, byte selectedColor, boolean front) {
 		BlockState placeState = CRBlocks.CONDUCTOR_WHISTLE_FLAG.getDefaultState();
 		level.setBlock(placePos, placeState, 11);
@@ -444,123 +399,16 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 			TypedEntityData.of(((IBE<?>) CRBlocks.CONDUCTOR_WHISTLE_FLAG.get()).getBlockEntityType(), beTag);
 		BlockEntity blockEntity = level.getBlockEntity(placePos);
 		if (blockEntity != null) {
-			Railways.LOGGER.info("{} flag block entity before load: class={} at={} front={}",
-				LOG_PREFIX, blockEntity.getClass().getName(), placePos, front);
 			blockEntityData.loadInto(blockEntity, player.registryAccess());
 			blockEntity.setChanged();
 			level.sendBlockUpdated(placePos, placeState, placeState, 3);
 			if (blockEntity instanceof ConductorWhistleFlagBlockEntity flagBe && flagBe.station != null) {
-				Railways.LOGGER.info("{} flag target after load: globalTrack={} hasValidTrack={} edgePointBefore={}",
-					LOG_PREFIX, flagBe.station.getGlobalPosition(), flagBe.station.hasValidTrack(), flagBe.station.getEdgePoint() != null);
 				flagBe.station.tick();
 				if (flagBe.station.getEdgePoint() != null) {
 					flagBe.station.getEdgePoint().name = stationName;
-					Railways.LOGGER.info("{} flag station registered immediately: id={} name={} graphMatchingStations={}",
-						LOG_PREFIX, flagBe.station.getEdgePoint().getId(), flagBe.station.getEdgePoint().name,
-						countStationsNamed(train, stationName));
-				} else {
-					Railways.LOGGER.info("{} flag station did not register immediately; graphMatchingStations={}",
-						LOG_PREFIX, countStationsNamed(train, stationName));
 				}
 			}
-		} else {
-			Railways.LOGGER.info("{} no block entity found after placing flag at {}", LOG_PREFIX, placePos);
 		}
-	}
-
-	private static long countStationsNamed(Train train, String stationName) {
-		if (train.graph == null)
-			return -1;
-		return train.graph.getPoints(EdgePointType.STATION).stream()
-			.map(GlobalStation.class::cast)
-			.filter(station -> Objects.equals(station.name, stationName))
-			.count();
-	}
-
-	private static void logRouteDiagnostics(Train train, String stationName) {
-		if (train.graph == null) {
-			Railways.LOGGER.info("{} route diagnostics: train={} has no graph", LOG_PREFIX, train.id);
-			return;
-		}
-
-		List<GlobalStation> stations = train.graph.getPoints(EdgePointType.STATION).stream()
-			.map(GlobalStation.class::cast)
-			.filter(station -> Objects.equals(station.name, stationName))
-			.toList();
-
-		Railways.LOGGER.info("{} route diagnostics: train={} stationName={} matches={} doubleEnded={} forwardConductor={} backwardConductor={} currentStation={} leadingEdge={} trailingEdge={}",
-			LOG_PREFIX, train.id, stationName, stations.size(), train.doubleEnded, train.hasForwardConductor(),
-			train.hasBackwardConductor(), train.getCurrentStation() == null ? "<none>" : train.getCurrentStation().name,
-			train.carriages.get(0).getLeadingPoint().edge != null,
-			train.carriages.get(train.carriages.size() - 1).getTrailingPoint().edge != null);
-
-		for (GlobalStation station : stations) {
-			boolean[] forwardReached = {false};
-			boolean[] backwardReached = {false};
-			ArrayList<GlobalStation> destination = new ArrayList<>();
-			destination.add(station);
-
-			train.navigation.search(Double.MAX_VALUE, true, destination, (distance, cost, reachedVia, currentEntry, globalStation) -> {
-				if (globalStation == station) {
-					forwardReached[0] = true;
-					Railways.LOGGER.info("{} route diagnostics: forward search reached station={} distance={} cost={} viaEdge={}",
-						LOG_PREFIX, station.getId(), distance, cost, currentEntry.getSecond());
-					return true;
-				}
-				return false;
-			});
-
-			train.navigation.search(Double.MAX_VALUE, false, destination, (distance, cost, reachedVia, currentEntry, globalStation) -> {
-				if (globalStation == station) {
-					backwardReached[0] = true;
-					Railways.LOGGER.info("{} route diagnostics: backward search reached station={} distance={} cost={} viaEdge={}",
-						LOG_PREFIX, station.getId(), distance, cost, currentEntry.getSecond());
-					return true;
-				}
-				return false;
-			});
-
-			DiscoveredPath selectedPath = train.navigation.findPathTo(station, -1);
-			TrackNode stationNode1 = train.graph.locateNode(station.edgeLocation.getFirst());
-			TrackNode stationNode2 = train.graph.locateNode(station.edgeLocation.getSecond());
-			TrackEdge stationEdge = stationNode1 == null || stationNode2 == null ? null : train.graph.getConnectionsFrom(stationNode1).get(stationNode2);
-			Set<Identifier> validTypes = getValidPathfindingTypes(train);
-			Identifier stationTrackType = stationEdge == null ? null : CRTrackMaterials.getType(stationEdge.getTrackMaterial());
-			boolean stationMaterialAllowed = stationEdge != null && (validTypes.contains(stationEdge.getTrackMaterial().getId())
-				|| validTypes.contains(stationTrackType)
-				|| CRTrackMaterials.CRTrackType.UNIVERSAL.equals(stationTrackType));
-			Railways.LOGGER.info("{} route diagnostics: station={} pos={} edgeFirst={} edgeSecond={} position={} approachFirst={} approachSecond={} forwardReached={} backwardReached={} selectedPath={} selectedDistance={}",
-				LOG_PREFIX, station.getId(), station.getBlockEntityPos(), station.edgeLocation.getFirst(),
-				station.edgeLocation.getSecond(), station.position,
-				station.canApproachFrom(stationNode1),
-				station.canApproachFrom(stationNode2),
-				forwardReached[0], backwardReached[0],
-				selectedPath == null ? "<none>" : selectedPath.destination.name,
-				selectedPath == null ? 0 : selectedPath.distance);
-			Railways.LOGGER.info("{} route diagnostics: stationEdgeMaterial={} stationTrackType={} validPathfindingTypes={} materialAllowed={} leadingPos={} trailingPos={} leadingSameEdge={} trailingSameEdge={}",
-				LOG_PREFIX, stationEdge == null ? "<none>" : stationEdge.getTrackMaterial().getId(), stationTrackType, validTypes,
-				stationMaterialAllowed,
-				train.carriages.get(0).getLeadingPoint().position,
-				train.carriages.get(train.carriages.size() - 1).getTrailingPoint().position,
-				stationEdge != null && train.carriages.get(0).getLeadingPoint().edge == stationEdge,
-				stationEdge != null && train.carriages.get(train.carriages.size() - 1).getTrailingPoint().edge == stationEdge);
-		}
-	}
-
-	private static Set<Identifier> getValidPathfindingTypes(Train train) {
-		Set<Identifier> validTypes = new HashSet<>();
-		for (int i = 0; i < train.carriages.size(); i++) {
-			Carriage carriage = train.carriages.get(i);
-			if (i == 0) {
-				validTypes.addAll(carriage.leadingBogey().type.getValidPathfindingTypes(carriage.leadingBogey().getStyle()));
-			} else {
-				validTypes.retainAll(carriage.leadingBogey().type.getValidPathfindingTypes(carriage.leadingBogey().getStyle()));
-			}
-			if (carriage.isOnTwoBogeys()) {
-				validTypes.retainAll(carriage.trailingBogey().type.getValidPathfindingTypes(carriage.trailingBogey().getStyle()));
-			}
-		}
-		return validTypes;
 	}
 
 	private static Optional<UUID> getUuid(CompoundTag tag, String key) {
