@@ -1,6 +1,13 @@
 {
   "sources": [
     {
+      "type": "minecraft:filter",
+      "pattern": {
+        "namespace": "^railways$",
+        "path": "^block/.*_connected$"
+      }
+    },
+    {
       "type": "directory",
       "source": "entity/caps",
       "prefix": "entity/caps/"

@@ -28,6 +28,7 @@
     "client.MixinSlidingDoorVisual",
     "client.MixinSpriteContentsAnimationState",
     "client.MixinSpriteContentsPhantomAnimation",
+    "client.MixinSpriteLoaderAtlasCapacity",
     "client.MixinStandardTrackBlockRendererPhantom",
     "client.MixinStationRendererStateReset",
     "client.MixinToolboxHandlerClient",
