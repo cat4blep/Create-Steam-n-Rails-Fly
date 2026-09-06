@@ -1,5 +1,3 @@
-<div align="center">
-  <img src=".idea/icon.png" width="192" height="192" alt="Create: Steam 'n' Rails logo">
   <h1>Create: Steam 'n' Rails — Create Fly port</h1>
   <p>Steam 'n' Rails for Fabric, Minecraft 26.2, and Create Fly.</p>
 
@@ -8,8 +6,7 @@
 
 This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.2. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
 
-The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26.2. [Download the JAR](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/download/vSNR.FLY-STABLE-1.2.1/SNR.FLY-STABLE-1.2.1.jar), read the [1.2.1 release notes](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/tag/vSNR.FLY-STABLE-1.2.1), or browse [all releases](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases).
-
+The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26.2
 ## Compatibility
 
 | Component | Required version |
@@ -23,65 +20,9 @@ The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26
 
 This is a Fabric-only port. Forge and NeoForge are not supported. Use Create Fly rather than another Create implementation, and do not install the original Steam 'n' Rails JAR alongside this port.
 
-## Installation
-
-1. Install Java 25, Fabric Loader, and Fabric API for Minecraft 26.2.
-2. Install a Create Fly build for Minecraft 26.2 within the version range above. Release 1.2.1 was built against the `26.2-rc-2-6.0.9-1` artifact.
-3. Put `SNR.FLY-STABLE-1.2.1.jar` in the instance's `mods` directory, replacing any older Steam 'n' Rails JAR.
-4. Start the game and confirm that Fabric reports `railways`, `create`, and their dependencies as loaded.
-
-For multiplayer, update both the server and all clients to 1.2.1. This release uses network protocol 15, introduced in 1.2, and synchronizes server settings when joining; local settings are restored when disconnecting.
-
-Fresh installations default to `registerMissingTracks: true` in `config/railways/common.json`. Existing values are preserved when upgrading. Keep this setting consistent on the server and clients, and fully restart after changing it: it controls which integration track blocks and items are registered. An existing `false` is not automatically replaced by `true`.
-
-Back up existing worlds before upgrading the mod or Minecraft.
-
-## Changes in 1.2.1
-
-- Fixes train coupling leaving the rear carriage unbound, without wheels and unable to move until reconnecting, by applying train updates to Create Fly's client railway manager.
-- Prevents client-side uncoupling updates from modifying the integrated-server train a second time.
-- Uses `registerMissingTracks: true` consistently for the first startup and generated configs on fresh installations.
-
-## Changes in 1.2
-
-- Fixes legacy train data migration with Trinkets Updated ([#9](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/issues/9)), preserving equipment and third-party NBT.
-- Removes 611 redundant connected-texture source sheets from the block atlas while retaining generated sprites and source PNGs. If atlas packing still fails, it retries with fewer mip levels, preserving original texture resolution and global graphics settings.
-- Fixes rendering of conductor equipment, whistle flags, semaphores and diesel smokestacks, plus quarter-turn rotation of axial smokestacks.
-- Reads early options from the current JSON config and safely applies server settings without overwriting client configuration files.
-- Rejects unsupported coupler, switch, buffer and whistle interactions on curved track in the active handler.
-- Removes expensive whistle route diagnostics and repetitive logging.
-
-See the [changelog](changelog.md) and [release history](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases) for more details. Earlier fixes for bogey gauges, monorail geometry, track-switch rendering, phantom textures, train buffers and moving block GUIs are retained.
-
 ## Issue reports
 
 When [reporting a problem](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/issues), include the complete `latest.log` or crash report, mod versions, a short reproduction sequence, and whether it also occurs with only Steam 'n' Rails and its required dependencies installed. For rendering or atlas issues, also include the GPU, driver version, graphics backend (OpenGL/Vulkan), resource packs, mipmap level and anisotropic filtering setting.
-
-## Building from source
-
-The project uses the included Gradle wrapper and requires JDK 25. Set `JAVA_HOME` to that JDK before building.
-
-Windows PowerShell:
-
-```powershell
-./gradlew.bat clean build validateAccessWidener --no-daemon
-```
-
-Linux or macOS:
-
-```bash
-./gradlew clean build validateAccessWidener --no-daemon
-```
-
-The distributable JAR is written to `build/libs/`. Use the JAR without the `-sources` suffix. The first build also downloads the development dependencies and generates the connected-texture sprites used by this port.
-
-### Datagen
-
-For maintainer datagen tasks, set the following environment variable before running the relevant Gradle task:
-
-```env
-DATAGEN=TRUE
-```
 
 ## Contributing
 
@@ -103,5 +44,3 @@ Certain sections of the code are derived from projects with compatible licenses,
 - [ZurrTum/Create-Fly](https://github.com/ZurrTum/Create-Fly) and its contributors for the Create Fly port used by Minecraft 26.2.
 - [chaevsfe/Create-Steam-n-Rails-Fly](https://github.com/chaevsfe/Create-Steam-n-Rails-Fly) for fixes adapted into release 1.2.
 - The original Create team and all projects credited in the source and license notices.
-
-We use [YourKit Java Profiler](https://www.yourkit.com/java/profiler/) during mod development and thank YourKit for supporting open-source projects.
