@@ -1,4 +1,17 @@
 ------------------------------------------------------
+SNR.FLY-STABLE-1.2.1 (Fabric / Minecraft 26.2)
+------------------------------------------------------
+Fixes
+- Fix train coupler packets using the server railway manager instead of the client manager, leaving the rear carriage unbound with missing wheels until reconnecting.
+- Prevent client-side uncoupling updates from modifying the integrated-server train a second time.
+- Enable registerMissingTracks by default for fresh installations, using the same default before config creation and on later restarts.
+
+Upgrading
+- Existing common.json values are preserved. An existing registerMissingTracks=false is not automatically changed to true.
+- Keep registerMissingTracks consistent between server and clients and fully restart after changing it; the setting affects registered blocks and items.
+- Network protocol remains 15, as in 1.2. Minecraft, Fabric, Create Fly and Java requirements are unchanged.
+
+------------------------------------------------------
 SNR.FLY-STABLE-1.2 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 Fixes

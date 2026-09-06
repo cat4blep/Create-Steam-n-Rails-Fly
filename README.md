@@ -8,7 +8,7 @@
 
 This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.2. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
 
-The current stable release is **SNR.FLY-STABLE-1.2** for Fabric / Minecraft 26.2. [Download the JAR](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/download/vSNR.FLY-STABLE-1.2/SNR.FLY-STABLE-1.2.jar), read the [1.2 release notes](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/tag/vSNR.FLY-STABLE-1.2), or browse [all releases](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases).
+The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26.2. [Download the JAR](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/download/vSNR.FLY-STABLE-1.2.1/SNR.FLY-STABLE-1.2.1.jar), read the [1.2.1 release notes](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases/tag/vSNR.FLY-STABLE-1.2.1), or browse [all releases](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/releases).
 
 ## Compatibility
 
@@ -19,20 +19,28 @@ The current stable release is **SNR.FLY-STABLE-1.2** for Fabric / Minecraft 26.2
 | Fabric API | `0.152.0+26.2` or newer |
 | Create | [Create Fly](https://github.com/ZurrTum/Create-Fly) `>=6.0.9-1 <6.0.10-0` |
 | Java | 25 |
-| This port | `SNR.FLY-STABLE-1.2` |
+| This port | `SNR.FLY-STABLE-1.2.1` |
 
 This is a Fabric-only port. Forge and NeoForge are not supported. Use Create Fly rather than another Create implementation, and do not install the original Steam 'n' Rails JAR alongside this port.
 
 ## Installation
 
 1. Install Java 25, Fabric Loader, and Fabric API for Minecraft 26.2.
-2. Install a Create Fly build for Minecraft 26.2 within the version range above. Release 1.2 was built against the `26.2-rc-2-6.0.9-1` artifact.
-3. Put `SNR.FLY-STABLE-1.2.jar` in the instance's `mods` directory, replacing any older Steam 'n' Rails JAR.
+2. Install a Create Fly build for Minecraft 26.2 within the version range above. Release 1.2.1 was built against the `26.2-rc-2-6.0.9-1` artifact.
+3. Put `SNR.FLY-STABLE-1.2.1.jar` in the instance's `mods` directory, replacing any older Steam 'n' Rails JAR.
 4. Start the game and confirm that Fabric reports `railways`, `create`, and their dependencies as loaded.
 
-For multiplayer, update both the server and all clients to 1.2. This release changes the Railways network protocol from 14 to 15 and synchronizes server settings when joining; local settings are restored when disconnecting.
+For multiplayer, update both the server and all clients to 1.2.1. This release uses network protocol 15, introduced in 1.2, and synchronizes server settings when joining; local settings are restored when disconnecting.
+
+Fresh installations default to `registerMissingTracks: true` in `config/railways/common.json`. Existing values are preserved when upgrading. Keep this setting consistent on the server and clients, and fully restart after changing it: it controls which integration track blocks and items are registered. An existing `false` is not automatically replaced by `true`.
 
 Back up existing worlds before upgrading the mod or Minecraft.
+
+## Changes in 1.2.1
+
+- Fixes train coupling leaving the rear carriage unbound, without wheels and unable to move until reconnecting, by applying train updates to Create Fly's client railway manager.
+- Prevents client-side uncoupling updates from modifying the integrated-server train a second time.
+- Uses `registerMissingTracks: true` consistently for the first startup and generated configs on fresh installations.
 
 ## Changes in 1.2
 
