@@ -6,7 +6,7 @@
 
 This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.2. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
 
-The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26.2
+The current stable release is **SNR.FLY-STABLE-1.2.2** for Fabric / Minecraft 26.2
 ## Compatibility
 
 | Component | Required version |
@@ -16,7 +16,7 @@ The current stable release is **SNR.FLY-STABLE-1.2.1** for Fabric / Minecraft 26
 | Fabric API | `0.152.0+26.2` or newer |
 | Create | [Create Fly](https://github.com/ZurrTum/Create-Fly) `>=6.0.9-1 <6.0.10-0` |
 | Java | 25 |
-| This port | `SNR.FLY-STABLE-1.2.1` |
+| This port | `SNR.FLY-STABLE-1.2.2` |
 
 This is a Fabric-only port. Forge and NeoForge are not supported. Use Create Fly rather than another Create implementation, and do not install the original Steam 'n' Rails JAR alongside this port.
 
