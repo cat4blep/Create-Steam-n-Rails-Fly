@@ -18,6 +18,7 @@ import com.railwayteam.railways.content.fuel.tank.FuelTankMovementBehavior;
 import com.railwayteam.railways.util.CreateBehaviourCompat;
 import com.railwayteam.railways.internal.compat.registrate.util.entry.BlockEntry;
 import com.zurrtum.create.content.contraptions.actors.psi.PortableStorageInterfaceMovement;
+import com.zurrtum.create.content.fluids.tank.FluidTankBlock;
 import com.railwayteam.railways.internal.compat.create.foundation.data.CreateRegistrate;
 import com.railwayteam.railways.internal.compat.create.foundation.data.SharedProperties;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -36,6 +37,7 @@ public final class CRBlocksImpl {
         .initialProperties(SharedProperties::copperMetal)
         .properties(BlockBehaviour.Properties::noOcclusion)
         .properties(properties -> properties.isRedstoneConductor((state, level, pos) -> true))
+        .properties(properties -> properties.lightLevel(FluidTankBlock::getLight))
         .onRegister(CreateBehaviourCompat.movementBehaviour(FUEL_TANK_MOVEMENT))
         .item(FuelTankItem::new)
         .build()

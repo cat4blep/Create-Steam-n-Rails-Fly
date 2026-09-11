@@ -143,6 +143,11 @@ public final class CRDataFixers {
         CompoundTag cherry = updateBlockState(fixer, 1, "railways:track_biomesoplenty_cherry", null, null);
         requireName(cherry, "railways:track_cherry");
 
+        CompoundTag streamlined = updateBlockState(
+            fixer, 1, "railways:smokestack_streamlined", "axis", "z"
+        );
+        requireProperty(streamlined, "facing", "north");
+
         CompoundTag smokebox = updateBlockState(
             fixer,
             1,
@@ -165,6 +170,8 @@ public final class CRDataFixers {
         requireProperty(smokestack, "part", VariableStackPart.SINGLE.getSerializedName());
 
         verifyTracksSavedDataTraversal(fixer);
+        verifyContraptionEntityChunkTraversal(fixer);
+        verifyPlayerRootVehicleTraversal(fixer);
     }
 
     private static CompoundTag updateBlockState(
@@ -193,7 +200,7 @@ public final class CRDataFixers {
         return state;
     }
 
-    private static void verifyTracksSavedDataTraversal(DataFixer fixer) {
+    private static CompoundTag carriageContraptionEntity() {
         ListTag palette = new ListTag();
         palette.add(blockState("railways:mono_bogey_upside_down", null, null));
 
@@ -204,8 +211,43 @@ public final class CRDataFixers {
         CompoundTag entity = new CompoundTag();
         entity.putString("id", "create:carriage_contraption");
         entity.put("Contraption", contraption);
+        return entity;
+    }
+
+    private static void requireMigratedContraption(CompoundTag entity) {
+        CompoundTag state = entity.getCompoundOrEmpty("Contraption")
+            .getCompoundOrEmpty("Blocks").getListOrEmpty("Palette").getCompoundOrEmpty(0);
+        requireName(state, "railways:mono_bogey");
+        requireProperty(state, "upside_down", "true");
+    }
+
+    private static void verifyContraptionEntityChunkTraversal(DataFixer fixer) {
+        ListTag entities = new ListTag();
+        entities.add(carriageContraptionEntity());
+        CompoundTag root = new CompoundTag();
+        root.put("Entities", entities);
+
+        CompoundTag fixed = (CompoundTag) fixer.update(
+            References.ENTITY_CHUNK, new Dynamic<>(NbtOps.INSTANCE, root), 0, Railways.DATA_FIXER_VERSION
+        ).getValue();
+        requireMigratedContraption(fixed.getListOrEmpty("Entities").getCompoundOrEmpty(0));
+    }
+
+    private static void verifyPlayerRootVehicleTraversal(DataFixer fixer) {
+        CompoundTag rootVehicle = new CompoundTag();
+        rootVehicle.put("Entity", carriageContraptionEntity());
+        CompoundTag root = new CompoundTag();
+        root.put("RootVehicle", rootVehicle);
+
+        CompoundTag fixed = (CompoundTag) fixer.update(
+            References.PLAYER, new Dynamic<>(NbtOps.INSTANCE, root), 0, Railways.DATA_FIXER_VERSION
+        ).getValue();
+        requireMigratedContraption(fixed.getCompoundOrEmpty("RootVehicle").getCompoundOrEmpty("Entity"));
+    }
+
+    private static void verifyTracksSavedDataTraversal(DataFixer fixer) {
         CompoundTag carriage = new CompoundTag();
-        carriage.put("Entity", entity);
+        carriage.put("Entity", carriageContraptionEntity());
         ListTag carriages = new ListTag();
         carriages.add(carriage);
         CompoundTag train = new CompoundTag();
@@ -223,15 +265,11 @@ public final class CRDataFixers {
             0,
             Railways.DATA_FIXER_VERSION
         ).getValue();
-        CompoundTag fixedState = fixed.getCompoundOrEmpty("data")
+        CompoundTag fixedEntity = fixed.getCompoundOrEmpty("data")
             .getListOrEmpty("Trains").getCompoundOrEmpty(0)
             .getListOrEmpty("Carriages").getCompoundOrEmpty(0)
-            .getCompoundOrEmpty("Entity")
-            .getCompoundOrEmpty("Contraption")
-            .getCompoundOrEmpty("Blocks")
-            .getListOrEmpty("Palette").getCompoundOrEmpty(0);
-        requireName(fixedState, "railways:mono_bogey");
-        requireProperty(fixedState, "upside_down", "true");
+            .getCompoundOrEmpty("Entity");
+        requireMigratedContraption(fixedEntity);
     }
 
     private static void requireName(CompoundTag state, String expected) {

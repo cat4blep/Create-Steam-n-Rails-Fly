@@ -37,6 +37,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -59,6 +60,12 @@ public class ClientPacketHandlers {
     private static final int MAX_CAMERA_LOOKUP_TICKS = 100;
     private static int pendingCameraEntityId = -1;
     private static int pendingCameraLookupTicks;
+
+    public static void disconnect(Minecraft mc, Component reason) {
+        var connection = mc.getConnection();
+        if (connection != null)
+            connection.getConnection().disconnect(reason);
+    }
 
     public static void handleCameraMove(Minecraft mc, int id, double x, double y, double z, float yaw, float pitch, boolean onGround) {
         if (mc.level == null) return;

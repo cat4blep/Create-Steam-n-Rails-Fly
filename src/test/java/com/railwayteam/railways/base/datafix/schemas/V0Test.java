@@ -17,12 +17,15 @@ import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonObject;
 import com.railwayteam.railways.base.datafix.CRReferences;
 import com.railwayteam.railways.base.datafix.fixes.UpsideDownMonoBogeyFix;
+import com.railwayteam.railways.base.datafix.fixes.StreamlinedSmokeStackFacingFix;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.util.datafix.schemas.NamespacedSchema;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,11 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class V0Test {
     private static com.mojang.datafixers.DataFixer fixer(boolean trinkets) {
-        DataFixerBuilder builder = new DataFixerBuilder(1);
+        DataFixerBuilder builder = new DataFixerBuilder(2);
         Schema parent = trinkets ? new TrinketsSchema(100, null) : new VanillaSchema(100, null);
         builder.addSchema(0, (version, ignored) -> new V0(version, parent));
         Schema v1 = builder.addSchema(1, NamespacedSchema::new);
         builder.addFixer(new UpsideDownMonoBogeyFix(v1, "legacy bogey"));
+        Schema v2 = builder.addSchema(2, NamespacedSchema::new);
+        builder.addFixer(new StreamlinedSmokeStackFacingFix(v2, "legacy streamlined smokestack"));
         return builder.build().fixer();
     }
 
@@ -86,6 +91,65 @@ class V0Test {
         assertEquals(fixed, fixer.update(References.ENTITY, new Dynamic<>(JsonOps.INSTANCE, fixed), 0, 1).getValue());
     }
 
+    @ParameterizedTest
+    @CsvSource({"false,chunk", "true,chunk", "false,player", "true,player"})
+    void migratesRootVehicleAndPassengersWithoutLosingOtherModData(boolean trinkets, String rootType) {
+        JsonObject entity = JsonParser.parseString("""
+            {"id":"create:carriage_contraption",
+             "Contraption":{"Blocks":{"Palette":[{"Name":"railways:mono_bogey_upside_down"}]}},
+             "Passengers":[{"id":"test:carrier","BlockState":{"Name":"railways:mono_bogey_upside_down"},
+               "trinkets":{"hat":{"Items":[{"id":"minecraft:diamond"}]}}}],
+             "cardinal_components":{"trinkets:trinkets":{"hat":{"Items":[{"id":"minecraft:iron_helmet"}]}}},
+             "OtherModData":{"value":42}}
+            """).getAsJsonObject();
+        JsonObject expectedEntity = entity.deepCopy();
+        var fixedBlock = JsonParser.parseString("""
+            {"Name":"railways:mono_bogey","Properties":{"upside_down":"true"}}
+            """);
+        expectedEntity.getAsJsonObject("Contraption").getAsJsonObject("Blocks")
+            .getAsJsonArray("Palette").set(0, fixedBlock.deepCopy());
+        expectedEntity.getAsJsonArray("Passengers").get(0).getAsJsonObject()
+            .add("BlockState", fixedBlock.deepCopy());
+
+        JsonObject input = wrapEntity(entity, rootType);
+        JsonObject expected = wrapEntity(expectedEntity, rootType);
+        var type = rootType.equals("chunk") ? References.ENTITY_CHUNK : References.PLAYER;
+        var fixer = fixer(trinkets);
+        var output = fixer.update(type, new Dynamic<>(JsonOps.INSTANCE, input), 0, 1).getValue();
+        assertEquals(expected, output, "both palettes migrate while unrelated fields survive");
+        assertEquals(output, fixer.update(type, new Dynamic<>(JsonOps.INSTANCE, output), 0, 1).getValue());
+    }
+
+    private static JsonObject wrapEntity(JsonObject entity, String rootType) {
+        JsonObject root = new JsonObject();
+        if (rootType.equals("chunk")) {
+            var entities = new com.google.gson.JsonArray();
+            entities.add(entity);
+            root.add("Entities", entities);
+        } else {
+            JsonObject vehicle = new JsonObject();
+            vehicle.add("Entity", entity);
+            vehicle.addProperty("Attach", "00000000-0000-0000-0000-000000000001");
+            root.add("RootVehicle", vehicle);
+            root.addProperty("XpLevel", 25);
+        }
+        root.addProperty("OtherRootData", "preserved");
+        return root;
+    }
+
+    @ParameterizedTest
+    @CsvSource({"x,east", "z,north"})
+    void migratesStreamlinedSmokestackAxis(String axis, String facing) {
+        var input = JsonParser.parseString("""
+            {"Name":"railways:smokestack_streamlined","Properties":{"axis":"%s","waterlogged":"false"}}
+            """.formatted(axis));
+        var expected = JsonParser.parseString("""
+            {"Name":"railways:smokestack_streamlined","Properties":{"facing":"%s","waterlogged":"false"}}
+            """.formatted(facing));
+        assertEquals(expected, fixer(false).update(References.BLOCK_STATE,
+            new Dynamic<>(JsonOps.INSTANCE, input), 1, 2).getValue());
+    }
+
     private static class VanillaSchema extends NamespacedSchema {
         VanillaSchema(int version, Schema parent) { super(version, parent); }
 
@@ -110,6 +174,13 @@ class V0Test {
             schema.registerType(false, References.TEXT_COMPONENT, () -> DSL.constType(DSL.string()));
             schema.registerType(true, References.ENTITY,
                 () -> DSL.taggedChoiceLazy("id", namespacedString(), entities));
+            schema.registerType(true, References.ENTITY_TREE,
+                () -> DSL.optionalFields("Passengers", DSL.list(References.ENTITY_TREE.in(schema)),
+                    References.ENTITY.in(schema)));
+            schema.registerType(false, References.ENTITY_CHUNK,
+                () -> DSL.optionalFields("Entities", DSL.list(References.ENTITY_TREE.in(schema))));
+            schema.registerType(false, References.PLAYER,
+                () -> DSL.optionalFields("RootVehicle", DSL.optionalFields("Entity", References.ENTITY_TREE.in(schema))));
         }
     }
 

@@ -1,4 +1,15 @@
 ------------------------------------------------------
+Unreleased
+------------------------------------------------------
+- Validate curved-track casing targets against the actual curve and reject changes from spectators or players without build permission.
+- Reject curved-track handcar placement from spectators or players without build permission.
+- Preserve track casing and its alternate model when saving schematics.
+- Restore the heating requirement for seven stone paint mixing recipes.
+- Disconnect clients with an incompatible Railways network protocol.
+- Make fuel tanks emit light according to their fluid.
+- Extend legacy migration checks to streamlined smokestack facing, entity chunks and player root vehicles.
+
+------------------------------------------------------
 SNR.FLY-STABLE-1.2.1 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 Fixes
