@@ -1,8 +1,10 @@
 package com.railwayteam.railways.registry;
 
 import com.railwayteam.railways.Railways;
+import com.railwayteam.railways.compat.tracks.GenericTrackCompat;
 import com.railwayteam.railways.content.conductor.ConductorCapItem;
 import com.zurrtum.create.content.processing.sequenced.SequencedAssemblyItem;
+import com.zurrtum.create.content.trains.track.TrackBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
@@ -76,7 +78,15 @@ public class CRCreativeModeTabs {
         }
 
         private static Predicate<Item> makeExclusionPredicate() {
-            return item -> item instanceof SequencedAssemblyItem;
+            return item -> {
+                if (item instanceof SequencedAssemblyItem)
+                    return true;
+                if (item instanceof BlockItem blockItem && blockItem.getBlock() instanceof TrackBlock trackBlock) {
+                    GenericTrackCompat compat = GenericTrackCompat.get(trackBlock.getMaterial());
+                    return compat != null && !compat.modLoaded;
+                }
+                return false;
+            };
         }
 
         private static List<ItemOrdering> makeOrderings() {

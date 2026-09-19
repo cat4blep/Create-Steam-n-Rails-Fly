@@ -67,6 +67,11 @@ public class GenericTrackCompat {
         return ALL.get(modid);
     }
 
+    public static GenericTrackCompat get(TrackMaterial material) {
+        GenericTrackCompat compat = get(material.getId().getNamespace());
+        return compat != null && compat.MATERIALS.get(material.getId().getPath()) == material ? compat : null;
+    }
+
     protected final Map<String, TrackMaterial> MATERIALS = new HashMap<>();
     protected final Map<String, NonNullSupplier<? extends TrackBlock>> BLOCKS = new HashMap<>();
 

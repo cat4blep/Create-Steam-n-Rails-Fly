@@ -1,5 +1,12 @@
 ------------------------------------------------------
-Unreleased
+SNR.FLY-STABLE-1.2.3 (Fabric / Minecraft 26.2)
+------------------------------------------------------
+- Hide integration tracks from creative tabs and search when their source mods are absent, while preserving registered blocks and items.
+- Register curved-track models and renderers for integration tracks at all three gauges.
+- Bind the entity overlay texture when rendering contraptions with Iris, preventing trains from turning white near the edge of the screen.
+
+------------------------------------------------------
+SNR.FLY-STABLE-1.2.2 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 - Validate curved-track casing targets against the actual curve and reject changes from spectators or players without build permission.
 - Reject curved-track handcar placement from spectators or players without build permission.

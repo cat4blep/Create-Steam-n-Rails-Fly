@@ -16,6 +16,7 @@
     "client.MixinCurvedTrackInteraction",
     "client.MixinKeyboardHandler",
     "client.MixinObjGeometryModelMesh",
+    "client.MixinPonderRenderTypes",
     "client.MixinSegmentAngles",
     "client.MixinTrackBlockOutline",
     "client.MixinTrackVisual",
