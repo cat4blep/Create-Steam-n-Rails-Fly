@@ -16,6 +16,7 @@ import com.zurrtum.create.content.trains.entity.Train;
 import com.zurrtum.create.infrastructure.packet.s2c.AddTrainPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,8 +26,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Converts the marked native AddTrainPacket into a relocation-only client snapshot. */
 @Mixin(value = AllHandle.class, remap = false)
 public abstract class MixinAllHandleShadowTrain {
-    @Inject(method = "onAddTrain", at = @At("HEAD"), cancellable = true)
-    private void railways$beginShadowRestore(AddTrainPacket packet, CallbackInfo ci) {
+    // Build 2 schedules packets inside onAddTrain; wait until that dispatch has completed.
+    // Source: https://github.com/ZurrTum/Create-Fly/blob/26.2/src/client/java/com/zurrtum/create/client/AllHandle.java
+    @Inject(
+        method = "onAddTrain",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/zurrtum/create/client/AllHandle;forceMainThread("
+                + "Lnet/minecraft/network/protocol/game/ClientGamePacketListener;"
+                + "Lnet/minecraft/network/protocol/Packet;)V",
+            shift = At.Shift.AFTER
+        ),
+        cancellable = true
+    )
+    private void railways$beginShadowRestore(ClientGamePacketListener listener, AddTrainPacket packet, CallbackInfo ci) {
         Train train = packet.train();
         if (!train.id.equals(ShadowRealm.clientPendingShadowTrainId)) {
             return;

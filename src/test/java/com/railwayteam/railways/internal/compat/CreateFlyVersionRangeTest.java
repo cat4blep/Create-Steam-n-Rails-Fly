@@ -34,7 +34,7 @@ class CreateFlyVersionRangeTest {
             properties.getProperty("create_fabric_version_range")
         );
 
-        assertTrue(range.test(Version.parse("6.0.9-1")));
+        assertFalse(range.test(Version.parse("6.0.9-1")));
         assertTrue(range.test(Version.parse("6.0.9-2")));
         assertFalse(range.test(Version.parse("6.0.10-1")));
         assertFalse(range.test(Version.parse("6.0.10")));

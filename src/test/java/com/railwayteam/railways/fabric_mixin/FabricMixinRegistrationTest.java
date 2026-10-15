@@ -31,6 +31,7 @@ class FabricMixinRegistrationTest {
         Set<String> registered = loadRegisteredMixins();
         for (String mixin : List.of(
             "MixinAbstractContainerMenu",
+            "MixinAllHandleTrainRelocationShadow",
             "MixinCarriageBufferDistance",
             "MixinContainerLevelAccess",
             "MixinItemCombinerMenu",

@@ -154,9 +154,7 @@ public class BufferModel extends WrapperBlockStateModel {
             quad.direction(),
             quad.materialInfo()
         );
-        BakedModelHelper.setNormals(rotated, new Vector3f[] {
-            new Vector3f(normal), new Vector3f(normal), new Vector3f(normal), new Vector3f(normal)
-        });
+        BakedModelHelper.setNormals(rotated, normal);
         return rotated;
     }
 

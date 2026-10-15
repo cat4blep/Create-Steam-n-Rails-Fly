@@ -46,7 +46,7 @@ class CreateClientRailwaysTest {
         var field = FabricLoaderImpl.class.getDeclaredField("modMap");
         field.setAccessible(true);
         var mods = (Map<String, ModContainer>) field.get(FabricLoaderImpl.INSTANCE);
-        var metadata = new BuiltinModMetadata.Builder("create", "6.0.9-1").build();
+        var metadata = new BuiltinModMetadata.Builder("create", "6.0.9-2").build();
         var container = (ModContainer) Proxy.newProxyInstance(ModContainer.class.getClassLoader(),
             new Class<?>[] {ModContainer.class}, (proxy, method, args) -> {
                 if (method.getName().equals("getMetadata")) return metadata;

@@ -12,30 +12,38 @@ package com.railwayteam.railways.fabric_mixin;
 
 import com.railwayteam.railways.content.shadow_realm.ShadowRealm;
 import com.railwayteam.railways.content.shadow_realm.ShadowRealm.RestorationTarget;
+import com.zurrtum.create.AllHandle;
 import com.zurrtum.create.infrastructure.packet.c2s.TrainRelocationPacket;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Routes relocation packets for stored shadow trains before Create looks for a live entity. */
-@Mixin(value = TrainRelocationPacket.class, priority = 500, remap = false)
-public abstract class MixinTrainRelocationPacketShadow {
-    @Inject(method = "handle", at = @At("HEAD"), cancellable = true)
-    private void railways$restoreShadowTrain(ServerGamePacketListener listener, CallbackInfo ci) {
-        if (!(listener instanceof ServerGamePacketListenerImpl serverListener)) {
-            return;
-        }
-        TrainRelocationPacket packet = (TrainRelocationPacket) (Object) this;
+/** Restores stored shadow trains on the server thread before Create looks for a live entity. */
+@Mixin(value = AllHandle.class, priority = 500, remap = false)
+public abstract class MixinAllHandleTrainRelocationShadow {
+    @Inject(
+        method = "onTrainRelocation",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread("
+                + "Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;"
+                + "Lnet/minecraft/network/PacketProcessor;)V",
+            shift = At.Shift.AFTER
+        ),
+        cancellable = true
+    )
+    private static void railways$restoreShadowTrain(
+        ServerGamePacketListenerImpl listener, TrainRelocationPacket packet, CallbackInfo ci
+    ) {
         RestorationTarget target = new RestorationTarget(
-            serverListener.player.level(),
+            listener.player.level(),
             packet.pos(),
             packet.hoveredBezier(),
             packet.direction(),
             packet.lookAngle()
         );
-        ShadowRealm.handleTrainRelocationPacket(serverListener.player, packet.trainId(), target, ci);
+        ShadowRealm.handleTrainRelocationPacket(listener.player, packet.trainId(), target, ci);
     }
 }

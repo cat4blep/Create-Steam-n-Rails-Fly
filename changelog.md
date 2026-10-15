@@ -1,4 +1,12 @@
 ------------------------------------------------------
+SNR.FLY-STABLE-1.2.4 (Fabric / Minecraft 26.2)
+------------------------------------------------------
+- Update to Create Fly 6.0.9-2 and require build 2 or newer within the 6.0.9 line.
+- Fix the startup crash caused by the changed AddTrainPacket handler signature (#11).
+- Restore Shadow Realm trains after Create Fly dispatches client and server packets to the main thread.
+- Adapt diagonal buffer model normals to Create Fly's updated rendering API.
+
+------------------------------------------------------
 SNR.FLY-STABLE-1.2.3 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 - Hide integration tracks from creative tabs and search when their source mods are absent, while preserving registered blocks and items.
