@@ -66,7 +66,6 @@ import com.railwayteam.railways.content.custom_tracks.gen_template.OutputPrefixe
 import com.railwayteam.railways.content.custom_tracks.gen_template.TextureMaps;
 import com.railwayteam.railways.content.custom_tracks.gen_template.TrackGenTemplate;
 import com.railwayteam.railways.content.custom_tracks.generic_crossing.GenericCrossingBlock;
-import com.railwayteam.railways.content.custom_tracks.monorail.MonorailTrackBlock;
 import com.railwayteam.railways.content.handcar.HandcarBlock;
 import com.railwayteam.railways.content.handcar.HandcarControlsInteractionBehaviour;
 import com.railwayteam.railways.content.handcar.HandcarItem;
@@ -125,7 +124,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -165,14 +163,10 @@ public class CRBlocks {
 
     private static BlockEntry<TrackBlock> makeTrack(NonNullBiConsumer<DataGenContext<Block, TrackBlock>, RegistrateBlockstateProvider> blockstateGen, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> collectProperties) {
         return makeTrack(CRTrackMaterials.MONORAIL, blockstateGen, (t) -> {
-        }, collectProperties, MonorailTrackBlock::new);
+        }, collectProperties);
     }
 
     private static BlockEntry<TrackBlock> makeTrack(TrackMaterial material, NonNullBiConsumer<DataGenContext<Block, TrackBlock>, RegistrateBlockstateProvider> blockstateGen, NonNullConsumer<? super TrackBlock> onRegister, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> collectProperties) {
-        return makeTrack(material, blockstateGen, onRegister, collectProperties, TrackBlock::new);
-    }
-
-    private static BlockEntry<TrackBlock> makeTrack(TrackMaterial material, NonNullBiConsumer<DataGenContext<Block, TrackBlock>, RegistrateBlockstateProvider> blockstateGen, NonNullConsumer<? super TrackBlock> onRegister, Function<BlockBehaviour.Properties, BlockBehaviour.Properties> collectProperties, BiFunction<BlockBehaviour.Properties, TrackMaterial, TrackBlock> blockFactory) {
         List<TagKey<Block>> trackTags = new ArrayList<>();
         trackTags.add(AllTags.AllBlockTags.TRACKS.tag);
         if (CRTrackMaterials.getType(material) != CRTrackMaterials.CRTrackType.MONORAIL)
@@ -182,7 +176,7 @@ public class CRBlocks {
             itemTags.add(CRTags.AllItemTags.PHANTOM_TRACK_REVEALING.tag);
         }
         //noinspection unchecked
-        return REGISTRATE.block("track_" + material.getId().getPath(), p -> blockFactory.apply(p, material))
+        return REGISTRATE.block("track_" + material.getId().getPath(), p -> CRTrackMaterials.getBlockFactory(material).create(p, material))
             .initialProperties(SharedProperties::stone)
             .properties(p -> collectProperties.apply(p)
                 .mapColor(MapColor.METAL)

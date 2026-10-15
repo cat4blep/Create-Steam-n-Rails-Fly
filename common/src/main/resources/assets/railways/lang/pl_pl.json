@@ -837,5 +837,9 @@
   "tag.item.railways.phantom_track_revealing": "Odkrywanie fantomowego toru",
   "tag.item.railways.streamlined_stack": "Opływowy komin",
   "tag.item.railways.woodburner_stack": "Komin opalany drewnem",
-  "tag.item.railways.wooden_headstocks": "Drewniane czołownice"
+  "tag.item.railways.wooden_headstocks": "Drewniane czołownice",
+  "advancement.railways.root": "Witamy w Steam 'n' Rails",
+  "advancement.railways.root.desc": "Tu Być Lokomotywa",
+  "advancement.railways.strange_tea": "To nie jest Earl Grey",
+  "advancement.railways.strange_tea.desc": "Wypij przypadkowo farbę§7(Ukryte osiągnięcie)"
 }

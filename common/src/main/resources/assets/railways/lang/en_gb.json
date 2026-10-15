@@ -1271,5 +1271,7 @@
   "tag.item.railways.phantom_track_revealing": "Phantom Track Revealing",
   "tag.item.railways.streamlined_stack": "Streamlined Stack",
   "tag.item.railways.woodburner_stack": "Woodburner Stack",
-  "tag.item.railways.wooden_headstocks": "Wooden Headstocks"
+  "tag.item.railways.wooden_headstocks": "Wooden Headstocks",
+  "block.railways.black_hazard_stripes_diagonal_on_black": "Black on Black Hazard Stripes",
+  "block.railways.handcar.tooltip.summary": "Use a wrench to pick up."
 }

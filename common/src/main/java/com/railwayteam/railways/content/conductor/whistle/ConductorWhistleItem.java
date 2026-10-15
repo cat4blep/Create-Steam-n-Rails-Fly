@@ -20,6 +20,7 @@ package com.railwayteam.railways.content.conductor.whistle;
 
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
+import com.railwayteam.railways.internal.compat.create.client.CreateClient;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRSounds;
 import com.railwayteam.railways.util.TextUtils;
@@ -110,19 +111,30 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 			UUID trainId = selectedTrain.get();
 			UUID conductorId = selectedConductor.get();
 			String trainName = "NOT FOUND";
-			GlobalRailwayManager railways = Create.RAILWAYS;
-			if (railways != null && railways.trains.containsKey(trainId))
-				trainName = railways.trains.get(trainId).name.getString();
+			GlobalRailwayManager railways = CreateClient.RAILWAYS();
+			Train train = railways == null ? null : railways.trains.get(trainId);
+			if (train != null)
+				trainName = train.name.getString();
 
-			tooltip.accept(Component.translatable("railways.whistle.tool.bound").withStyle(ChatFormatting.DARK_GREEN));
-			tooltip.accept(TextUtils.translateWithFormatting("railways.whistle.tool.conductor_id", conductorId.toString().substring(0, 5)));
-			tooltip.accept(TextUtils.translateWithFormatting("railways.whistle.tool.train_id", trainName, trainId.toString().substring(0, 5)));
-			tooltip.accept(Component.translatable("railways.whistle.tool.bound_usage"));
-			tooltip.accept(Component.translatable("railways.whistle.tool.bound_auto_usage"));
-			tooltip.accept(Component.translatable("railways.whistle.tool.bound_auto_clear"));
+			if (useModernTooltip()) {
+				tooltip.accept(TextUtils.translateWithFormatting("railways.whistle.tool.bound2", conductorId.toString().substring(0, 5), trainName, trainId.toString().substring(0, 5)));
+			} else {
+				tooltip.accept(Component.translatable("railways.whistle.tool.bound").withStyle(ChatFormatting.DARK_GREEN));
+				tooltip.accept(TextUtils.translateWithFormatting("railways.whistle.tool.conductor_id", conductorId.toString().substring(0, 5)));
+				tooltip.accept(TextUtils.translateWithFormatting("railways.whistle.tool.train_id", trainName, trainId.toString().substring(0, 5)));
+				tooltip.accept(Component.translatable("railways.whistle.tool.bound_usage"));
+				tooltip.accept(Component.translatable("railways.whistle.tool.bound_auto_usage"));
+				tooltip.accept(Component.translatable("railways.whistle.tool.bound_auto_clear"));
+			}
 		} else {
-			tooltip.accept(Component.translatable("railways.whistle.tool.not_bound").withStyle(ChatFormatting.DARK_RED));
+			tooltip.accept(useModernTooltip()
+				? TextUtils.translateWithFormatting("railways.whistle.tool.not_bound2")
+				: Component.translatable("railways.whistle.tool.not_bound").withStyle(ChatFormatting.DARK_RED));
 		}
+	}
+
+	private static boolean useModernTooltip() {
+		return CRConfigs.client() == null || CRConfigs.client().modernWhistleTooltip.get();
 	}
 
 	@Override

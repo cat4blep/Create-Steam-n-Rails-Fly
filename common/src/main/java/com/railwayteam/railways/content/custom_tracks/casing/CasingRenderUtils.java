@@ -23,6 +23,7 @@ import com.zurrtum.create.catnip.math.AngleHelper;
 import com.zurrtum.create.client.catnip.math.VecHelper;
 import com.zurrtum.create.client.catnip.render.SuperBufferFactory;
 import com.zurrtum.create.client.catnip.render.SuperByteBufferRenderState;
+import com.zurrtum.create.client.content.trains.track.TrackRenderer.SegmentAngles;
 import com.zurrtum.create.client.flywheel.api.instance.InstancerProvider;
 import com.zurrtum.create.client.flywheel.api.material.CardinalLightingMode;
 import com.zurrtum.create.client.flywheel.api.model.Model;
@@ -33,7 +34,9 @@ import com.zurrtum.create.client.flywheel.lib.material.SimpleMaterial;
 import com.zurrtum.create.client.flywheel.lib.model.ModelUtil;
 import com.zurrtum.create.client.flywheel.lib.model.baked.BakedModelBuilder;
 import com.zurrtum.create.client.flywheel.lib.model.baked.PartialModel;
+import com.zurrtum.create.client.flywheel.lib.transform.TransformStack;
 import com.zurrtum.create.content.trains.track.BezierConnection;
+import com.zurrtum.create.content.trains.track.TrackBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -61,6 +64,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType.NARROW_GAUGE;
 import static com.railwayteam.railways.registry.CRTrackMaterials.CRTrackType.WIDE_GAUGE;
@@ -253,6 +257,53 @@ public abstract class CasingRenderUtils {
         }).build());
 
         return instancerProvider.instancer(InstanceTypes.TRANSFORMED, model).createInstance();
+    }
+
+    /** Captures straight and curved casings before render submission, without retaining mutable buffers. */
+    public static List<CasingModel> extractTrackCasings(
+        TrackBlockEntity blockEntity,
+        Function<BezierConnection, SegmentAngles> segmentFactory
+    ) {
+        Level level = blockEntity.getLevel();
+        if (level == null || !hasCasing(blockEntity))
+            return List.of();
+
+        List<CasingModel> models = new ArrayList<>();
+        Map<CasingStateKey, SuperByteBufferRenderState> states = new HashMap<>();
+        TrackCasingLayout.Sink sink = (model, casingBlock, pose, lightPos) -> {
+            int light = LightCoordsUtil.getLightCoords(level, lightPos);
+            SuperByteBufferRenderState snapshot = states.computeIfAbsent(
+                new CasingStateKey(model, casingBlock, light),
+                key -> createRenderState(reTexture(model, casingBlock), casingBlock.defaultBlockState(), level, light)
+            );
+            models.add(new CasingModel(snapshot, pose.copy()));
+        };
+
+        BlockPos pos = blockEntity.getBlockPos();
+        PoseStack matrices = new PoseStack();
+        TransformStack.of(matrices).nudge((int) pos.asLong());
+        TrackCasingLayout.straight(blockEntity, pos, matrices, sink);
+        for (BezierConnection connection : blockEntity.getConnections().values())
+            TrackCasingLayout.curve(connection, pos, matrices, segmentFactory, sink);
+        return List.copyOf(models);
+    }
+
+    public static void submitCasings(List<CasingModel> casings, PoseStack matrices, SubmitNodeCollector queue) {
+        for (CasingModel casing : casings)
+            casing.model.submit(casing.transform, matrices, queue);
+    }
+
+    private static boolean hasCasing(TrackBlockEntity blockEntity) {
+        if (((IHasTrackCasing) blockEntity).railways$getTrackCasing() != null)
+            return true;
+        for (BezierConnection connection : blockEntity.getConnections().values()) {
+            if (connection.isPrimary() && ((IHasTrackCasing) connection).railways$getTrackCasing() != null)
+                return true;
+        }
+        return false;
+    }
+
+    private record CasingStateKey(PartialModel model, Block block, int light) {
     }
 
     private static SuperByteBufferRenderState createRenderState(

@@ -949,6 +949,30 @@ tasks.processResources {
     exclude("**/*.bbmodel", "**/*.lnk", "**/*.xcf", "**/*.md", "**/*.txt", "**/*.blend", "**/*.blend1")
 }
 
+val verifyBuildInfoVersion by tasks.registering {
+    group = "verification"
+    description = "Checks that the runtime mod version matches the archive version."
+
+    val buildInfo = file("common/src/main/java/com/railwayteam/railways/RailwaysBuildInfo.java")
+    val expectedVersion = project.property("mod_version").toString()
+    inputs.file(buildInfo)
+    inputs.property("modVersion", expectedVersion)
+
+    doLast {
+        val declaredVersion = Regex("VERSION\\s*=\\s*\"([^\"]+)\"")
+            .find(buildInfo.readText())?.groupValues?.get(1)
+        if (declaredVersion != expectedVersion) {
+            throw GradleException(
+                "RailwaysBuildInfo.VERSION ($declaredVersion) must match mod_version ($expectedVersion).",
+            )
+        }
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn(verifyBuildInfoVersion)
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(25)

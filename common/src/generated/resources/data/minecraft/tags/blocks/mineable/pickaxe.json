@@ -2556,6 +2556,42 @@
     {
       "id": "railways:track_tfc_willow_narrow",
       "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_empyreal",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_empyreal_wide",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_empyreal_narrow",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_maple",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_maple_wide",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_maple_narrow",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_pine",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_pine_wide",
+      "required": false
+    },
+    {
+      "id": "railways:track_biomesoplenty_pine_narrow",
+      "required": false
     }
   ]
 }

@@ -22,6 +22,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,13 +54,16 @@ public interface IHasCustomOutline {
         xDiff /= length;
         yDiff /= length;
         zDiff /= length;
+        float lineWidth = Minecraft.getInstance().getWindow().getAppropriateLineWidth();
 
         vb.addVertex(transform, (float) (x1 / 16), (float) (y1 / 16), (float) (z1 / 16))
                 .setColor(0F, 0F, 0F, 0.4F)
-                .setNormal(transform, xDiff, yDiff, zDiff);
+                .setNormal(transform, xDiff, yDiff, zDiff)
+                .setLineWidth(lineWidth);
         vb.addVertex(transform, (float) (x2 / 16), (float) (y2 / 16), (float) (z2 / 16))
                 .setColor(0F, 0F, 0F, 0.4F)
-                .setNormal(transform, xDiff, yDiff, zDiff);
+                .setNormal(transform, xDiff, yDiff, zDiff)
+                .setLineWidth(lineWidth);
     }
 
     /**

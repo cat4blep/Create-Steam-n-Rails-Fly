@@ -6,6 +6,7 @@ import com.railwayteam.railways.api.bogeymenu.v0.entry.CategoryEntry;
 import com.railwayteam.railways.content.custom_bogeys.special.monobogey.InvisibleMonoBogeyBlock;
 import com.railwayteam.railways.impl.bogeymenu.v0.BogeyMenuManagerImpl;
 import com.zurrtum.create.AllBogeyStyles;
+import com.zurrtum.create.AllSoundEvents;
 import com.zurrtum.create.catnip.data.Pair;
 import com.zurrtum.create.content.trains.bogey.AbstractBogeyBlock;
 import com.zurrtum.create.content.trains.bogey.AllBogeySizes;
@@ -13,6 +14,7 @@ import com.zurrtum.create.content.trains.bogey.BogeySize;
 import com.zurrtum.create.content.trains.bogey.BogeyStyle;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -89,10 +91,10 @@ public class CRBogeyStyles {
 
 		HEAVYWEIGHT = create("heavyweight", TRIPLEAXLE_CYCLE_GROUP).size(AllBogeySizes.SMALL, CRBlocks.TRIPLEAXLE_BOGEY.get()).build();
 		RADIAL = create("radial", TRIPLEAXLE_CYCLE_GROUP).size(AllBogeySizes.SMALL, CRBlocks.TRIPLEAXLE_BOGEY.get()).build();
-		HANDCAR = create("handcar", "handcar_cycle_group").size(AllBogeySizes.SMALL, CRBlocks.HANDCAR.get()).build();
-		INVISIBLE = create("invisible", AllBogeyStyles.STANDARD_CYCLE_GROUP).size(AllBogeySizes.SMALL, CRBlocks.INVISIBLE_BOGEY.get()).build();
+		HANDCAR = create("handcar", "handcar_cycle_group").size(AllBogeySizes.SMALL, CRBlocks.HANDCAR.get()).soundEvent(AllSoundEvents.COGS::getMainEvent).build();
+		INVISIBLE = create("invisible", AllBogeyStyles.STANDARD_CYCLE_GROUP).size(AllBogeySizes.SMALL, CRBlocks.INVISIBLE_BOGEY.get()).soundEvent(() -> SoundEvents.EMPTY).build();
 		MONOBOGEY = create("monobogey", "monobogey").size(AllBogeySizes.SMALL, CRBlocks.MONO_BOGEY.get()).build();
-		INVISIBLE_MONOBOGEY = create("invisible_monobogey", "monobogey").size(AllBogeySizes.SMALL, CRBlocks.INVISIBLE_MONO_BOGEY.get()).build();
+		INVISIBLE_MONOBOGEY = create("invisible_monobogey", "monobogey").size(AllBogeySizes.SMALL, CRBlocks.INVISIBLE_MONO_BOGEY.get()).soundEvent(() -> SoundEvents.EMPTY).build();
 
 		WIDE_DEFAULT = create("wide_default", AllBogeyStyles.STANDARD_CYCLE_GROUP)
 			.size(AllBogeySizes.SMALL, CRBlocks.WIDE_DOUBLEAXLE_BOGEY.get())

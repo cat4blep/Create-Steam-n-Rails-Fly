@@ -41,6 +41,7 @@ import com.zurrtum.create.client.content.trains.bogey.BogeyBlockEntityVisual;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingRenderUtils;
 import com.railwayteam.railways.ponder.CRPonderPlugin;
 import com.railwayteam.railways.registry.CRBlockPartials;
+import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRBogeyStyleRenders;
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
@@ -180,6 +181,7 @@ public class RailwaysClient {
         PartialModel.of(Railways.asResource(base + "segment_right"))
       ));
     }
+    AllTrackRenders.register(CRBlocks.GENERIC_CROSSING.get(), StandardTrackBlockRenderer::new);
   }
 
   private static void registerEntityRenderers() {

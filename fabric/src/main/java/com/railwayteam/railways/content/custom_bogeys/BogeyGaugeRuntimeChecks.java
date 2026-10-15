@@ -13,6 +13,7 @@ package com.railwayteam.railways.content.custom_bogeys;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.bogey_menu.handler.BogeyMenuHandlerServer;
 import com.railwayteam.railways.registry.CRBogeyStyles;
+import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.registry.CRTrackMaterials;
 import com.railwayteam.railways.util.Utils;
 import com.zurrtum.create.AllBogeyStyles;
@@ -58,13 +59,48 @@ public final class BogeyGaugeRuntimeChecks {
 			return;
 		checked = true;
 
+		checkDefaultStyles();
 		checkMappings();
 		checkWrenchCycleFilters();
 		checkContextualStyleCycle(server.overworld());
 		checkTrackAnchors(server);
 		Railways.LOGGER.info(
-			"Bogey gauge mapping, wrench-cycle filtering, and TrackBlock anchor runtime checks passed"
+			"Bogey default styles, gauge mapping, wrench-cycle filtering, and TrackBlock anchor runtime checks passed"
 		);
+	}
+
+	private static void checkDefaultStyles() {
+		checkDefaultStyle(CRBlocks.SINGLEAXLE_BOGEY.get(), CRBogeyStyles.SINGLEAXLE);
+		checkDefaultStyle(CRBlocks.DOUBLEAXLE_BOGEY.get(), CRBogeyStyles.PASSENGER);
+		checkDefaultStyle(CRBlocks.LARGE_PLATFORM_DOUBLEAXLE_BOGEY.get(), CRBogeyStyles.PASSENGER);
+		checkDefaultStyle(CRBlocks.TRIPLEAXLE_BOGEY.get(), CRBogeyStyles.HEAVYWEIGHT);
+		checkDefaultStyle(CRBlocks.HANDCAR.get(), CRBogeyStyles.HANDCAR);
+		checkDefaultStyle(CRBlocks.WIDE_DOUBLEAXLE_BOGEY.get(), CRBogeyStyles.WIDE_DEFAULT);
+		checkDefaultStyle(CRBlocks.WIDE_SCOTCH_BOGEY.get(), CRBogeyStyles.WIDE_DEFAULT);
+		checkDefaultStyle(CRBlocks.WIDE_COMICALLY_LARGE_BOGEY.get(), CRBogeyStyles.WIDE_COMICALLY_LARGE);
+		checkDefaultStyle(CRBlocks.NARROW_SMALL_BOGEY.get(), CRBogeyStyles.NARROW_DEFAULT);
+		checkDefaultStyle(CRBlocks.NARROW_SCOTCH_BOGEY.get(), CRBogeyStyles.NARROW_DEFAULT);
+		checkDefaultStyle(CRBlocks.NARROW_DOUBLE_SCOTCH_BOGEY.get(), CRBogeyStyles.NARROW_DOUBLE_SCOTCH);
+		checkDefaultStyle(CRBlocks.MEDIUM_BOGEY.get(), CRBogeyStyles.MEDIUM_STANDARD);
+		checkDefaultStyle(CRBlocks.MEDIUM_2_0_2_TRAILING.get(), CRBogeyStyles.MEDIUM_2_0_2_TRAILING);
+		checkDefaultStyle(CRBlocks.MEDIUM_4_0_4_TRAILING.get(), CRBogeyStyles.MEDIUM_4_0_4_TRAILING);
+		checkDefaultStyle(CRBlocks.MEDIUM_TRIPLE_WHEEL.get(), CRBogeyStyles.MEDIUM_TRIPLE_WHEEL);
+		checkDefaultStyle(CRBlocks.MEDIUM_QUADRUPLE_WHEEL.get(), CRBogeyStyles.MEDIUM_QUADRUPLE_WHEEL);
+		checkDefaultStyle(CRBlocks.MEDIUM_QUINTUPLE_WHEEL.get(), CRBogeyStyles.MEDIUM_QUINTUPLE_WHEEL);
+		checkDefaultStyle(CRBlocks.LARGE_CREATE_STYLE_0_4_0.get(), CRBogeyStyles.LARGE_CREATE_STYLED_0_4_0);
+		checkDefaultStyle(CRBlocks.LARGE_CREATE_STYLE_0_6_0.get(), CRBogeyStyles.LARGE_CREATE_STYLED_0_6_0);
+		checkDefaultStyle(CRBlocks.LARGE_CREATE_STYLE_0_8_0.get(), CRBogeyStyles.LARGE_CREATE_STYLED_0_8_0);
+		checkDefaultStyle(CRBlocks.LARGE_CREATE_STYLE_0_10_0.get(), CRBogeyStyles.LARGE_CREATE_STYLED_0_10_0);
+		checkDefaultStyle(CRBlocks.LARGE_CREATE_STYLE_0_12_0.get(), CRBogeyStyles.LARGE_CREATE_STYLED_0_12_0);
+		checkDefaultStyle(CRBlocks.INVISIBLE_BOGEY.get(), CRBogeyStyles.INVISIBLE);
+		checkDefaultStyle(CRBlocks.MONO_BOGEY.get(), CRBogeyStyles.MONOBOGEY);
+		checkDefaultStyle(CRBlocks.INVISIBLE_MONO_BOGEY.get(), CRBogeyStyles.INVISIBLE_MONOBOGEY);
+	}
+
+	private static void checkDefaultStyle(AbstractBogeyBlock<?> block, BogeyStyle expected) {
+		require(expected != AllBogeyStyles.STANDARD, "custom default style was not registered");
+		require(block.getDefaultStyle() == expected,
+			"bogey block retained a stale default style: " + block);
 	}
 
 	private static void checkMappings() {

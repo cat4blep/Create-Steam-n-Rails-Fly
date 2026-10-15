@@ -1,4 +1,24 @@
 ------------------------------------------------------
+SNR.FLY-STABLE-1.4 (Fabric / Minecraft 26.2)
+------------------------------------------------------
+- Fix mounted conductor toolboxes using an incorrect Create Fly block type.
+- Resolve bogey default styles after registration instead of retaining Create's initial standard style.
+- Avoid the conductor chunk-tracking hook when Very Many Players is installed.
+- Resolve whistle train names from the client railway manager and add a compact tooltip option.
+- Release railway graph points when their blocks are moved into contraptions.
+- Drop track casing with broken tracks and render casing with correct normals when Flywheel instancing is disabled.
+- Use specialized narrow and wide track blocks, restore mixed-material crossings, and apply gauge-specific curve rules.
+- Reject existing and prospective crossings at curve endpoints before consuming items or placing pavement, and return casing after successful crossing conversion.
+- Remove collided handcars from the railway graph and return their items.
+- Give handcars a distance-attenuated cog sound without steam sounds or smoke, and suppress invisible bogey effects.
+- Hide device overlays on phantom tracks and restore them on generic crossings.
+- Set the line width when drawing custom block outlines.
+- Add the station reservation toggle with persistence, navigation and network synchronization; increase the network protocol to 16.
+- Add empyreal, maple and pine Biomes O' Plenty tracks at all three gauges and refresh mahogany, redwood and umbran textures.
+- Update translations and add Italian.
+- Check that the runtime and archive versions match before compiling.
+
+------------------------------------------------------
 SNR.FLY-STABLE-1.3 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 - Update to Create Fly 6.0.9-2 and require build 2 or newer within the 6.0.9 line.

@@ -11,6 +11,7 @@
 package com.railwayteam.railways.fabric_mixin;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FabricMixinRegistrationTest {
@@ -32,13 +34,40 @@ class FabricMixinRegistrationTest {
         for (String mixin : List.of(
             "MixinAbstractContainerMenu",
             "MixinAllHandleTrainRelocationShadow",
+            "MixinBlockBehaviourTrackCasingDrops",
             "MixinCarriageBufferDistance",
             "MixinContainerLevelAccess",
+            "MixinContraptionEdgePoints",
+            "MixinGlobalStationLimit",
             "MixinItemCombinerMenu",
             "MixinNavigationBuffer",
-            "MixinTrainBufferBlocked"
+            "MixinNavigationLimit",
+            "MixinTrackPlacement",
+            "MixinTrainBufferBlocked",
+            "MixinTrainHandcarCollision",
+            "conductor_possession.ChunkMapTrackingViewMixin"
         )) {
             assertTrue(registered.contains(mixin), () -> mixin + " is not registered in railways.mixins.json");
+        }
+    }
+
+    @Test
+    void configuredMixinsArePackagedAndConditionalPluginIsActive() throws IOException {
+        var loader = getClass().getClassLoader();
+        try (var input = loader.getResourceAsStream("railways.mixins.json")) {
+            assertNotNull(input);
+            JsonObject config = JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
+            assertEquals("com.railwayteam.railways.mixin.CRMixinPlugin", config.get("plugin").getAsString());
+            String packageName = config.get("package").getAsString();
+            Set<String> names = new HashSet<>();
+            for (String section : List.of("mixins", "client")) {
+                for (var entry : config.getAsJsonArray(section)) {
+                    String mixin = entry.getAsString();
+                    assertTrue(names.add(mixin), () -> "Duplicate mixin: " + mixin);
+                    String resource = (packageName + "." + mixin).replace('.', '/') + ".class";
+                    assertNotNull(loader.getResource(resource), () -> "Configured mixin is excluded from the build: " + mixin);
+                }
+            }
         }
     }
 
