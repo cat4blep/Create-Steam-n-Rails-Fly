@@ -58,7 +58,7 @@ import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.Comparator;
 import java.util.List;
@@ -311,14 +311,14 @@ public class BogeyMenuScreen extends AbstractSimiScreen {
 
 	@Override
 	public boolean keyPressed(KeyEvent event) {
-		if (event.key() == GLFW.GLFW_KEY_ESCAPE) {
+		if (event.key() == InputConstants.KEY_ESCAPE) {
 			if (selectedBogey == null)
 				onClose();
 			else
 				onMenuClose();
 			return true;
 		}
-		if (event.key() == GLFW.GLFW_KEY_ENTER) {
+		if (event.key() == InputConstants.KEY_RETURN) {
 			onMenuClose();
 			return true;
 		}

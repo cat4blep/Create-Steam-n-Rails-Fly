@@ -2,16 +2,16 @@ package com.railwayteam.railways.registry;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.railwayteam.railways.Railways;
+import com.zurrtum.create.client.foundation.utility.ControlsUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public enum CRKeys {
-    BOGEY_MENU("bogey_menu", GLFW.GLFW_KEY_LEFT_ALT),
-    CYCLE_MENU("cycle_menu", GLFW.GLFW_KEY_LEFT_ALT);
+    BOGEY_MENU("bogey_menu", InputConstants.KEY_LALT), // 26.3: SDL scancodes
+    CYCLE_MENU("cycle_menu", InputConstants.KEY_LALT);
 
     public static final Set<KeyMapping> NON_CONFLICTING_KEYMAPPINGS = new HashSet<>();
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Railways.asResource("railways"));
@@ -37,7 +37,7 @@ public enum CRKeys {
         for (CRKeys key : values()) {
             if (key.keybind == null || key.keybind.isUnbound())
                 continue;
-            key.keybind.setDown(InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key.getBoundCode()));
+            key.keybind.setDown(ControlsUtil.isActuallyPressed(key.keybind));
         }
     }
 
@@ -58,23 +58,30 @@ public enum CRKeys {
     }
 
     public static boolean isKeyDown(int key) {
-        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key);
+        return InputConstants.isKeyDown(key);
     }
 
     public static boolean isMouseButtonDown(int button) {
-        return GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), button) == GLFW.GLFW_PRESS;
+        // 26.3: SDL mouse buttons (InputConstants.MOUSE_BUTTON_*: left 1, middle 2, right 3)
+        var mouse = Minecraft.getInstance().mouseHandler;
+        return switch (button) {
+            case InputConstants.MOUSE_BUTTON_LEFT -> mouse.isLeftPressed();
+            case InputConstants.MOUSE_BUTTON_MIDDLE -> mouse.isMiddlePressed();
+            case InputConstants.MOUSE_BUTTON_RIGHT -> mouse.isRightPressed();
+            default -> false;
+        };
     }
 
     public static boolean ctrlDown() {
-        return isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) || isKeyDown(GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return isKeyDown(InputConstants.KEY_LCONTROL) || isKeyDown(InputConstants.KEY_RCONTROL);
     }
 
     public static boolean shiftDown() {
-        return isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return isKeyDown(InputConstants.KEY_LSHIFT) || isKeyDown(InputConstants.KEY_RSHIFT);
     }
 
     public static boolean altDown() {
-        return isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) || isKeyDown(GLFW.GLFW_KEY_RIGHT_ALT);
+        return isKeyDown(InputConstants.KEY_LALT) || isKeyDown(InputConstants.KEY_RALT);
     }
 
     private static void registerKeyBinding(KeyMapping keyMapping) {

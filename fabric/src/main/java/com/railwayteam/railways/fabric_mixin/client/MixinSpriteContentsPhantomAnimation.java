@@ -10,7 +10,7 @@
 
 package com.railwayteam.railways.fabric_mixin.client;
 
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.railwayteam.railways.content.custom_tracks.phantom.PhantomSpriteManager;
 import com.railwayteam.railways.mixin_interfaces.IPhantomAnimationState;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SpriteContents.class)
 public abstract class MixinSpriteContentsPhantomAnimation {
     @Inject(
-        method = "createAnimationState(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;I)Lnet/minecraft/client/renderer/texture/SpriteContents$AnimationState;",
+        method = "createAnimationState(Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;I)Lnet/minecraft/client/renderer/texture/SpriteContents$AnimationState;",
         at = @At("RETURN")
     )
     private void railways$configurePhantomAnimation(GpuBufferSlice allocationBuffer, int offsetMultiplier,

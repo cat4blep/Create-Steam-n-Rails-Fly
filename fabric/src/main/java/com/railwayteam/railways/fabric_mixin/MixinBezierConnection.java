@@ -1,5 +1,6 @@
 package com.railwayteam.railways.fabric_mixin;
 
+import net.minecraft.util.Prediction;
 import com.railwayteam.railways.Railways;
 import com.railwayteam.railways.content.custom_tracks.casing.CasingChecker;
 import com.railwayteam.railways.mixin_interfaces.IHasTrackCasing;
@@ -117,7 +118,7 @@ public abstract class MixinBezierConnection implements IHasTrackCasing {
         Block casing = railways$getTrackCasing();
         if (casing != null) {
             Inventory inv = player.getInventory();
-            inv.placeItemBackInInventory(new ItemStack(casing));
+            inv.placeItemBackInInventory(new ItemStack(casing), Prediction.SERVER_ONLY);
         }
     }
 }

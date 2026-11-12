@@ -30,10 +30,10 @@ public class MixinStationRendererStateReset {
                                             float tickProgress, Vec3 cameraPosition,
                                             CrumblingOverlay crumblingOverlay, CallbackInfo ci) {
         state.flag = null;
-        state.flagYRot = null;
+        state.flagYRot = 0.0f;
         state.flagOffsetZ = 0.0f;
-        state.flagXRot = null;
-        state.flagYRot2 = null;
+        state.flagXRot = 0.0f;
+        state.flagYRot2 = false;
         state.block = null;
     }
 }

@@ -183,7 +183,7 @@ public class HandcarItem extends BlockItem implements IDeployAnywayBlockItem {
         CarriageContraption contraption = new CarriageContraption(Direction.EAST);
 
         SchematicLevel assemblyWorld = new SchematicLevel(level);
-        StructureTemplate template = level.getStructureManager()
+        StructureTemplate template = level.getServer().getStructureTemplateManager() // 26.3
             .get(Railways.asResource("handcar/assembly"))
             .orElse(null);
         if (template == null)

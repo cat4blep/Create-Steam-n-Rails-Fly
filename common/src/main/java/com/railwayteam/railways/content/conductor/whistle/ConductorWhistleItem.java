@@ -18,6 +18,7 @@
 
 package com.railwayteam.railways.content.conductor.whistle;
 
+import net.minecraft.util.Prediction;
 import com.railwayteam.railways.config.CRConfigs;
 import com.railwayteam.railways.content.conductor.ConductorEntity;
 import com.railwayteam.railways.internal.compat.create.client.CreateClient;
@@ -304,7 +305,7 @@ public class ConductorWhistleItem extends TrackTargetingBlockItem {
 					}
 				});
 				if (!scheduleStack.isEmpty() && !player.addItem(scheduleStack))
-					player.drop(scheduleStack, false);
+					player.drop(scheduleStack, false, Prediction.SERVER_ONLY);
 			}
 		}
 

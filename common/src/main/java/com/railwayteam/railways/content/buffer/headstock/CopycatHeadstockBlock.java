@@ -18,6 +18,7 @@
 
 package com.railwayteam.railways.content.buffer.headstock;
 
+import net.minecraft.util.Prediction;
 import com.railwayteam.railways.content.buffer.BlockStateBlockItemGroup;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRBlocks;
@@ -228,7 +229,7 @@ public class CopycatHeadstockBlock extends WaterloggedCopycatBlock implements Bl
             if (player != null && !player.isCreative())
                 Block.getDrops(state, (ServerLevel) world, pos, world.getBlockEntity(pos), player, context.getItemInHand())
                     .forEach(itemStack -> {
-                        player.getInventory().placeItemBackInInventory(itemStack);
+                        player.getInventory().placeItemBackInInventory(itemStack, Prediction.SERVER_ONLY);
                     });
             state.spawnAfterBreak((ServerLevel) world, pos, ItemStack.EMPTY, true);
             world.destroyBlock(pos, false);

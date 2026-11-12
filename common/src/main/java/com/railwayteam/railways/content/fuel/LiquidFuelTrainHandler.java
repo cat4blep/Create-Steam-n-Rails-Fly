@@ -23,8 +23,8 @@ import com.railwayteam.railways.multiloader.PlatformAbstractionHelper;
 import com.railwayteam.railways.util.FluidUtils;
 import com.zurrtum.create.api.contraption.storage.fluid.MountedFluidStorageWrapper;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.FuelValues;
+import com.railwayteam.railways.multiloader.fabric.PlatformAbstractionHelperImpl;
+import net.minecraft.server.level.ServerLevel;
 import org.jetbrains.annotations.Nullable;
 
 public class LiquidFuelTrainHandler {
@@ -32,10 +32,10 @@ public class LiquidFuelTrainHandler {
         return com.railwayteam.railways.content.fuel.fabric.LiquidFuelTrainHandlerImpl.handleFuelDraining(fluidFuels);
     }
 
-    public static int handleFuelDraining(MountedFluidStorageWrapper fluidFuels, FuelValues fuelValues) {
+    public static int handleFuelDraining(MountedFluidStorageWrapper fluidFuels, ServerLevel level) {
         return com.railwayteam.railways.content.fuel.fabric.LiquidFuelTrainHandlerImpl.handleFuelDraining(
             fluidFuels,
-            fuelValues
+            level
         );
     }
 
@@ -43,7 +43,7 @@ public class LiquidFuelTrainHandler {
         return handleFuelChecking(o, null);
     }
 
-    public static int handleFuelChecking(Object o, @Nullable FuelValues fuelValues) {
+    public static int handleFuelChecking(Object o, @Nullable ServerLevel level) {
         int burnTime;
 
         Fluid fluid = FluidUtils.getFluid(o);
@@ -53,9 +53,9 @@ public class LiquidFuelTrainHandler {
         if (fuelType != null) {
             burnTime = fuelType.getInvalid() ? 0 : fuelType.getFuelTicks();
         } else {
-            int bucketBurnTime = fuelValues == null
+            int bucketBurnTime = level == null
                 ? PlatformAbstractionHelper.getBurnTime(fluid.getBucket())
-                : fuelValues.burnDuration(new ItemStack(fluid.getBucket()));
+                : PlatformAbstractionHelperImpl.getBurnTime(fluid.getBucket(), level);
 
             // Divide burnTime by 10 to get burnTime for 1/10th of a bucket and then by divide by 4,
             // so it isn't so strong

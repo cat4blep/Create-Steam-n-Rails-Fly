@@ -136,7 +136,7 @@ public final class FuelRuntimeChecks {
             ImmutableMap.of(BlockPos.ZERO, storage)
         );
 
-        int fuelTicks = LiquidFuelTrainHandler.handleFuelDraining(wrapper, server.fuelValues());
+        int fuelTicks = LiquidFuelTrainHandler.handleFuelDraining(wrapper, server.overworld());
         require(fuelTicks > 0, "one tenth of a lava bucket produced no train fuel ticks");
         require(wrapper.getStack(0).getAmount() == 8_100, "liquid fuel drain did not consume exactly 8,100 units");
         require(storage.isDirty(), "liquid fuel drain did not mark mounted storage dirty");

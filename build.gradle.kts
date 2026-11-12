@@ -5,7 +5,7 @@ import java.util.zip.ZipFile
 import org.gradle.api.tasks.bundling.Jar
 
 plugins {
-    id("net.fabricmc.fabric-loom") version "1.16-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.19.4"
     `maven-publish`
 }
 
@@ -67,8 +67,6 @@ sourceSets {
             "com/railwayteam/railways/registry/commands/ClearCapCacheCommand.java",
             "com/railwayteam/railways/registry/commands/ClearCasingCacheCommand.java",
             "com/railwayteam/railways/registry/commands/ConductorDemoCommand.java",
-            "com/railwayteam/railways/registry/commands/CountPaintCommand.java",
-            "com/railwayteam/railways/registry/commands/FillPaintCommand.java",
             "com/railwayteam/railways/registry/commands/IdentifyTrainCommand.java",
             "com/railwayteam/railways/registry/commands/MixinAuditCommand.java",
             "com/railwayteam/railways/registry/commands/PalettesDemoCommand.java",
@@ -368,7 +366,7 @@ tasks.processResources {
     )
     inputs.properties(properties)
     inputs.property("railwayFabricConventionTagSchema", "fabric-convention-tags-v2-26.2-v1")
-    inputs.property("railwayAdvancementSchema", "minecraft-26.2-v1")
+    inputs.property("railwayAdvancementSchema", "minecraft-26.3-v1")
     inputs.property("railwayPaintFluidComponents", "minecraft-26.2-custom-data-v1")
     inputs.property("railwayPaintProjectileRegistryPath", "create-fly-26.2-v1")
     inputs.property("railwayCompatTrackLootConditions", "fabric-resource-conditions-6.1-v1")
@@ -715,6 +713,12 @@ tasks.processResources {
                         normalized[key] = normalizedValue
                     }
 
+                    if (normalized["trigger"] == "minecraft:recipe_unlocked") {
+                        @Suppress("UNCHECKED_CAST")
+                        val conditions = normalized["conditions"] as? MutableMap<String, Any?>
+                        conditions?.remove("recipe")?.let { conditions["recipes"] = it }
+                    }
+
                     if (itemPredicate) {
                         val legacyTag = normalized.remove("tag")
                         if (legacyTag != null) {
@@ -801,7 +805,7 @@ tasks.processResources {
         }
 
         logger.lifecycle(
-            "Normalized ${railwayAdvancementFiles.size} Railway advancements for Minecraft 26.2: " +
+            "Normalized ${railwayAdvancementFiles.size} Railway advancements for Minecraft 26.3: " +
                 "$rewrittenAdvancementIcons icons, $rewrittenAdvancementBackgrounds backgrounds, " +
                 "$rewrittenAdvancementTriggers triggers, $rewrittenItemIdPredicates item IDs, " +
                 "$rewrittenItemTagPredicates item tags",
@@ -815,6 +819,71 @@ tasks.processResources {
         val railwayBlockLootTables = fileTree(railwayBlockLootTableRoot) {
             include("*.json")
         }.files.sortedBy(File::getName)
+        val recipeFiles = fileTree(outputRoot.resolve("data/railways/recipe")) { include("**/*.json") }
+        recipeFiles.forEach { recipeFile ->
+            if (!recipeFile.readText().contains("forge:mod_loaded")) return@forEach
+            @Suppress("UNCHECKED_CAST")
+            val recipe = JsonSlurper().parse(recipeFile) as MutableMap<String, Any?>
+            val conditions = recipe["conditions"] as? List<*> ?: return@forEach
+            if (recipe.containsKey("fabric:load_conditions") && conditions.all { condition ->
+                    (condition as? Map<*, *>)?.get("type") == "forge:mod_loaded"
+                }
+            ) {
+                recipe.remove("conditions")
+                recipeFile.writeText(JsonOutput.prettyPrint(JsonOutput.toJson(recipe)) + "\n")
+            }
+        }
+
+        fun migrateLootCondition(condition: Map<*, *>): Map<String, Any?> =
+            when (val type = condition["condition"]) {
+                "minecraft:block_state_property" -> linkedMapOf(
+                    "type" to "minecraft:match_block",
+                    "blocks" to condition["block"],
+                    "state" to condition["properties"],
+                )
+                else -> linkedMapOf<String, Any?>("type" to type).apply {
+                    condition.forEach { (key, value) -> if (key != "condition") put(key as String, value) }
+                }
+            }
+
+        fun migrateLootNode(node: MutableMap<String, Any?>) {
+            (node["rolls"] as? Number)?.let { rolls ->
+                require(rolls.toDouble() == rolls.toInt().toDouble()) { "Expected whole-number loot rolls: $rolls" }
+                node["rolls"] = rolls.toInt()
+            }
+            (node.remove("conditions") as? List<*>)?.map { migrateLootCondition(it as Map<*, *>) }?.let { terms ->
+                if (terms.isNotEmpty()) {
+                    node["condition"] = terms.singleOrNull() ?: linkedMapOf("type" to "minecraft:all_of", "terms" to terms)
+                }
+            }
+            (node.remove("functions") as? List<*>)?.map { function ->
+                @Suppress("UNCHECKED_CAST")
+                (function as MutableMap<String, Any?>).apply {
+                    val type = remove("function")
+                    put("type", type)
+                    if (type == "minecraft:set_count") {
+                        @Suppress("UNCHECKED_CAST")
+                        val count = get("count") as? MutableMap<String, Any?>
+                        count?.replaceAll { _, value -> if (value is Number) value.toInt() else value }
+                    }
+                    migrateLootNode(this)
+                }
+            }?.let { modifiers ->
+                if (modifiers.isNotEmpty()) node["modifier"] = modifiers.singleOrNull() ?: modifiers
+            }
+            listOf("pools", "entries", "children").forEach { key ->
+                @Suppress("UNCHECKED_CAST")
+                (node[key] as? List<MutableMap<String, Any?>>)?.forEach(::migrateLootNode)
+            }
+        }
+
+        fileTree(outputRoot.resolve("data/railways/loot_table")) { include("**/*.json") }.forEach { lootFile ->
+            @Suppress("UNCHECKED_CAST")
+            val loot = JsonSlurper().parse(lootFile) as MutableMap<String, Any?>
+            migrateLootNode(loot)
+            lootFile.writeText(JsonOutput.prettyPrint(JsonOutput.toJson(loot)) + "\n")
+        }
+
         val conditionedCompatFamilies = compatTrackLootTableModIds.keys.associateWith { 0 }.toMutableMap()
         var conditionedCompatLootTables = 0
 

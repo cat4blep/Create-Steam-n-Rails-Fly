@@ -1,4 +1,12 @@
 ------------------------------------------------------
+SNR.FLY-STABLE-1.5 (Fabric / Minecraft 26.3)
+------------------------------------------------------
+- Port to Minecraft 26.3 and Create Fly 6.0.9-2 on Fabric.
+- Update loot tables, recipe advancements and conditional integration recipes for 26.3.
+- Enable `/snr fill_paint` and `/snr count_paint` with paint color suggestions.
+- Clear cached liquid fuel storage when a contraption resets its mounted storage.
+
+------------------------------------------------------
 SNR.FLY-STABLE-1.4 (Fabric / Minecraft 26.2)
 ------------------------------------------------------
 - Fix mounted conductor toolboxes using an incorrect Create Fly block type.

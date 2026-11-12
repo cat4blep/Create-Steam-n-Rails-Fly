@@ -1,10 +1,10 @@
   <h1>Create: Steam 'n' Rails — Create Fly port</h1>
-  <p>Steam 'n' Rails for Fabric, Minecraft 26.2, and Create Fly.</p>
+  <p>Steam 'n' Rails for Fabric, Minecraft 26.3, and Create Fly.</p>
 
 [![discord-plural](https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/social/discord-plural_vector.svg)](https://discord.gg/r75NPJWD68) 
 </div>
 
-This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.2. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
+This repository ports [Create: Steam 'n' Rails](https://github.com/Layers-of-Railways/Railway) to [Create Fly](https://github.com/ZurrTum/Create-Fly) for stable Minecraft 26.3. Steam 'n' Rails expands Create's train and steam systems with custom tracks, semaphores, conductors, bogeys, palettes, and other railway content.
 
 This is a Fabric-only port. Forge and NeoForge are not supported. Use Create Fly rather than another Create implementation, and do not install the original Steam 'n' Rails JAR alongside this port.
 
@@ -16,7 +16,7 @@ When [reporting a problem](https://github.com/cat4blep/Create-Steam-n-Rails-Fly/
 
 Open an issue before starting a large change so its scope can be agreed on and duplicate work can be avoided. Pull requests should describe the affected Minecraft/Create Fly versions and include the checks used to verify the change.
 
-Branches for this port must be named **exactly** `<modloader>-<version>`, with no additional words or suffixes. The current branch is `fabric-26.2`.
+Branches for this port must be named **exactly** `<modloader>-<version>`, with no additional words or suffixes. The current branch is `fabric-26.3`.
 
 Translations for the upstream project are managed through [Crowdin](https://crowdin.com/project/create-steam-n-rails-official). Translation questions can be asked in the [translator's chat](https://discord.com/channels/706277846389227612/1049156352553000970) on the Steam 'n' Rails Discord.
 
@@ -29,6 +29,7 @@ Certain sections of the code are derived from projects with compatible licenses,
 ## Credits
 
 - [Layers of Railways](https://github.com/Layers-of-Railways/Railway) and its contributors for Create: Steam 'n' Rails.
-- [ZurrTum/Create-Fly](https://github.com/ZurrTum/Create-Fly) and its contributors for the Create Fly port used by Minecraft 26.2.
+- [ZurrTum/Create-Fly](https://github.com/ZurrTum/Create-Fly) and its contributors for the Create Fly port used by Minecraft 26.3.
+- [zoom-packers/Create-Steam-n-Rails-Fly](https://github.com/zoom-packers/Create-Steam-n-Rails-Fly/tree/zp5/26.3) for Minecraft 26.3 API changes adapted from the Zoompack port.
 - [chaevsfe/Create-Steam-n-Rails-Fly](https://github.com/chaevsfe/Create-Steam-n-Rails-Fly) for fixes adapted into release 1.2.
 - The original Create team and all projects credited in the source and license notices.

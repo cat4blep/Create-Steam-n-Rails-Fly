@@ -18,6 +18,7 @@
 
 package com.railwayteam.railways.content.custom_tracks.generic_crossing;
 
+import net.minecraft.util.Prediction;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.railwayteam.railways.registry.CRBlockEntities;
 import com.railwayteam.railways.registry.CRTrackMaterials;
@@ -289,8 +290,8 @@ public class GenericCrossingBlock extends Block implements IBE<GenericCrossingBl
                 if (!player.isCreative()) {
                     Item a = crossingBE.getPrimary().getBlock().asItem();
                     Item b = crossingBE.getSecondary().getBlock().asItem();
-                    player.getInventory().placeItemBackInInventory(new ItemStack(a));
-                    player.getInventory().placeItemBackInInventory(new ItemStack(b));
+                    player.getInventory().placeItemBackInInventory(new ItemStack(a), Prediction.SERVER_ONLY);
+                    player.getInventory().placeItemBackInInventory(new ItemStack(b), Prediction.SERVER_ONLY);
                 }
             }
         }

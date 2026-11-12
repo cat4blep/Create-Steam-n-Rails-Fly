@@ -1,5 +1,6 @@
 package com.railwayteam.railways.fabric_mixin.client;
 
+import net.minecraft.world.item.component.SwingAnimation;
 import com.railwayteam.railways.content.buffer.TrackBufferBlockItem;
 import com.railwayteam.railways.content.conductor.whistle.ConductorWhistleItem;
 import com.railwayteam.railways.content.coupling.coupler.TrackCouplerBlockItem;
@@ -61,7 +62,7 @@ public abstract class MixinCurvedTrackInteraction {
         ItemStack held = player.getMainHandItem();
         Item heldItem = held.getItem();
         if (heldItem instanceof HandcarItem handcar && handcar.useOnCurve(result, held)) {
-            player.swing(InteractionHand.MAIN_HAND);
+            player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
             cir.setReturnValue(true);
             return;
         }
@@ -82,7 +83,7 @@ public abstract class MixinCurvedTrackInteraction {
         }
 
         CRPackets.PACKETS.send(new SlabUseOnCurvePacket(track.getBlockPos(), curveTarget, BlockPos.containing(result.vec())));
-        player.swing(InteractionHand.MAIN_HAND);
+        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
         cir.setReturnValue(true);
     }
 }

@@ -18,6 +18,7 @@
 
 package com.railwayteam.railways.content.handcar;
 
+import net.minecraft.util.Prediction;
 import com.railwayteam.railways.content.coupling.TrainUtils;
 import com.railwayteam.railways.registry.CRBlocks;
 import com.railwayteam.railways.util.AdventureUtils;
@@ -40,7 +41,7 @@ public class HandcarControlsInteractionBehaviour extends ControlsInteractionBeha
 
                 ItemStack stack = CRBlocks.HANDCAR.asStack();
                 if (!player.isCreative()) {
-                    player.getInventory().placeItemBackInInventory(stack);
+                    player.getInventory().placeItemBackInInventory(stack, Prediction.SERVER_ONLY);
                 }
                 AllSoundEvents.WRENCH_REMOVE.playOnServer(player.level, BlockPos.containing(cce.toGlobalVector(Vec3.atCenterOf(localPos), 0.5f)), 1, player.getRandom().nextFloat() * .5f + .5f);
 

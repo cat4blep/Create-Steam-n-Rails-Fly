@@ -12,7 +12,7 @@ package com.railwayteam.railways.fabric_mixin.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.zurrtum.create.client.catnip.render.PonderRenderPipelines;
 import com.zurrtum.create.client.catnip.render.PonderRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(PonderRenderTypes.class)
 public abstract class MixinPonderRenderTypes {
     @WrapOperation(method = "<clinit>", at = @At(value = "INVOKE", target =
-        "Lnet/minecraft/client/renderer/rendertype/RenderSetup;builder(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;"))
+        "Lnet/minecraft/client/renderer/rendertype/RenderSetup;builder(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;)Lnet/minecraft/client/renderer/rendertype/RenderSetup$RenderSetupBuilder;"))
     private static RenderSetup.RenderSetupBuilder railways$bindEntityOverlay(RenderPipeline pipeline,
             Operation<RenderSetup.RenderSetupBuilder> original) {
         RenderSetup.RenderSetupBuilder builder = original.call(pipeline);

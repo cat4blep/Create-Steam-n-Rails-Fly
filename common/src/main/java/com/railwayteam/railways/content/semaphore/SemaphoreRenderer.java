@@ -34,6 +34,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
@@ -128,7 +129,7 @@ public class SemaphoreRenderer extends SmartBlockEntityRenderer<SemaphoreBlockEn
                 : (yellow ? CRBlockPartials.SEMAPHORE_LAMP_YELLOW : CRBlockPartials.SEMAPHORE_LAMP_RED);
             state.lampColorBuf = CachedBuffers.partial(lamp, blockState);
 
-            state.translucentType = CreateRenderTypes.translucent();
+            state.translucentType = RenderTypes.translucentMovingBlock();
             state.additiveType = CreateRenderTypes.additive();
         }
     }

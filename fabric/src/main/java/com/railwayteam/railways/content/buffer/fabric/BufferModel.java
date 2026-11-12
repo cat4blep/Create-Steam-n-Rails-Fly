@@ -47,6 +47,7 @@ import net.minecraft.client.resources.model.ResolvableModel;
 import net.minecraft.client.resources.model.ResolvedModel;
 import net.minecraft.client.resources.model.SimpleModelWrapper;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
@@ -246,7 +247,7 @@ public class BufferModel extends WrapperBlockStateModel {
                 output,
                 properties,
                 displayContext,
-                renderQuads
+                ItemQuads.split(renderQuads)
             );
             if (swapper != null) {
                 Material.Baked particle = properties.particleMaterial();

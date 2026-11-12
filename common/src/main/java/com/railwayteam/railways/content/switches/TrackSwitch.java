@@ -28,6 +28,7 @@ import com.zurrtum.create.content.trains.graph.TrackNode;
 import com.zurrtum.create.content.trains.graph.TrackNodeLocation;
 import com.zurrtum.create.content.trains.signal.SignalPropagator;
 import com.zurrtum.create.content.trains.signal.SingleBlockEntityEdgePoint;
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
@@ -148,6 +149,16 @@ public class TrackSwitch extends SingleBlockEntityEdgePoint {
 				return entry.getKey();
 		}
 		return null;
+	}
+
+	private static List<TrackNodeLocation> readExits(FriendlyByteBuf buffer, DimensionPalette dimensions) {
+		int count = buffer.readVarInt();
+		if (count < 0 || count > buffer.readableBytes())
+			throw new DecoderException("Invalid track switch exit count: " + count);
+		List<TrackNodeLocation> list = new ArrayList<>(Math.min(count, 16));
+		for (int i = 0; i < count; i++)
+			list.add(TrackNodeLocation.receive(buffer, dimensions));
+		return list;
 	}
 
 	void updateExits(TrackNodeLocation switchPoint, Collection<TrackNodeLocation> newExits) {
@@ -325,7 +336,9 @@ public class TrackSwitch extends SingleBlockEntityEdgePoint {
 		buffer.writeBoolean(hasPoint);
 		if (hasPoint) {
 			switchPoint.send(buffer, dimensions);
-			buffer.writeCollection(exits, (buf, e) -> e.send(buf, dimensions));
+			buffer.writeVarInt(exits.size());
+			for (TrackNodeLocation e : exits)
+				e.send(buffer, dimensions);
 		}
 	}
 
@@ -395,7 +408,7 @@ public class TrackSwitch extends SingleBlockEntityEdgePoint {
 		if (buffer.readBoolean()) {
 			updateExits(
 				TrackNodeLocation.receive(buffer, dimensions),
-				buffer.readList(buf -> TrackNodeLocation.receive(buf, dimensions))
+				readExits(buffer, dimensions)
 			);
 		} else {
 			exits.clear();

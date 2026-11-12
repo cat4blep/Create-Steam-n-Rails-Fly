@@ -39,7 +39,7 @@ class TrackCasingPoseTest {
     void segmentCompositionPreservesParentCoordinatesAndInverseTransposeNormals() {
         PoseStack stack = new PoseStack();
         stack.translate(13, -4, 27);
-        stack.mulPose(new Quaternionf().rotateY(0.7f));
+        stack.rotate(new Quaternionf().rotateY(0.7f));
         stack.scale(1.4f, 0.8f, 1);
         PoseStack.Pose segment = new PoseStack.Pose();
         segment.translate(2, 3, 4);

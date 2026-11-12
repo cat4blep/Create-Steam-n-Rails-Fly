@@ -1,5 +1,6 @@
 package com.railwayteam.railways.content.conductor;
 
+import net.minecraft.util.Prediction;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
 import com.railwayteam.railways.content.conductor.toolbox.MountedToolbox;
@@ -48,6 +49,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.MoveSimulationType;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -345,11 +347,12 @@ public class ConductorEntity extends AbstractGolem {
     }
 
     @Override
-    public boolean canSimulateMovement() {
+    public MoveSimulationType getMoveSimulationType() {
         // 1.21.11: travel() is only called when canSimulateMovement() AND isEffectiveAi() are both true.
         // isLocalInstanceAuthoritative() (which the default delegates to) returns false for server-
         // controlled mobs on the client, so we must override this separately from isEffectiveAi().
-        return isPossessedAndClient() || super.canSimulateMovement();
+        // 26.3: canSimulateMovement() is final and derived from the move simulation type
+        return isPossessedAndClient() ? MoveSimulationType.SERVER_AND_CLIENT : super.getMoveSimulationType();
     }
 
     public void turnView(double yRot, double xRot) {
@@ -882,7 +885,7 @@ public class ConductorEntity extends AbstractGolem {
             return InteractionResult.SUCCESS;
         } else if (stack.isEmpty() && !getHeldSchedules().isEmpty()) {
             for (ItemStack item : heldSchedules) {
-                if (!player.addItem(item)) player.drop(item, false);
+                if (!player.addItem(item)) player.drop(item, false, Prediction.SERVER_ONLY);
             }
             this.entityData.set(HOLDING_SCHEDULES, false);
             getHeldSchedules().clear();

@@ -30,6 +30,7 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -37,7 +38,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-import static com.railwayteam.railways.multiloader.PlatformAbstractionHelper.enumArgument;
+import static com.railwayteam.railways.registry.commands.PaintCommandArguments.colorArgument;
+import static com.railwayteam.railways.registry.commands.PaintCommandArguments.getColor;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -48,17 +50,17 @@ public class CountPaintCommand {
 
     public static ArgumentBuilder<CommandSourceStack, ?> register(CommandBuildContext context) {
         return literal("count_paint")
-            .requires(cs -> cs.hasPermission(2))
+            .requires(cs -> cs.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
             .then(argument("from", BlockPosArgument.blockPos())
                 .then(argument("to", BlockPosArgument.blockPos())
-                    .then(argument("color", enumArgument(PalettesColor.class))
+                    .then(colorArgument("color")
                         .executes(ctx -> countColor(
                             ctx.getSource(),
                             BoundingBox.fromCorners(
                                 BlockPosArgument.getLoadedBlockPos(ctx, "from"),
                                 BlockPosArgument.getLoadedBlockPos(ctx, "to")
                             ),
-                            ctx.getArgument("color", PalettesColor.class),
+                            getColor(ctx, "color"),
                             null
                         ))
                         .then(literal("where")
@@ -69,7 +71,7 @@ public class CountPaintCommand {
                                         BlockPosArgument.getLoadedBlockPos(ctx, "from"),
                                         BlockPosArgument.getLoadedBlockPos(ctx, "to")
                                     ),
-                                    ctx.getArgument("color", PalettesColor.class),
+                                    getColor(ctx, "color"),
                                     BlockPredicateArgument.getBlockPredicate(ctx, "block_filter")
                                 ))
                             )
@@ -83,8 +85,8 @@ public class CountPaintCommand {
         PalettesColor color,
         @Nullable Predicate<BlockInWorld> targetPredicate
     ) throws CommandSyntaxException {
-        int targetedVolume = area.getXSpan() * area.getYSpan() * area.getZSpan();
-        int max = source.getLevel().getGameRules().getInt(GameRules.RULE_COMMAND_MODIFICATION_BLOCK_LIMIT);
+        long targetedVolume = (long) area.getXSpan() * area.getYSpan() * area.getZSpan();
+        int max = source.getLevel().getGameRules().get(GameRules.MAX_BLOCK_MODIFICATIONS);
         if (targetedVolume > max) {
             throw ERROR_AREA_TOO_LARGE.create(max, targetedVolume);
         }
@@ -92,7 +94,10 @@ public class CountPaintCommand {
         ServerLevel level = source.getLevel();
         int count = 0;
         for (BlockPos pos : BlockPos.betweenClosed(area.minX(), area.minY(), area.minZ(), area.maxX(), area.maxY(), area.maxZ())) {
-            BlockInWorld blockInWorld = new BlockInWorld(level, pos, true);
+            if (!level.hasChunkAt(pos))
+                continue;
+
+            BlockInWorld blockInWorld = new BlockInWorld(level, pos, false);
             if (targetPredicate != null && !targetPredicate.test(blockInWorld))
                 continue;
 

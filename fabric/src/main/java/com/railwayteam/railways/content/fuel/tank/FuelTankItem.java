@@ -33,7 +33,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.Nullable;
 
 public class FuelTankItem extends BlockItem {
     public FuelTankItem(Block block, Properties properties) {
@@ -50,17 +49,16 @@ public class FuelTankItem extends BlockItem {
     }
 
     @Override
-    protected boolean updateCustomBlockEntityTag(
-        BlockPos pos,
-        Level level,
-        @Nullable Player player,
-        ItemStack stack,
-        BlockState state
-    ) {
-        MinecraftServer server = level.getServer();
-        if (server == null) {
+    protected boolean placeBlock(BlockPlaceContext context, BlockState state) {
+        if (!super.placeBlock(context, state)) {
             return false;
         }
+        Level level = context.getLevel();
+        MinecraftServer server = level.getServer();
+        if (server == null || !level.getBlockState(context.getClickedPos()).is(state.getBlock())) {
+            return true;
+        }
+        ItemStack stack = context.getItemInHand();
 
         TypedEntityData<BlockEntityType<?>> data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
         if (data != null) {
@@ -77,7 +75,7 @@ public class FuelTankItem extends BlockItem {
                 TypedEntityData.of(((IBE<?>) getBlock()).getBlockEntityType(), nbt)
             );
         }
-        return super.updateCustomBlockEntityTag(pos, level, player, stack, state);
+        return true;
     }
 
     private static void capStoredFluid(MinecraftServer server, CompoundTag nbt, String key) {

@@ -10,6 +10,7 @@
 
 package com.railwayteam.railways.fabric_mixin;
 
+import net.minecraft.util.Prediction;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.railwayteam.railways.content.palettes.painting.PaintPitcherItem;
@@ -67,6 +68,6 @@ public class MixinPotatoCannonItem {
         // stack, consume that stack and return the remainder to the inventory instead of allowing
         // an infinite paint source.
         source.setCount(0);
-        inventory.placeItemBackInInventory(replacement);
+        inventory.placeItemBackInInventory(replacement, Prediction.SERVER_ONLY);
     }
 }

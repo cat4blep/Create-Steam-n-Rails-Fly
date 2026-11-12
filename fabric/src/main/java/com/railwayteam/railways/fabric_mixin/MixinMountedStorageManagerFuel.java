@@ -45,6 +45,11 @@ public abstract class MixinMountedStorageManagerFuel implements IFuelInventory {
         railways$fluidFuels = fuelStorages.isEmpty() ? null : new MountedFluidStorageWrapper(fuelStorages);
     }
 
+    @Inject(method = "reset", at = @At("RETURN"))
+    private void railways$resetFluidFuels(CallbackInfo ci) {
+        railways$fluidFuels = null;
+    }
+
     @Override
     public MountedFluidStorageWrapper railways$getFluidFuels() {
         return railways$fluidFuels;
